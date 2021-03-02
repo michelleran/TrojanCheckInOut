@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "381721377823",
+    "project_id": "trojancheckinout",
+    "storage_bucket": "trojancheckinout.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381721377823:android:bbd0f13f0c04982a29292a",
+        "android_client_info": {
+          "package_name": "com.team10.trojancheckinout"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "381721377823-8lasuitevj0479a0er8sa1d351smlbbr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaayyX100d3PXyjojoHV2wQ9o7pPz25M8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "381721377823-8lasuitevj0479a0er8sa1d351smlbbr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
