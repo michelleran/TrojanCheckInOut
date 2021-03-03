@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class BuildingListFragment extends Fragment {
-    private BuildingListAdapter adapter;
+    private BuildingAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,7 +37,7 @@ public class BuildingListFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         buildingList.setLayoutManager(llm);
 
-        adapter = new BuildingListAdapter();
+        adapter = new BuildingAdapter();
         buildingList.setAdapter(adapter);
 
         // get extant buildings, then listen for add/remove/update
@@ -59,7 +59,7 @@ public class BuildingListFragment extends Fragment {
     }
 }
 
-class BuildingListAdapter extends RecyclerView.Adapter<BuildingListAdapter.ViewHolder> {
+class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.ViewHolder> {
     private ArrayList<String> buildingNames;
     private HashMap<String, Building> nameToBuilding;
 
@@ -73,7 +73,7 @@ class BuildingListAdapter extends RecyclerView.Adapter<BuildingListAdapter.ViewH
         }
     }
 
-    public BuildingListAdapter() {
+    public BuildingAdapter() {
         // initialize cache
         buildingNames = new ArrayList<>();
         nameToBuilding = new HashMap<>();
