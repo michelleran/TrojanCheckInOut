@@ -3,7 +3,6 @@ package com.team10.trojancheckinout;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.team10.trojancheckinout.model.Building;
-import com.team10.trojancheckinout.databinding.FragmentBuildingListBinding;
 import com.team10.trojancheckinout.model.Listener;
 import com.team10.trojancheckinout.model.Server;
 
@@ -24,18 +22,15 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class BuildingListFragment extends Fragment {
-    //private FragmentBuildingListBinding binding;
     private BuildingListAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // inflate & bind
         View rootView = inflater.inflate(
             R.layout.fragment_building_list, container, false);
 
-        //binding = DataBindingUtil.inflate(inflater, R.layout.fragment_building_list, container, false);
-
+        // set up RecyclerView
         RecyclerView buildingList = rootView.findViewById(R.id.building_list);
 
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
@@ -73,7 +68,7 @@ class BuildingListAdapter extends RecyclerView.Adapter<BuildingListAdapter.ViewH
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            name = (TextView) itemView.findViewById(R.id.building_name);
+            name = itemView.findViewById(R.id.building_name);
             // TODO
         }
     }
@@ -81,7 +76,6 @@ class BuildingListAdapter extends RecyclerView.Adapter<BuildingListAdapter.ViewH
     public BuildingListAdapter() {
         // initialize cache
         buildingNames = new ArrayList<>();
-        buildingNames.add("Test");
         nameToBuilding = new HashMap<>();
     }
 
