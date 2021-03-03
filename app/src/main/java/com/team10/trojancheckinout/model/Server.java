@@ -21,5 +21,8 @@ public class Server {
         // TODO: replace this dummy implementation
         listener.onAdd(new Building("Building 1"));
         listener.onAdd(new Building("Building 2"));
+        listener.onAdd(new Building("Building 3"));
+        listener.onRemove(new Building("Building 1"));
+        // final dataset should be Building 2, Building 3
     }
 }

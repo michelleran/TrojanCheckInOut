@@ -41,27 +41,20 @@ public class BuildingListFragment extends Fragment {
         buildingList.setAdapter(adapter);
 
         // get extant buildings, then listen for add/remove/update
-        Server.listenForBuildings(new Listener<Building>() {
-            @Override
-            public void onAdd(Building item) { adapter.addBuilding(item); }
-            @Override
-            public void onRemove(Building item) { adapter.removeBuilding(item); }
-            @Override
-            public void onUpdate(Building item) { adapter.updateBuilding(item); }
-
-            @Override
-            public void onFailure(Exception exception) {
-                // TODO: print
-            }
-        });
+        Server.listenForBuildings(adapter);
 
         return rootView;
     }
 }
 
-class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.ViewHolder> {
+class BuildingAdapter
+    extends RecyclerView.Adapter<BuildingAdapter.ViewHolder>
+    implements Listener<Building>
+{
     private ArrayList<String> buildingNames;
     private HashMap<String, Building> nameToBuilding;
+
+    private final String TAG = "BuildingAdapter";
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView name;
@@ -79,36 +72,45 @@ class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.ViewHolder> {
         nameToBuilding = new HashMap<>();
     }
 
-    public void addBuilding(Building building) {
-        if (buildingNames.contains(building.getName())) {
+    @Override
+    public void onAdd(Building item) {
+        if (buildingNames.contains(item.getName())) {
             // replace building in cache
-            updateBuilding(building);
+            onUpdate(item);
             return;
         }
-        buildingNames.add(building.getName());
-        nameToBuilding.put(building.getName(), building);
+        buildingNames.add(item.getName());
+        nameToBuilding.put(item.getName(), item);
         // sort alphabetically
         Collections.sort(buildingNames);
         // refresh
         notifyDataSetChanged();
     }
 
-    public void removeBuilding(Building building) {
-        buildingNames.remove(building.getName());
-        nameToBuilding.remove(building.getName());
+    @Override
+    public void onRemove(Building item) {
+        buildingNames.remove(item.getName());
+        nameToBuilding.remove(item.getName());
         // refresh
         notifyDataSetChanged();
     }
 
-    public void updateBuilding(Building building) {
-        if (!buildingNames.contains(building.getName())) {
+    @Override
+    public void onUpdate(Building item) {
+        if (!buildingNames.contains(item.getName())) {
             // add new building
-            addBuilding(building);
+            onAdd(item);
             return;
         }
-        nameToBuilding.put(building.getName(), building);
+        nameToBuilding.put(item.getName(), item);
         // refresh
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void onFailure(Exception exception) {
+        Log.e(TAG, exception.getMessage());
+        // don't need to do anything
     }
 
     @NonNull
@@ -122,7 +124,7 @@ class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d("BuildingListAdapter", "Element " + position + " set.");
+        Log.d(TAG, "Element " + position + " set.");
         holder.name.setText(buildingNames.get(position));
         // TODO
     }
