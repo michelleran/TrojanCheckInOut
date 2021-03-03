@@ -16,4 +16,10 @@ public class Server {
 
         // TODO: anything else
     }
+
+    public static void listenForBuildings(Listener<Building> listener) {
+        // TODO: replace this dummy implementation
+        listener.onAdd(new Building("Building 1"));
+        listener.onAdd(new Building("Building 2"));
+    }
 }

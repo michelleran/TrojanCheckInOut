@@ -71,7 +71,7 @@ class ManagerPagerAdapter extends FragmentPagerAdapter {
             case 2:
                 return new SearchFragment();
             default:
-                Log.println(Log.ERROR, "ManagerActivity", "No fragment for position " + position);
+                Log.e("ManagerActivity", "No fragment for position " + position);
                 return null;
         }
     }
