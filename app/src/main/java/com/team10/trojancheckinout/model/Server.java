@@ -33,7 +33,7 @@ public class Server {
 
     public static void getBuilding(String id, Callback<Building> callback) {
         // TODO: replace this
-        callback.onSuccess(new Building("Test Building"));
+        callback.onSuccess(new Building(id));
     }
 
     public static void listenForBuildings(Listener<Building> listener) {
@@ -44,14 +44,19 @@ public class Server {
         listener.onRemove(new Building("Building 1"));
         // final dataset should be Building 2, Building 3
     }
+    
+    public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
+        // TODO: listen to query "students where student's current building = building id"
+        listener.onAdd(testStudent);
+    }
 
     public static void searchHistory(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
                                      String buildingName, int studentId, String major,
-                                     Callback<Record> callback) {
+                                     Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
         // TODO: replace this
-        callback.onSuccess(new Record("", true));
-        callback.onSuccess(new Record("", false));
-        callback.onSuccess(new Record("", true));
+        callback.onSuccess(new Record(buildingName, true));
+        callback.onSuccess(new Record(buildingName, false));
+        callback.onSuccess(new Record(buildingName, true));
     }
 }

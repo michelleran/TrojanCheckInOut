@@ -16,6 +16,8 @@ import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Record;
 import com.team10.trojancheckinout.model.Server;
 
+import java.util.Collections;
+
 /**
  * Use the {@link BuildingDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -26,7 +28,7 @@ public class BuildingDetailsFragment extends Fragment {
 
     private String buildingId;
     private String buildingName;
-    private RecordAdapter adapter;
+    private CheckedInStudentAdapter adapter;
 
     /**
      * Don't use! Use {@link BuildingDetailsFragment#newInstance} instead.
@@ -76,8 +78,7 @@ public class BuildingDetailsFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recordList.setLayoutManager(llm);
 
-        // TODO: replace since we need to list students currently checked in
-        adapter = new RecordAdapter();
+        adapter = new CheckedInStudentAdapter();
         recordList.setAdapter(adapter);
 
         Server.searchHistory(
@@ -96,5 +97,24 @@ public class BuildingDetailsFragment extends Fragment {
         });
 
         return rootView;
+    }
+}
+
+class CheckedInStudentAdapter extends RecordAdapter {
+    @Override
+    public void addRecord(Record record) {
+        if (record.getCheckIn()) {
+            super.addRecord(record);
+            return;
+        }
+        // a student checked out
+        for (int i = 0; i < records.size(); i++) {
+            if (records.get(i).getStudentId().equals(record.getStudentId())) {
+                // remove corresponding check-in record
+                records.remove(i);
+                break;
+            }
+        }
+        notifyDataSetChanged();
     }
 }

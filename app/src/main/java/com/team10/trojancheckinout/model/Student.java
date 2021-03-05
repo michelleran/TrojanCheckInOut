@@ -26,6 +26,9 @@ public class Student implements User {
         return id;
     }
 
+    @Override
+    public String getIdString() { return String.valueOf(id); }
+
     public String getGivenName() {
         return givenName;
     }

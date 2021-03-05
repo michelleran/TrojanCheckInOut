@@ -19,7 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder> {
-    private ArrayList<Record> records;
+    protected ArrayList<Record> records;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView studentPhoto;
