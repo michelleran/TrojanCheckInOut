@@ -9,6 +9,10 @@ public class Server {
     private static FirebaseFirestore db;
     private static FirebaseStorage storage;
 
+    // TODO: delete later
+    private static final Student testStudent =
+        new Student(0, "Test", "User", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg", "CSCI");
+
     public static void initialize() {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -17,8 +21,23 @@ public class Server {
         // TODO: anything else
     }
 
+    public static User getCurrentUser() {
+        // TODO: replace this
+        return testStudent;
+    }
+
+    public static void getStudent(String id, Callback<Student> callback) {
+        // TODO: replace this
+        callback.onSuccess(testStudent);
+    }
+
+    public static void getBuilding(String id, Callback<Building> callback) {
+        // TODO: replace this
+        callback.onSuccess(new Building("Test Building"));
+    }
+
     public static void listenForBuildings(Listener<Building> listener) {
-        // TODO: replace this dummy implementation
+        // TODO: replace this
         listener.onAdd(new Building("Building 1"));
         listener.onAdd(new Building("Building 2"));
         listener.onAdd(new Building("Building 3"));

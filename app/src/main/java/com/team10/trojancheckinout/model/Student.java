@@ -1,6 +1,6 @@
 package com.team10.trojancheckinout.model;
 
-public class Student {
+public class Student implements User {
     private int id;
     private String givenName;
     private String surname;
@@ -54,11 +54,11 @@ public class Student {
         return deleted;
     }
 
-    public void setBuilding(String currentBuilding) {
+    void setBuilding(String currentBuilding) {
         this.currentBuilding = currentBuilding;
     }
 
-    public void setDeleted(boolean deleted) {
+    void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 }
