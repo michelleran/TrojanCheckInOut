@@ -1,5 +1,6 @@
 package com.team10.trojancheckinout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +15,16 @@ import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.Student;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder> {
     protected ArrayList<Record> records;
+
+    private final String TAG = "RecordAdapter";
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView studentPhoto;
@@ -45,7 +50,13 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     public void addRecord(Record record) {
         records.add(record);
-        // TODO: sort by time (listeners may not be fired in the order data is written)
+        // sort by time (listeners may not be fired in the order data is written)
+        Collections.sort(records, new Comparator<Record>() {
+            @Override
+            public int compare(Record r1, Record r2) {
+                return r1.getTime().compareTo(r2.getTime());
+            }
+        });
         notifyDataSetChanged();
     }
 
@@ -85,7 +96,8 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
             @Override
             public void onFailure(Exception exception) {
-                // TODO
+                Log.e(TAG, exception.getMessage());
+                // TODO: handle
             }
         });
 
@@ -98,7 +110,8 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
             @Override
             public void onFailure(Exception exception) {
-                // TODO
+                Log.e(TAG, exception.getMessage());
+                // TODO: handle
             }
         });
     }

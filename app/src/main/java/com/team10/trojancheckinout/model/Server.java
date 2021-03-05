@@ -33,16 +33,13 @@ public class Server {
 
     public static void getBuilding(String id, Callback<Building> callback) {
         // TODO: replace this
-        callback.onSuccess(new Building(id));
+        callback.onSuccess(new Building(id, id, "", 30));
     }
 
     public static void listenForBuildings(Listener<Building> listener) {
         // TODO: replace this
-        listener.onAdd(new Building("Building 1"));
-        listener.onAdd(new Building("Building 2"));
-        listener.onAdd(new Building("Building 3"));
-        listener.onRemove(new Building("Building 1"));
-        // final dataset should be Building 2, Building 3
+        listener.onAdd(new Building("Building 1", "Building 1", "", 10));
+        listener.onAdd(new Building("Building 2", "Building 2", "", 20));
     }
     
     public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
