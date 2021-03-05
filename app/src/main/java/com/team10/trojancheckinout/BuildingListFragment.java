@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,7 +39,7 @@ public class BuildingListFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         buildingList.setLayoutManager(llm);
 
-        adapter = new BuildingAdapter();
+        adapter = new BuildingAdapter(getFragmentManager());
         buildingList.setAdapter(adapter);
 
         // get extant buildings, then listen for add/remove/update
@@ -51,6 +53,7 @@ class BuildingAdapter
     extends RecyclerView.Adapter<BuildingAdapter.ViewHolder>
     implements Listener<Building>
 {
+    private FragmentManager fragmentManager;
     private ArrayList<String> buildingNames;
     private HashMap<String, Building> nameToBuilding;
 
@@ -66,7 +69,8 @@ class BuildingAdapter
         }
     }
 
-    public BuildingAdapter() {
+    public BuildingAdapter(FragmentManager fragmentManager) {
+        this.fragmentManager = fragmentManager;
         // initialize cache
         buildingNames = new ArrayList<>();
         nameToBuilding = new HashMap<>();
@@ -124,9 +128,21 @@ class BuildingAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d(TAG, "Element " + position + " set.");
-        holder.name.setText(buildingNames.get(position));
+        Building building = nameToBuilding.get(buildingNames.get(position));
+        holder.name.setText(building.getName());
         // TODO
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // open building details (replace this fragment)
+                final FragmentTransaction ft = fragmentManager.beginTransaction();
+                ft.replace(R.id.building_tab_content,
+                            BuildingDetailsFragment.newInstance(building));
+                ft.commit();
+                ft.addToBackStack(building.getId());
+            }
+        });
     }
 
     @Override
