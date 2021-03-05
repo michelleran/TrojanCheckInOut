@@ -128,8 +128,6 @@ class BuildingAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d(TAG, "Element " + position + " set.");
-
         Building building = nameToBuilding.get(buildingNames.get(position));
         holder.name.setText(building.getName());
         // TODO
@@ -139,7 +137,8 @@ class BuildingAdapter
             public void onClick(View view) {
                 // open building details (replace this fragment)
                 final FragmentTransaction ft = fragmentManager.beginTransaction();
-                ft.replace(R.id.building_tab_content, BuildingDetailsFragment.newInstance(building.getId()));
+                ft.replace(R.id.building_tab_content,
+                            BuildingDetailsFragment.newInstance(building));
                 ft.commit();
                 ft.addToBackStack(building.getId());
             }
