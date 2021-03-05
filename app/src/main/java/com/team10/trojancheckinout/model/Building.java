@@ -1,12 +1,16 @@
 package com.team10.trojancheckinout.model;
 
 public class Building {
-    String name;
+    private String id;
+    private String name;
 
     public Building() { }
-    public Building(String name) { // TODO: fully implement
+    public Building(String name) {
+        // TODO: properly implement
+        this.id = name;
         this.name = name;
     }
 
+    public String getId() { return id; }
     public String getName() { return name; }
 }
