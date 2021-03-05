@@ -44,4 +44,14 @@ public class Server {
         listener.onRemove(new Building("Building 1"));
         // final dataset should be Building 2, Building 3
     }
+
+    public static void searchHistory(int startYear, int startMonth, int startDay, int startHour, int startMin,
+                                     int endYear, int endMonth, int endDay, int endHour, int endMin,
+                                     String buildingName, int studentId, String major,
+                                     Callback<Record> callback) {
+        // TODO: replace this
+        callback.onSuccess(new Record("", true));
+        callback.onSuccess(new Record("", false));
+        callback.onSuccess(new Record("", true));
+    }
 }

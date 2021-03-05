@@ -43,6 +43,21 @@ public class BuildingListFragment extends Fragment {
         // get extant buildings, then listen for add/remove/update
         Server.listenForBuildings(adapter);
 
+        // MARK: for testing
+        /*RecordAdapter a = new RecordAdapter();
+        buildingList.setAdapter(a);
+        Server.searchHistory(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "", 0, "", new Callback<Record>() {
+            @Override
+            public void onSuccess(Record result) {
+                a.addRecord(result);
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+
+            }
+        });*/
+
         return rootView;
     }
 }
