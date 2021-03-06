@@ -6,10 +6,20 @@
     <string name="title_activity_manager">Manager</string>
     <string name="tab_text_1">Profile</string>
     <string name="tab_text_2">Buildings</string>
-    <string name="tab_text_3">Search</string>
+    <string name="tab_text_3">Filter</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="checked_into">Checked into</string>
     <string name="checked_out_of">Checked out of</string>
+
+    <string name="start_date">Start date</string>
+    <string name="start_time">Start time</string>
+    <string name="end_date">End date</string>
+    <string name="end_time">End time</string>
+
+    <string name="building">Building</string>
+
+    <string name="student_id">Student id</string>
+    <string name="student_major">Major</string>
 </resources>
