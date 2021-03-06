@@ -1,26 +1,46 @@
 package com.team10.trojancheckinout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.team10.trojancheckinout.model.Building;
+import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Record;
+import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.model.Student;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-/**
- * Reuse for student profile, building profile, and search results.
- */
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder> {
-    private ArrayList<Record> records;
+    protected ArrayList<Record> records;
+
+    private final String TAG = "RecordAdapter";
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        public final ImageView studentPhoto;
+        public final TextView studentName;
+        public final TextView recordType;
+        public final TextView buildingName;
+        public final TextView time;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            // TODO
+            // get refs to views
+            studentPhoto = itemView.findViewById(R.id.record_student_photo);
+            studentName = itemView.findViewById(R.id.record_student_name);
+            recordType = itemView.findViewById(R.id.record_type);
+            buildingName = itemView.findViewById(R.id.record_building_name);
+            time = itemView.findViewById(R.id.record_time);
         }
     }
 
@@ -30,7 +50,13 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     public void addRecord(Record record) {
         records.add(record);
-        // TODO: sort by time (listeners may not be fired in the order data is written)
+        // sort by time (listeners may not be fired in the order data is written)
+        Collections.sort(records, new Comparator<Record>() {
+            @Override
+            public int compare(Record r1, Record r2) {
+                return r1.getTime().compareTo(r2.getTime());
+            }
+        });
         notifyDataSetChanged();
     }
 
@@ -45,7 +71,49 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull RecordAdapter.ViewHolder holder, int position) {
-        // TODO: populate holder w/ records.get(position)
+        Record record = records.get(position);
+        holder.recordType.setText(record.getCheckIn() ? R.string.checked_into : R.string.checked_out_of);
+        holder.time.setText(record.getTimeString());
+
+        holder.studentPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: open profile of student
+            }
+        });
+
+        Server.getStudent(record.getStudentId(), new Callback<Student>() {
+            @Override
+            public void onSuccess(Student result) {
+                // set student photo
+                Glide.with(holder.itemView)
+                     .load(result.getPhotoUrl())
+                     .into(holder.studentPhoto);
+                // set student name
+                holder.studentName.setText(
+                    String.format("%s, %s", result.getSurname(), result.getGivenName()));
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e(TAG, exception.getMessage());
+                // TODO: handle
+            }
+        });
+
+        Server.getBuilding(record.getBuildingId(), new Callback<Building>() {
+            @Override
+            public void onSuccess(Building result) {
+                // set building name
+                holder.buildingName.setText(result.getName());
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e(TAG, exception.getMessage());
+                // TODO: handle
+            }
+        });
     }
 
     @Override
