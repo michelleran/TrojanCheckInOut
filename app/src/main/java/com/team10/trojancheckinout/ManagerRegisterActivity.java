@@ -11,4 +11,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manager_register);
     }
+
+
+
 }
