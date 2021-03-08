@@ -22,4 +22,10 @@
 
     <string name="student_id">Student id</string>
     <string name="student_major">Major</string>
+
+    <!-- TODO -->
+    <array name="majors">
+        <item>Major 1</item>
+        <item>Major 2</item>
+    </array>
 </resources>

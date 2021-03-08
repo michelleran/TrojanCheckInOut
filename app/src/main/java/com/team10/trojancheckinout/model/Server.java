@@ -9,6 +9,8 @@ public class Server {
     private static FirebaseFirestore db;
     private static FirebaseStorage storage;
 
+    private static final String[] majors = { "Major 1", "Major 2" };
+
     // TODO: delete later
     private static final Student testStudent =
         new Student(0, "Test", "User", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg", "CSCI");
@@ -20,6 +22,8 @@ public class Server {
 
         // TODO: anything else
     }
+
+    public static String[] getMajors() { return majors; }
 
     public static User getCurrentUser() {
         // TODO: replace this
