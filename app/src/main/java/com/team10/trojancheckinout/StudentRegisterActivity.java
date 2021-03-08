@@ -42,13 +42,13 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         spin.setAdapter(adapter);
         spin.setOnItemSelectedListener(this);
 
-        fname = findViewById(R.id.etSFname);
-        lname = findViewById(R.id.etSLname);
-        sEmail = findViewById(R.id.etSEmail);
-        sPassword = findViewById(R.id.etSPassword);
+        fname = findViewById(R.id.etMFname);
+        lname = findViewById(R.id.etMLname);
+        sEmail = findViewById(R.id.etMEmail);
+        sPassword = findViewById(R.id.etMPassword);
         sID = findViewById(R.id.etUSCid);
 
-        sBack = findViewById(R.id.esBackButton);
+        sBack = findViewById(R.id.emBackButton);
         sRegister = findViewById(R.id.sRegBtn);
 
         sRegister.setOnClickListener(new View.OnClickListener() {
