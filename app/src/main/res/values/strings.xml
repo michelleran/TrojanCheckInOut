@@ -4,6 +4,7 @@
     <string name="placeholder">Placeholder</string>
 
     <string name="title_activity_manager">Manager</string>
+
     <string name="tab_text_1">Profile</string>
     <string name="tab_text_2">Buildings</string>
     <string name="tab_text_3">Filter</string>

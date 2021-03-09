@@ -4,8 +4,6 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <uses-feature android:name="android.hardware.type.watch" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,16 +13,6 @@
         android:theme="@style/Theme.TrojanCheckInOut">
         <activity android:name=".RegisterActivity"></activity>
 
-        <uses-library
-            android:name="com.google.android.wearable"
-            android:required="true" />
-        <!--
-               Set to true if your app is Standalone, that is, it does not require the handheld
-               app to run.
-        -->
-        <meta-data
-            android:name="com.google.android.wearable.standalone"
-            android:value="true" /> <!-- <activity -->
         <!-- android:name=".RegisterActivity" -->
         <!-- android:label="@string/title_activity_register"> -->
         <!-- <intent-filter> -->
@@ -36,6 +24,15 @@
             android:name=".ManagerActivity"
             android:label="@string/title_activity_manager"
             android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
+
+        <activity
+            android:name=".StudentActivity"
+            android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
+
+        <activity
+            android:name=".StudentBasicActivity"
+            android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
+
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

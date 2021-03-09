@@ -1,5 +1,6 @@
 package com.team10.trojancheckinout;
 
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,7 +79,10 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
         holder.studentPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: open profile of student
+                // open profile of student
+                Intent intent = new Intent(holder.itemView.getContext(), StudentBasicActivity.class);
+                intent.putExtra("studentId", record.getStudentId());
+                holder.itemView.getContext().startActivity(intent);
             }
         });
 
