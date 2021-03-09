@@ -17,6 +17,7 @@
     <string name="uscid">USC ID</string>
     <string name="major">Major</string>
     <string name="current_location">Current Location</string>
+    <string name="none">None</string>
 
     <!--
     This string is used for square devices and overridden by hello_world in

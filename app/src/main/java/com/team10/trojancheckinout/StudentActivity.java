@@ -1,6 +1,5 @@
 package com.team10.trojancheckinout;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,34 +10,23 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.model.Student;
 
 public class StudentActivity extends AppCompatActivity {
     private static final String TAG = "StudentActivity";
     TextView givenName, surname, id, major, currentBuilding;
     ImageView photoUrl;
-    Button editImage;
     String fName, lName, usc_id, photo_url, major_, currBuilding;
-    FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-    DocumentReference documentReference;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    FirebaseStorage storage = FirebaseStorage.getInstance();
+    Student student;
 
     //load user data into profile
     @Override
@@ -53,29 +41,23 @@ public class StudentActivity extends AppCompatActivity {
         currentBuilding = findViewById(R.id.currentBuilding);
         photoUrl = findViewById(R.id.student_photo);
 
-        //get data corresponding to logged in user
-        db.collection("users").document(user.getUid())
-                .get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                fName = task.getResult().getString("givenName");
-                lName = task.getResult().getString("surname");
-                usc_id = task.getResult().getString("id");
-                major_ = task.getResult().getString("major");
-                currBuilding = task.getResult().getString("currentBuilding");
-                photo_url = task.getResult().getString("photoUrl");
+        //assume current user is student, gets student data
+        student = (Student) Server.getCurrentUser();
+        fName = student.getGivenName();
+        lName = student.getSurname();
+        usc_id = student.getIdString();
+        major_ = student.getMajor();
+        currBuilding = student.getCurrentBuilding();
+        photo_url = student.getPhotoUrl();
 
-                givenName.setText(fName);
-                surname.setText(lName);
-                id.setText(usc_id);
-                major.setText(major_);
-                currentBuilding.setText(currBuilding);
-                if (photo_url != null) {  //require profile photo on registration?
-                    Glide.with(getApplicationContext()).load(photo_url).into(photoUrl);
-                }
-            } else {
-                Toast.makeText(getApplicationContext(), "Student data load error", Toast.LENGTH_LONG).show();
-            }
-        });
+        //set student data into TextView
+        givenName.setText(fName);
+        surname.setText(lName);
+        id.setText(usc_id);
+        major.setText(major_);
+        if(currBuilding != null) currentBuilding.setText(currBuilding);
+        else currentBuilding.setText(R.string.none);
+        Glide.with(getApplicationContext()).load(photo_url).into(photoUrl);
     }
 
     //upload and change profile image from gallery on click
@@ -91,11 +73,12 @@ public class StudentActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
                 Uri imageUri = data.getData();
                 photoUrl.setImageURI(imageUri);
-                uploadImagetoFirebase(imageUri);
+                //uploadImagetoFirebase(imageUri);
             }
         }
     }
 
+    //upload image URI retrieved from Image Gallery to Firebase - update Student's photo URL field
     private void uploadImagetoFirebase(Uri imageUri){
         //upload profile picture to firebase
         UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
