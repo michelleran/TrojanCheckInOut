@@ -53,7 +53,7 @@ public class FilterFragment extends Fragment {
     private int endMin = -1;
 
     private String buildingName;
-    private int studentId;
+    private long studentId;
     private String major;
 
     @Override
@@ -158,8 +158,9 @@ public class FilterFragment extends Fragment {
                 // get remaining inputs
                 buildingName = buildingNameField.getText().toString();
                 try {
-                    studentId = Integer.parseInt(studentIdField.getText().toString());
+                    studentId = Long.parseLong(studentIdField.getText().toString());
                 } catch (Exception e) {
+                    Log.e("FilterFragment", e.getMessage());
                     // TODO: handle
                 }
                 major = spinner.getSelectedItem().toString();

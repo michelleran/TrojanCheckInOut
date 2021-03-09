@@ -53,7 +53,7 @@ public class Server {
 
     public static void searchHistory(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
-                                     String buildingName, int studentId, String major,
+                                     String buildingName, long studentId, String major,
                                      Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
         // TODO: replace this
         callback.onSuccess(new Record(buildingName, true));

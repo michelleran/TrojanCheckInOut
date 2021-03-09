@@ -48,7 +48,7 @@ public class FilterResultsFragment extends Fragment {
     private int endMin = -1;
 
     private String buildingName;
-    private int studentId;
+    private long studentId;
     private String major;
 
     private RecordAdapter adapter;
@@ -63,7 +63,7 @@ public class FilterResultsFragment extends Fragment {
      */
     public static FilterResultsFragment newInstance(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                                     int endYear, int endMonth, int endDay, int endHour, int endMin,
-                                                    String buildingName, int studentId, String major) {
+                                                    String buildingName, long studentId, String major) {
         FilterResultsFragment fragment = new FilterResultsFragment();
         Bundle args = new Bundle();
 
@@ -80,7 +80,7 @@ public class FilterResultsFragment extends Fragment {
         args.putInt(ARG_END_MIN, endMin);
 
         args.putString(ARG_BUILDING_NAME, buildingName);
-        args.putInt(ARG_STUDENT_ID, studentId);
+        args.putLong(ARG_STUDENT_ID, studentId);
         args.putString(ARG_MAJOR, major);
 
         fragment.setArguments(args);
@@ -104,7 +104,7 @@ public class FilterResultsFragment extends Fragment {
             endMin = getArguments().getInt(ARG_END_MIN);
 
             buildingName = getArguments().getString(ARG_BUILDING_NAME);
-            studentId = getArguments().getInt(ARG_STUDENT_ID);
+            studentId = getArguments().getLong(ARG_STUDENT_ID);
             major = getArguments().getString(ARG_MAJOR);
         }
     }
