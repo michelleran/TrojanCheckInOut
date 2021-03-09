@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".StudentBasicActivity">
+
+    <TextView
+        android:id="@+id/currentBuilding"
+        android:layout_width="186dp"
+        android:layout_height="42dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/currLoc_text"
+        app:layout_constraintTop_toBottomOf="@+id/major"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/major"
+        android:layout_width="186dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="4dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintStart_toEndOf="@+id/major_text"
+        app:layout_constraintTop_toBottomOf="@+id/id" />
+
+    <TextView
+        android:id="@+id/id"
+        android:layout_width="186dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="4dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintStart_toEndOf="@+id/uscID_text"
+        app:layout_constraintTop_toBottomOf="@+id/surname" />
+
+    <TextView
+        android:id="@+id/surname"
+        android:layout_width="186dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="4dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintStart_toEndOf="@+id/lastname_text"
+        app:layout_constraintTop_toBottomOf="@+id/givenName" />
+
+    <ImageView
+        android:id="@+id/student_photo"
+        android:layout_width="146dp"
+        android:layout_height="147dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.083"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <EditText
+        android:id="@+id/lastname_text"
+        android:layout_width="103dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/lastname"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fname_text" />
+
+    <EditText
+        android:id="@+id/major_text"
+        android:layout_width="64dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/major"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/uscID_text" />
+
+    <EditText
+        android:id="@+id/currLoc_text"
+        android:layout_width="152dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/current_location"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/major_text"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <EditText
+        android:id="@+id/fname_text"
+        android:layout_width="103dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/firstname"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/student_photo" />
+
+    <EditText
+        android:id="@+id/uscID_text"
+        android:layout_width="69dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/uscid"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lastname_text" />
+
+    <TextView
+        android:id="@+id/givenName"
+        android:layout_width="186dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="24dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintStart_toEndOf="@+id/fname_text"
+        app:layout_constraintTop_toBottomOf="@+id/student_photo" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
