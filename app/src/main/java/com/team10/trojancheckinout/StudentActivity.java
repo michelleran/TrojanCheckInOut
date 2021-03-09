@@ -8,15 +8,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.Student;
 
@@ -25,7 +21,6 @@ public class StudentActivity extends AppCompatActivity {
     TextView givenName, surname, id, major, currentBuilding;
     ImageView photoUrl;
     String fName, lName, usc_id, photo_url, major_, currBuilding;
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     Student student;
 
     //load user data into profile
@@ -55,8 +50,10 @@ public class StudentActivity extends AppCompatActivity {
         surname.setText(lName);
         id.setText(usc_id);
         major.setText(major_);
-        if(currBuilding != null) currentBuilding.setText(currBuilding);
-        else currentBuilding.setText(R.string.none);
+        if (currBuilding != null)
+            currentBuilding.setText(currBuilding);
+        else
+            currentBuilding.setText(R.string.none);
         Glide.with(getApplicationContext()).load(photo_url).into(photoUrl);
     }
 
@@ -73,21 +70,8 @@ public class StudentActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
                 Uri imageUri = data.getData();
                 photoUrl.setImageURI(imageUri);
-                //uploadImagetoFirebase(imageUri);
+                // TODO: upload image to Firebase through Server
             }
         }
     }
-
-    //upload image URI retrieved from Image Gallery to Firebase - update Student's photo URL field
-    private void uploadImagetoFirebase(Uri imageUri){
-        //upload profile picture to firebase
-        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                .setPhotoUri(imageUri).build();
-        user.updateProfile(profileUpdate).addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                Log.d(TAG, "User Profile image updated");
-            }
-        });
-    }
-
 }
