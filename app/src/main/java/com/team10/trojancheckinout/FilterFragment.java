@@ -168,8 +168,7 @@ public class FilterFragment extends Fragment {
                 // TODO: validate
 
                 // open filter results (replace this fragment)
-                // TODO: filter button is still visible
-                final FragmentTransaction ft = getFragmentManager().beginTransaction();
+                final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                 ft.replace(R.id.filter_tab_content,
                     FilterResultsFragment.newInstance(
                         startYear, startMonth, startDay, startHour, startMin,
