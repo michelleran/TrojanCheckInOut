@@ -8,7 +8,7 @@
     android:background="#9E1313">
 
     <ImageView
-        android:id="@+id/imgProfilePic"
+        android:id="@+id/imgPhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
@@ -18,16 +18,15 @@
         tools:src="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/txtName"
+        android:id="@+id/txtGivenName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
-        android:text="Name: "
+        android:text="First Name:"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/imgProfilePic"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgProfilePic" />
+        app:layout_constraintEnd_toStartOf="@+id/imgPhoto"
+        app:layout_constraintTop_toBottomOf="@+id/imgPhoto" />
 
     <TextView
         android:id="@+id/txtEmail"
@@ -37,8 +36,8 @@
         android:text="Email:"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="@+id/txtName"
-        app:layout_constraintTop_toBottomOf="@+id/txtName" />
+        app:layout_constraintStart_toStartOf="@+id/txtGivenName"
+        app:layout_constraintTop_toBottomOf="@+id/txtSurname" />
 
     <TextView
         android:id="@+id/txtPassword"
@@ -76,5 +75,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btnEdit" />
+
+    <TextView
+        android:id="@+id/txtSurname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Last Name:"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/txtGivenName"
+        app:layout_constraintTop_toBottomOf="@+id/txtGivenName" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
