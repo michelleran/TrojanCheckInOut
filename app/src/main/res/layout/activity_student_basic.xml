@@ -10,8 +10,13 @@
         android:id="@+id/currentBuilding"
         android:layout_width="186dp"
         android:layout_height="42dp"
-        android:textColor="@android:color/black"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:textSize="20dp"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/currLoc_text"
         app:layout_constraintTop_toBottomOf="@+id/major"
         app:layout_constraintVertical_bias="0.0" />
@@ -21,7 +26,10 @@
         android:layout_width="186dp"
         android:layout_height="42dp"
         android:layout_marginTop="4dp"
-        android:textColor="@android:color/black"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:textSize="20dp"
+        android:textColor="@color/black"
         app:layout_constraintStart_toEndOf="@+id/major_text"
         app:layout_constraintTop_toBottomOf="@+id/id" />
 
@@ -30,7 +38,10 @@
         android:layout_width="186dp"
         android:layout_height="42dp"
         android:layout_marginTop="4dp"
-        android:textColor="@android:color/black"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:textSize="20dp"
+        android:textColor="@color/black"
         app:layout_constraintStart_toEndOf="@+id/uscID_text"
         app:layout_constraintTop_toBottomOf="@+id/surname" />
 
@@ -39,7 +50,10 @@
         android:layout_width="186dp"
         android:layout_height="42dp"
         android:layout_marginTop="4dp"
-        android:textColor="@android:color/black"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:textSize="20dp"
+        android:textColor="@color/black"
         app:layout_constraintStart_toEndOf="@+id/lastname_text"
         app:layout_constraintTop_toBottomOf="@+id/givenName" />
 
@@ -52,66 +66,81 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.083"
+        app:layout_constraintVertical_bias="0.092"
         tools:srcCompat="@tools:sample/avatars" />
 
-    <EditText
+    <TextView
         android:id="@+id/lastname_text"
         android:layout_width="103dp"
         android:layout_height="42dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:textSize="19dp"
+        android:textColor="@color/black"
         android:text="@string/lastname"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fname_text" />
 
-    <EditText
+    <TextView
         android:id="@+id/major_text"
         android:layout_width="64dp"
         android:layout_height="42dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:textSize="20dp"
+        android:textColor="@color/black"
         android:text="@string/major"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/uscID_text" />
 
-    <EditText
+    <TextView
         android:id="@+id/currLoc_text"
         android:layout_width="152dp"
         android:layout_height="42dp"
         android:layout_marginStart="16dp"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
         android:text="@string/current_location"
+        android:textColor="@color/black"
+        android:textSize="19dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/major_text"
         app:layout_constraintVertical_bias="0.0" />
 
-    <EditText
+    <TextView
         android:id="@+id/fname_text"
         android:layout_width="103dp"
         android:layout_height="42dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:text="@string/firstname"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:textSize="19dp"
+        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/student_photo" />
 
-    <EditText
+    <TextView
         android:id="@+id/uscID_text"
         android:layout_width="69dp"
         android:layout_height="42dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:textSize="19dp"
+        android:textColor="@color/black"
         android:text="@string/uscid"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lastname_text" />
@@ -121,7 +150,10 @@
         android:layout_width="186dp"
         android:layout_height="42dp"
         android:layout_marginTop="24dp"
-        android:textColor="@android:color/black"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:textSize="20dp"
+        android:textColor="@color/black"
         app:layout_constraintStart_toEndOf="@+id/fname_text"
         app:layout_constraintTop_toBottomOf="@+id/student_photo" />
 
