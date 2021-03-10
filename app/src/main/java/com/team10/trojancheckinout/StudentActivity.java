@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -70,7 +71,9 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         major_tv.setText(major_);
         if (currBuilding != null) currentBuilding_tv.setText(currBuilding);
         else currentBuilding_tv.setText(R.string.none);
-        Glide.with(getApplicationContext()).load(photo_url).into(photoUrl);
+        Glide.with(getApplicationContext()).load(photo_url)
+                .placeholder(R.drawable.default_profile_picture)
+                .into(photoUrl);
 
         scanQRCode_btn = (Button) findViewById(R.id.scanQRCode);
 
