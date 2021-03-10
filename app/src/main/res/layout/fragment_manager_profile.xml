@@ -88,4 +88,40 @@
         app:layout_constraintStart_toStartOf="@+id/txtGivenName"
         app:layout_constraintTop_toBottomOf="@+id/txtGivenName" />
 
+    <EditText
+        android:id="@+id/edtGivenName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="38dp"
+        android:ems="10"
+        android:hint="First Name"
+        android:inputType="textPersonName"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@+id/txtGivenName"
+        app:layout_constraintTop_toBottomOf="@+id/imgPhoto" />
+
+    <EditText
+        android:id="@+id/edtSurname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:ems="10"
+        android:hint="Last Name"
+        android:inputType="textPersonName"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@+id/txtGivenName"
+        app:layout_constraintTop_toBottomOf="@+id/edtGivenName" />
+
+    <EditText
+        android:id="@+id/edtEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:ems="10"
+        android:hint="Email"
+        android:inputType="textPersonName"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@+id/txtSurname"
+        app:layout_constraintTop_toBottomOf="@+id/edtSurname" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
