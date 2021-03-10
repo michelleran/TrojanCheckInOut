@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/deleteAccountBtn"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".StudentActivity">
@@ -13,8 +14,8 @@
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="20dp"
         android:textColor="@color/black"
+        android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/currLoc_text"
         app:layout_constraintTop_toBottomOf="@+id/major" />
 
@@ -25,8 +26,8 @@
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="20dp"
         android:textColor="@color/black"
+        android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/major_text"
         app:layout_constraintTop_toBottomOf="@+id/id" />
 
@@ -37,8 +38,8 @@
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="20dp"
         android:textColor="@color/black"
+        android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/uscID_text"
         app:layout_constraintTop_toBottomOf="@+id/surname" />
 
@@ -49,8 +50,8 @@
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="20dp"
         android:textColor="@color/black"
+        android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/lastname_text"
         app:layout_constraintTop_toBottomOf="@+id/givenName" />
 
@@ -62,6 +63,7 @@
         android:layout_marginEnd="68dp"
         android:backgroundTint="#990000"
         android:text="@string/change_password"
+        android:onClick="changePassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/currentBuilding" />
 
@@ -85,6 +87,7 @@
         android:layout_marginEnd="36dp"
         android:backgroundTint="#990000"
         android:text="@string/check_out"
+        android:onClick="checkOut"
         app:layout_constraintBottom_toTopOf="@+id/scanQRCode"
         app:layout_constraintEnd_toStartOf="@+id/signOutbtn"
         app:layout_constraintHorizontal_bias="0.971"
@@ -98,12 +101,12 @@
         android:layout_height="68dp"
         android:layout_marginEnd="68dp"
         android:backgroundTint="#990000"
+        android:onClick="signOut"
         android:text="@string/sign_out"
         app:layout_constraintBottom_toTopOf="@+id/scanQRCode"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/changePasswordbtn"
-        app:layout_constraintVertical_bias="0.534"
-        android:onClick="signOut"/>
+        app:layout_constraintVertical_bias="0.534" />
 
     <Button
         android:id="@+id/scanQRCode"
@@ -135,9 +138,9 @@
         android:ems="10"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="19dp"
-        android:textColor="@color/black"
         android:text="@string/lastname"
+        android:textColor="@color/black"
+        android:textSize="19dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fname_text" />
 
@@ -150,9 +153,9 @@
         android:ems="10"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="20dp"
-        android:textColor="@color/black"
         android:text="@string/major"
+        android:textColor="@color/black"
+        android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/uscID_text" />
 
@@ -165,9 +168,9 @@
         android:ems="10"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="19dp"
-        android:textColor="@color/black"
         android:text="@string/current_location"
+        android:textColor="@color/black"
+        android:textSize="19dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/major_text" />
 
@@ -178,11 +181,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:ems="10"
-        android:text="@string/firstname"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="19dp"
+        android:text="@string/firstname"
         android:textColor="@color/black"
+        android:textSize="19dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/student_photo" />
 
@@ -195,9 +198,9 @@
         android:ems="10"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="19dp"
-        android:textColor="@color/black"
         android:text="@string/uscid"
+        android:textColor="@color/black"
+        android:textSize="19dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lastname_text" />
 
@@ -208,8 +211,8 @@
         android:layout_marginTop="24dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textSize="20dp"
         android:textColor="@color/black"
+        android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/fname_text"
         app:layout_constraintTop_toBottomOf="@+id/student_photo" />
 
@@ -220,11 +223,24 @@
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/white"
         android:clickable="true"
+        android:onClick="editImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.524"
         app:layout_constraintStart_toStartOf="@+id/student_photo"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_edit"
-        android:onClick="editImage"/>
+        app:srcCompat="@android:drawable/ic_menu_edit" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:clickable="true"
+        android:onClick="deleteAccount"
+        android:scaleX=".7"
+        android:scaleY=".7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_delete" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
