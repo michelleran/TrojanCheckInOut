@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -61,7 +62,8 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         lName = student.getSurname();
         usc_id = student.getIdString();
         major_ = student.getMajor();
-        currBuilding = student.getCurrentBuilding();
+        //gets building name through Server.getBuilding()
+        currBuilding = getBuildingName(student.getCurrentBuilding());
         photo_url = student.getPhotoUrl();
 
         //set student data into TextView
@@ -69,7 +71,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         surname_tv.setText(lName);
         id_tv.setText(usc_id);
         major_tv.setText(major_);
-        if (currBuilding != null) currentBuilding_tv.setText(currBuilding);
+        if (student.getCurrentBuilding() != null) currentBuilding_tv.setText(currBuilding);
         else currentBuilding_tv.setText(R.string.none);
         Glide.with(getApplicationContext()).load(photo_url)
                 .placeholder(R.drawable.default_profile_picture)
@@ -84,12 +86,36 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         scanQRCode_btn.setOnClickListener(this);
     }
 
+    public String getBuildingName(String id){
+        Server.getBuilding(id, new Callback<Building>() {
+            @Override
+            public void onSuccess(Building result) {
+                currBuilding = result.getName();
+            }
+            @Override
+            public void onFailure(Exception exception) {
+                currBuilding = null;
+                Log.e(TAG, "onFailure: getBuildingName failure");
+            }
+        });
+        return currBuilding;
+    }
+
     public void deleteAccount(View view){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.delete_dialog_message)
                 .setTitle(R.string.delete_dialog_title)
                 .setPositiveButton(R.string.confirm, (dialog, id) -> {
-                    //TODO: insert Server.deleteAccount method
+                    Server.deleteAccount(new Callback<Void>() {
+                        @Override
+                        public void onSuccess(Void result) {
+                            Toast.makeText(getApplicationContext(), "Account deleted", Toast.LENGTH_LONG).show();
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: deleteAccount failure");
+                        }
+                    });
                 })
                 .setNegativeButton(R.string.cancel, (dialog, id) -> {
                     dialog.cancel();
@@ -108,7 +134,16 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         //Set up buttons
         builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
             newPass = input.getText().toString();
-            //TODO: call Server.newPassword() function
+            Server.changePassword(newPass, new Callback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    Toast.makeText(StudentActivity.this, "Password changed!", Toast.LENGTH_SHORT).show();
+                }
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure: changePassword failure");
+                }
+            });
         });
         builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
         builder.show();
@@ -134,16 +169,40 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void signOut(View view){
-        //TODO: log out using Firebase auth with function from Server
+        Server.logout(new Callback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Toast.makeText(StudentActivity.this, "Logged out", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e(TAG, "onFailure: logout failure");
+            }
+        });
         startActivity(new Intent(StudentActivity.this, LoginActivity.class));
         finish();
     }
 
     //manually check out of building
     public void checkOut(View view){
+        //show Toast if user not checked into a building
+        if(currBuilding.equals("None") || currBuilding.equals(null)){
+            Toast.makeText(getApplicationContext(), "Not currently checked into a building", Toast.LENGTH_LONG)
+                    .show();
+        }
+        //set Current Building to None and Server.checkOut()
         currBuilding = "None";
         currentBuilding_tv.setText(R.string.none);
-        //TODO: update current building in firebase using function from Server
+        Server.checkOut(student.getCurrentBuilding(), new Callback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Toast.makeText(getApplicationContext(), "Successfully checked out!", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e(TAG, "onFailure: manual checkout failure");
+            }
+        });
     }
 
     @Override
@@ -163,15 +222,33 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             public void onSuccess(Building result) {
                 //if user already checked into this building, check out
                 if(currBuilding.equals(result.getName())){
-                    currBuilding = "None";
-                    currentBuilding_tv.setText(R.string.none);
-                    //TODO: update current building in firebase using function from Server
+                    Server.checkOut(buildingID, new Callback<Void>() {
+                        @Override
+                        public void onSuccess(Void res) {
+                            currBuilding = "None";
+                            currentBuilding_tv.setText(R.string.none);
+                            Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: checkOut failure");
+                        }
+                    });
                 }
                 //else check in
                 else{
-                    currBuilding = result.getName();
-                    currentBuilding_tv.setText(currBuilding);
-                    //TODO: update current building in firebase using function from Server
+                    Server.checkIn(buildingID, new Callback<Void>() {
+                        @Override
+                        public void onSuccess(Void res) {
+                            currBuilding = result.getName();
+                            currentBuilding_tv.setText(currBuilding);
+                            Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: checkIn failure");
+                        }
+                    });
                 }
             }
             @Override
