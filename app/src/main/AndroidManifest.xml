@@ -12,31 +12,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TrojanCheckInOut">
-        <activity android:name=".StudentBasicActivity"
-            android:exported="true"></activity>
-        <activity
-            android:name=".StudentActivity"
-            android:exported="true" />
 
-        <activity android:name=".RegisterActivity" /> <!-- <activity -->
-        <!-- android:name=".RegisterActivity" -->
-        <!-- android:label="@string/title_activity_register"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.MAIN" /> -->
-        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-        <!-- </intent-filter> -->
-        <!-- </activity> -->
+        <activity android:name=".StudentBasicActivity" />
+        <activity android:name=".StudentActivity" />
+
+        <activity android:name=".RegisterActivity" />
+
         <activity
             android:name=".ManagerActivity"
             android:label="@string/title_activity_manager"
             android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
+
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+    </application>
 </manifest>

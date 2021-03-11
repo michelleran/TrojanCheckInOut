@@ -221,7 +221,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onSuccess(Building result) {
                 //if user already checked into this building, check out
-                if(currBuilding.equals(result.getName())){
+                if(currBuilding != null && currBuilding.equals(result.getName())){
                     Server.checkOut(buildingID, new Callback<Void>() {
                         @Override
                         public void onSuccess(Void res) {

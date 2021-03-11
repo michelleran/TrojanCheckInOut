@@ -13,7 +13,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // MARK: for testing
-        Intent intent = new Intent(this, ManagerActivity.class);
+        Intent intent = new Intent(this, StudentActivity.class);
         startActivity(intent);
     }
 }
