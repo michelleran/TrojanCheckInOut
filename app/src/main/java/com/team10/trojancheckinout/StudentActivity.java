@@ -149,7 +149,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     //upload and change profile image from gallery on click
     public void editImage(View view){
         Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(openGalleryIntent, 1000);
+        startActivityForResult(openGalleryIntent, 1000); // TODO: request codes should be constants
     }
 
     //upload image URI retrieved from Image Gallery to Firebase - update Student's photo URL field
