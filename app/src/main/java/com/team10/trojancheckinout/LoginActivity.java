@@ -60,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                         Intent intent = new Intent(LoginActivity.this, ManagerActivity.class);
                         startActivity(intent);
                         //this should be the landing page after logging in regardless of user's class
+                        // TODO: false: open StudentActivity if user is student
                     }
                 }
 
@@ -77,6 +78,6 @@ public class LoginActivity extends AppCompatActivity {
     }
     private boolean validate(String name, String password){
         //will call the server function that allows to check if email/password combo is legitimate
-        return false;
+        return true;
     }
 }

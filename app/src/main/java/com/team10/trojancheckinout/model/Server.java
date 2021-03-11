@@ -12,6 +12,8 @@ public class Server {
     private static FirebaseFirestore db;
     private static FirebaseStorage storage;
 
+    private static final String[] majors = { "Major 1", "Major 2" };
+
     // TODO: delete later
     private static final Student testStudent =
         new Student(0, "Test", "User", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg", "CSCI");
@@ -23,6 +25,8 @@ public class Server {
 
         // TODO: anything else
     }
+
+    public static String[] getMajors() { return majors; }
 
     public static User getCurrentUser() {
         // TODO: replace this
@@ -76,7 +80,7 @@ public class Server {
 
     public static void searchHistory(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
-                                     String buildingName, int studentId, String major,
+                                     String buildingName, long studentId, String major,
                                      Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
         // TODO: replace this
         callback.onSuccess(new Record(buildingName, true));

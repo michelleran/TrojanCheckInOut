@@ -33,7 +33,6 @@ public class StudentBasicActivity extends AppCompatActivity {
         currentBuilding = findViewById(R.id.currentBuilding);
         photoUrl = findViewById(R.id.student_photo);
 
-        //assume current user is student, gets student data
         Server.getStudent(studentId, new Callback<Student>() {
             @Override
             public void onSuccess(Student result) {

@@ -1,7 +1,7 @@
 package com.team10.trojancheckinout.model;
 
 public class Student implements User {
-    private int id;
+    private long id;
     private String givenName;
     private String surname;
     private String email;
@@ -12,7 +12,7 @@ public class Student implements User {
 
     public Student(){}
 
-    public Student(int id, String givenName, String surname, String email,
+    public Student(long id, String givenName, String surname, String email,
                    String photoUrl, String major) {
         this.id = id;
         this.givenName = givenName;
@@ -22,7 +22,7 @@ public class Student implements User {
         this.major = major;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
