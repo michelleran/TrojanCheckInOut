@@ -31,6 +31,8 @@ import com.team10.trojancheckinout.utils.QRCodeHelper;
 
 public class StudentActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "StudentActivity";
+    private static final int PICK_PHOTO_REQUEST = 1000;
+
     TextView givenName_tv, surname_tv, id_tv, major_tv, currentBuilding_tv;
     ImageView photoUrl;
     Button scanQRCode_btn;
@@ -149,7 +151,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     //upload and change profile image from gallery on click
     public void editImage(View view){
         Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(openGalleryIntent, 1000); // TODO: request codes should be constants
+        startActivityForResult(openGalleryIntent, PICK_PHOTO_REQUEST);
     }
 
     //upload image URI retrieved from Image Gallery to Firebase - update Student's photo URL field
@@ -197,54 +199,55 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1000){
+        if(requestCode == PICK_PHOTO_REQUEST){
             if(resultCode == Activity.RESULT_OK){
                 Uri imageUri = data.getData();
                 photoUrl.setImageURI(imageUri);
                 //uploadImagetoFirebase(imageUri);
             }
+        } else {
+            //QR SCAN - set UI
+            String buildingID = QRCodeHelper.process(requestCode, resultCode, data, this);
+            Server.getBuilding(buildingID, new Callback<Building>() {
+                @Override
+                public void onSuccess(Building result) {
+                    //if user already checked into this building, check out
+                    if(currBuilding != null && currBuilding.equals(result.getName())){
+                        Server.checkOut(buildingID, new Callback<Void>() {
+                            @Override
+                            public void onSuccess(Void res) {
+                                currBuilding = "None";
+                                currentBuilding_tv.setText(R.string.none);
+                                Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
+                            }
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.e(TAG, "onFailure: checkOut failure");
+                            }
+                        });
+                    }
+                    //else check in
+                    else{
+                        Server.checkIn(buildingID, new Callback<Void>() {
+                            @Override
+                            public void onSuccess(Void res) {
+                                currBuilding = result.getName();
+                                currentBuilding_tv.setText(currBuilding);
+                                Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
+                            }
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.e(TAG, "onFailure: checkIn failure");
+                            }
+                        });
+                    }
+                }
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure: QR code getBuilding error");
+                }
+            });
         }
-        //QR SCAN - set UI
-        String buildingID = QRCodeHelper.process(requestCode, resultCode, data, this);
-        Server.getBuilding(buildingID, new Callback<Building>() {
-            @Override
-            public void onSuccess(Building result) {
-                //if user already checked into this building, check out
-                if(currBuilding != null && currBuilding.equals(result.getName())){
-                    Server.checkOut(buildingID, new Callback<Void>() {
-                        @Override
-                        public void onSuccess(Void res) {
-                            currBuilding = "None";
-                            currentBuilding_tv.setText(R.string.none);
-                            Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
-                        }
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Log.e(TAG, "onFailure: checkOut failure");
-                        }
-                    });
-                }
-                //else check in
-                else{
-                    Server.checkIn(buildingID, new Callback<Void>() {
-                        @Override
-                        public void onSuccess(Void res) {
-                            currBuilding = result.getName();
-                            currentBuilding_tv.setText(currBuilding);
-                            Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
-                        }
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Log.e(TAG, "onFailure: checkIn failure");
-                        }
-                    });
-                }
-            }
-            @Override
-            public void onFailure(Exception exception) {
-                Log.e(TAG, "onFailure: QR code getBuilding error");
-            }
-        });
     }
 
     @Override
