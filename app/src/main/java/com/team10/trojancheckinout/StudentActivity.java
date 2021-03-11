@@ -156,7 +156,17 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
 
     //upload image URI retrieved from Image Gallery to Firebase - update Student's photo URL field
     private void uploadImagetoFirebase(Uri imageUri){
-        // TODO
+        //upload profile picture to firebase
+        Server.changePhoto(imageUri, new Callback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e(TAG, "onFailure: upload prof pic failure");
+            }
+        });
     }
 
     public void signOut(View view){
@@ -203,7 +213,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             if(resultCode == Activity.RESULT_OK){
                 Uri imageUri = data.getData();
                 photoUrl.setImageURI(imageUri);
-                //uploadImagetoFirebase(imageUri);
+                uploadImagetoFirebase(imageUri);
             }
         } else {
             //QR SCAN - set UI

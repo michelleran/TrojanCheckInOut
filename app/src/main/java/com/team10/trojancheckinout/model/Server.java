@@ -1,5 +1,6 @@
 package com.team10.trojancheckinout.model;
 
+import android.net.Uri;
 import android.telecom.Call;
 
 import com.google.firebase.auth.*;
@@ -38,6 +39,10 @@ public class Server {
     }
 
     public static void changePassword(String newPassword, Callback<Void> callback){
+        //TODO: replace this
+    }
+
+    public static void changePhoto(Uri uri, Callback<String> callback){
         //TODO: replace this
     }
 
