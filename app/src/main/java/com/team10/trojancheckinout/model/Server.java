@@ -26,6 +26,11 @@ public class Server {
         return testStudent;
     }
 
+    // TODO: remove this
+    public static User getCurrentUser_manager() {
+        return new Manager("0", "Test", "Manager", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg");
+    }
+
     public static void getStudent(String id, Callback<Student> callback) {
         // TODO: replace this
         callback.onSuccess(testStudent);

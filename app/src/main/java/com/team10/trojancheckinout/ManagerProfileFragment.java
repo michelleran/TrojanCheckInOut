@@ -40,7 +40,7 @@ public class ManagerProfileFragment extends Fragment {
         edtSurname = (EditText) rootView.findViewById(R.id.edtSurname);
         edtEmail = (EditText) rootView.findViewById(R.id.edtEmail);
 
-        currentManager = (Manager) Server.getCurrentUser();
+        currentManager = (Manager) Server.getCurrentUser_manager(); // TODO: replace w/ getCurrentUser once implemented
 
         txtGivenName.setText("First Name: " + currentManager.getGivenName());
         txtSurname.setText("Surname: " + currentManager.getSurname());

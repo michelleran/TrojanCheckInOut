@@ -51,7 +51,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.wear:wear:1.0.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     implementation 'com.opencsv:opencsv:5.3'
@@ -59,5 +58,4 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    compileOnly 'com.google.android.wearable:wearable:2.6.0'
 }
