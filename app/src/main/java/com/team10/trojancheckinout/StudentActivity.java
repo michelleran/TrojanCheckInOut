@@ -22,9 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
@@ -38,7 +35,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     ImageView photoUrl;
     Button scanQRCode_btn;
     String fName, lName, usc_id, photo_url, major_, currBuilding;
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     Student student;
     private IntentIntegrator qrScan;
     private String newPass;
@@ -158,14 +154,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
 
     //upload image URI retrieved from Image Gallery to Firebase - update Student's photo URL field
     private void uploadImagetoFirebase(Uri imageUri){
-        //upload profile picture to firebase
-        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                .setPhotoUri(imageUri).build();
-        user.updateProfile(profileUpdate).addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                Log.d(TAG, "User Profile image updated");
-            }
-        });
+        // TODO
     }
 
     public void signOut(View view){
@@ -186,7 +175,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     //manually check out of building
     public void checkOut(View view){
         //show Toast if user not checked into a building
-        if(currBuilding.equals("None") || currBuilding.equals(null)){
+        if(currBuilding == null || currBuilding.equals("None")){
             Toast.makeText(getApplicationContext(), "Not currently checked into a building", Toast.LENGTH_LONG)
                     .show();
         }
