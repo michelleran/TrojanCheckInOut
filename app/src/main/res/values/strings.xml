@@ -2,7 +2,6 @@
     <string name="app_name">Trojan Check In Out</string>
 
     <string name="placeholder">Placeholder</string>
-
     <string name="title_activity_manager">Manager</string>
 
     <string name="tab_text_1">Profile</string>
@@ -30,12 +29,17 @@
     </array>
     
     <string name="title_activity_test">test</string>
-    <string name="firstname">First Name</string>
-    <string name="lastname">Last Name</string>
-    <string name="uscid">USC ID</string>
-    <string name="major">Major</string>
-    <string name="current_location">Current Location</string>
+    <string name="firstname"><u>First Name:</u></string>
+    <string name="lastname"><u>Last Name:</u></string>
+    <string name="uscid"><u>USC ID:</u></string>
+    <string name="major"><u>Major:</u></string>
+    <string name="current_location"><u>Current Location:</u></string>
+    <string name="delete_dialog_title">Delete Account</string>
+    <string name="delete_dialog_message">Are you sure you want to delete your account?</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
     <string name="none">None</string>
+    <string name="new_password">Input New Password</string>
 
     <!--
     This string is used for square devices and overridden by hello_world in

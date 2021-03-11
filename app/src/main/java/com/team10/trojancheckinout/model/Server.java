@@ -1,5 +1,7 @@
 package com.team10.trojancheckinout.model;
 
+import android.telecom.Call;
+
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
@@ -35,9 +37,29 @@ public class Server {
         callback.onSuccess(testStudent);
     }
 
+    public static void logout(Callback<Void> callback){
+        //TODO: replace this
+    }
+
+    public static void changePassword(String newPassword, Callback<Void> callback){
+        //TODO: replace this
+    }
+
+    public static void deleteAccount(Callback<Void> callback){
+        //TODO: replace this
+    }
+
     public static void getBuilding(String id, Callback<Building> callback) {
         // TODO: replace this
         callback.onSuccess(new Building(id, id, "", 30));
+    }
+
+    public static void checkIn(String id, Callback<Void> callback){
+        //TODO: replace this
+    }
+
+    public static void checkOut(String id, Callback<Void> callback){
+        //TODO: replace this
     }
 
     public static void listenForBuildings(Listener<Building> listener) {
