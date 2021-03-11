@@ -16,19 +16,9 @@
         <activity android:name=".StudentBasicActivity" />
         <activity android:name=".StudentActivity" />
 
-        <activity android:name=".RegisterActivity" />
-
         <activity
             android:name=".ManagerActivity"
             android:label="@string/title_activity_manager"
-            android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
-
-        <activity
-            android:name=".StudentActivity"
-            android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
-
-        <activity
-            android:name=".StudentBasicActivity"
             android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
 
         <activity android:name=".LoginActivity">
