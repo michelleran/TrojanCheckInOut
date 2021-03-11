@@ -14,7 +14,6 @@
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textColor="@color/black"
         android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/currLoc_text"
         app:layout_constraintTop_toBottomOf="@+id/major" />
@@ -26,7 +25,6 @@
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textColor="@color/black"
         android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/major_text"
         app:layout_constraintTop_toBottomOf="@+id/id" />
@@ -38,7 +36,6 @@
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textColor="@color/black"
         android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/uscID_text"
         app:layout_constraintTop_toBottomOf="@+id/surname" />
@@ -50,7 +47,6 @@
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textColor="@color/black"
         android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/lastname_text"
         app:layout_constraintTop_toBottomOf="@+id/givenName" />
@@ -134,8 +130,7 @@
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
         android:text="@string/lastname"
-        android:textColor="@color/black"
-        android:textSize="19dp"
+        android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fname_text" />
 
@@ -149,7 +144,6 @@
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
         android:text="@string/major"
-        android:textColor="@color/black"
         android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/uscID_text" />
@@ -164,7 +158,6 @@
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
         android:text="@string/current_location"
-        android:textColor="@color/black"
         android:textSize="19dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/major_text" />
@@ -179,7 +172,6 @@
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
         android:text="@string/firstname"
-        android:textColor="@color/black"
         android:textSize="19dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/student_photo" />
@@ -194,7 +186,6 @@
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
         android:text="@string/uscid"
-        android:textColor="@color/black"
         android:textSize="19dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lastname_text" />
@@ -206,7 +197,6 @@
         android:layout_marginTop="24dp"
         android:paddingLeft="5dp"
         android:paddingTop="10dp"
-        android:textColor="@color/black"
         android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/fname_text"
         app:layout_constraintTop_toBottomOf="@+id/student_photo" />
