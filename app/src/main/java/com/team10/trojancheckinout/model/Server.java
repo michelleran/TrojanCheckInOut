@@ -41,7 +41,7 @@ public class Server {
 
     public static void loginUser(String email, String password, LoginActivity loginActivity, Object[] registerRun, Callback<User> callback){
        // initialize();
-        LoginActivity la = new LoginActivity();
+        //LoginActivity la = new LoginActivity();
         //final boolean[] worked = {false};
         if(FirebaseAuth.getInstance().getCurrentUser()!=null) {
              Log.d("login", "Already Signed In");
