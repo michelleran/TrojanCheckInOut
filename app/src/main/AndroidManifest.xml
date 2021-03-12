@@ -21,12 +21,22 @@
             android:label="@string/title_activity_manager"
             android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
 
-        <activity android:name=".LoginActivity">
+        <activity android:name=".StartPage">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".LoginActivity">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>!-->
+        </activity>
+
+        <activity android:name=".StudentRegisterActivity"></activity>
+        <activity android:name=".ManagerRegisterActivity"></activity>
 
     </application>
 </manifest>
