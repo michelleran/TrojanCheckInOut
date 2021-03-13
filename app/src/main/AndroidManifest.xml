@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="true"
@@ -13,21 +14,32 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TrojanCheckInOut">
-        <activity android:name=".ManagerRegisterActivity"></activity>
-        <activity android:name=".StartPage" />
-        <activity android:name=".StudentRegisterActivity" />
+
+        <activity android:name=".StudentBasicActivity" />
+        <activity android:name=".StudentActivity" />
 
         <activity
             android:name=".ManagerActivity"
             android:label="@string/title_activity_manager"
             android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
-        <activity android:name=".LoginActivity">
+
+        <activity android:name=".StartPage"
+            android:theme="@style/Theme.TrojanCheckInOut.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <activity android:name=".LoginActivity">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>!-->
+        </activity>
+
+        <activity android:name=".StudentRegisterActivity"></activity>
+        <activity android:name=".ManagerRegisterActivity"></activity>
+
+    </application>
 </manifest>

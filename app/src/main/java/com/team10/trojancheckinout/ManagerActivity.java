@@ -29,15 +29,6 @@ public class ManagerActivity extends AppCompatActivity {
         viewPager.setAdapter(managerPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-        FloatingActionButton fab = findViewById(R.id.fab);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            }
-        });
     }
 }
 
@@ -69,7 +60,7 @@ class ManagerPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return new BuildingListFragment();
             case 2:
-                return new SearchFragment();
+                return new FilterFragment();
             default:
                 Log.e("ManagerActivity", "No fragment for position " + position);
                 return null;
