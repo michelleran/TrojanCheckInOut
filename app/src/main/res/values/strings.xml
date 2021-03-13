@@ -3,11 +3,52 @@
 
     <string name="placeholder">Placeholder</string>
     <string name="title_activity_manager">Manager</string>
+
     <string name="tab_text_1">Profile</string>
     <string name="tab_text_2">Buildings</string>
-    <string name="tab_text_3">Search</string>
+    <string name="tab_text_3">Filter</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="checked_into">Checked into</string>
     <string name="checked_out_of">Checked out of</string>
+
+    <string name="start_date">Start date</string>
+    <string name="start_time">Start time</string>
+    <string name="end_date">End date</string>
+    <string name="end_time">End time</string>
+
+    <string name="building">Building</string>
+
+    <string name="student_id">Student id</string>
+    <string name="student_major">Major</string>
+
+    <!-- TODO -->
+    <array name="majors">
+        <item>Major 1</item>
+        <item>Major 2</item>
+    </array>
+    
+    <string name="title_activity_test">test</string>
+    <string name="firstname"><u>First Name:</u></string>
+    <string name="lastname"><u>Last Name:</u></string>
+    <string name="uscid"><u>USC ID:</u></string>
+    <string name="major"><u>Major:</u></string>
+    <string name="current_location"><u>Current Location:</u></string>
+    <string name="delete_dialog_title">Delete Account</string>
+    <string name="delete_dialog_message">Are you sure you want to delete your account?</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="none">None</string>
+    <string name="new_password">Input New Password</string>
+
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
+    <string name="change_password">Change Password</string>
+    <string name="view_history">View History</string>
+    <string name="check_out">Check Out</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="scan_qr_code">Scan QR Code</string>
 </resources>

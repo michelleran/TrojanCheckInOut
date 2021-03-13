@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout.model;
 
 import android.net.Uri;
+
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
@@ -26,6 +28,8 @@ public class Server {
     private static FirebaseFirestore db;
     private static StorageReference storageRef;
 
+    private static final String[] majors = { "Major 1", "Major 2" };
+
     // TODO: delete later
     private static final Student testStudent =
         new Student("0", "Test", "User", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg", "CSCI");
@@ -40,9 +44,10 @@ public class Server {
 
     public static boolean isLoggedIn(){
         return FirebaseAuth.getInstance().getCurrentUser()!=null;
-    }
 
-    public static void loginUser(String email, String password, Callback<User> callback){
+    public static String[] getMajors() { return majors; }
+
+    public static void login(String email, String password, Callback<User> callback){
         initialize();
         //LoginActivity la = new LoginActivity();
         //final boolean[] worked = {false};
@@ -74,7 +79,7 @@ public class Server {
 
 
 
-    public static void logOutUser(){
+    public static void logout(){
         FirebaseAuth.getInstance().signOut();
         Log.w("log out", "log out attempt");
     }
@@ -100,10 +105,6 @@ public class Server {
                 });
 
     }
-
-
-
-
 
     public static void studentRegister(String id, String givenName, String surname, String email,
                                    String photoUrl, String major, String password, Callback<User> callback) {
@@ -425,12 +426,17 @@ public class Server {
         });
     }
 
-
-
-
     public static void getBuilding(String id, Callback<Building> callback) {
         // TODO: replace this
         callback.onSuccess(new Building(id, id, "", 30));
+    }
+
+    public static void checkIn(String id, Callback<Void> callback){
+        //TODO: replace this
+    }
+
+    public static void checkOut(String id, Callback<Void> callback){
+        //TODO: replace this
     }
 
     public static void listenForBuildings(Listener<Building> listener) {
@@ -446,7 +452,7 @@ public class Server {
 
     public static void searchHistory(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
-                                     String buildingName, int studentId, String major,
+                                     String buildingName, long studentId, String major,
                                      Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
         // TODO: replace this
         callback.onSuccess(new Record(buildingName, true));
