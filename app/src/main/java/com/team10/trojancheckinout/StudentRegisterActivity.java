@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.utils.Validator;
 
 public class StudentRegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -34,6 +35,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
     private Button sRegister;
     private Button sPhoto;
 
+    private Validator val;
     private boolean isValid = false;
 
     private Uri imageUri;
@@ -46,7 +48,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         setContentView(R.layout.activity_student_register);
 
         spin = findViewById(R.id.sMajors);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, majors); // TODO: populate spinner using Server.getMajors
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, majors);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         spin.setAdapter(adapter);
         spin.setOnItemSelectedListener(this);
@@ -64,13 +66,26 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         sRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String iFname = fname.getText().toString();
-                String iLname = lname.getText().toString();
-                String iEmail = sEmail.getText().toString();
+                String iFname = fname.getText().toString().trim();
+                String iLname = lname.getText().toString().trim();
+                String iEmail = sEmail.getText().toString().trim();
                 String iPassword = sPassword.getText().toString();
-                String iID = sID.getText().toString();
+                String iID = sID.getText().toString().trim();
 
-                isValid = validate(iFname,iLname,iEmail,iPassword,iID); // TODO: call server register method
+                String [] allEntries = new String[] {iFname, iLname, iEmail, iPassword, iID};
+                isValid = Validator.validateNotEmpty(allEntries, allEntries.length) && Validator.validateEmail(iEmail) && Validator.validatePassword(iPassword) && Validator.validateID(iID);
+                if(!Validator.validateNotEmpty(allEntries, allEntries.length)){
+                    Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
+                }
+                else if(!Validator.validateEmail(iEmail)){
+                    Toast.makeText(getApplicationContext(), "Please enter a valid usc email!" ,Toast.LENGTH_SHORT).show();
+                }
+                else if(!Validator.validatePassword(iPassword)){
+                    Toast.makeText(getApplicationContext(), "Please enter a password at least 8 characters long!" ,Toast.LENGTH_SHORT).show();
+                }
+                else if(!Validator.validateID(iID)){
+                    Toast.makeText(getApplicationContext(), "Please enter your TEN digit USC ID!" ,Toast.LENGTH_SHORT).show();
+                }
 
                 if(isValid){
                     Toast.makeText(StudentRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
@@ -102,7 +117,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
 
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-        //Toast.makeText(getApplicationContext(), "Selected Major: "+majors[position] ,Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Selected Major: "+majors[position] ,Toast.LENGTH_SHORT).show();
         selectedMajor = majors[position];
     }
     @Override
@@ -110,7 +125,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         // none
     }
 
-    private boolean validate(String fname, String lname, String email, String password, String ID){
+    /*private boolean validate(String fname, String lname, String email, String password, String ID){
         //Toast.makeText(getApplicationContext(), "Email: " + email ,Toast.LENGTH_SHORT).show();
         if(fname.isEmpty() || lname.isEmpty() || email.isEmpty() || password.isEmpty() || ID.isEmpty()){
             Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
@@ -130,7 +145,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         }
         Toast.makeText(getApplicationContext(), "Selected Major: "+ selectedMajor ,Toast.LENGTH_SHORT).show();
         return true;
-    }
+    }*/
 
     private void choosePicture(){
         Intent itt = new Intent();
