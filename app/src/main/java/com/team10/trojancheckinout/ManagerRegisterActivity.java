@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.utils.Validator;
 
 public class ManagerRegisterActivity extends AppCompatActivity {
 
@@ -25,6 +26,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
     private Button mRegister;
     private Button mPhoto;
 
+    private Validator val;
     private boolean isValid = false;
 
     private Uri imageUri;
@@ -50,12 +52,22 @@ public class ManagerRegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String iFname = mfname.getText().toString();
-                String iLname = mlname.getText().toString();
-                String iEmail = mEmail.getText().toString();
+                String iFname = mfname.getText().toString().trim();
+                String iLname = mlname.getText().toString().trim();
+                String iEmail = mEmail.getText().toString().trim();
                 String iPassword = mPassword.getText().toString();
 
-                isValid = validate(iFname,iLname,iEmail,iPassword);
+                String [] allEntries = new String[] {iFname, iLname, iEmail, iPassword};
+                isValid = Validator.validateNotEmpty(allEntries, allEntries.length) && Validator.validateEmail(iEmail) && Validator.validatePassword(iPassword);
+                if(!Validator.validateNotEmpty(allEntries, allEntries.length)){
+                    Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
+                }
+                else if(!Validator.validateEmail(iEmail)){
+                    Toast.makeText(getApplicationContext(), "Please enter a valid usc email!" ,Toast.LENGTH_SHORT).show();
+                }
+                else if(!Validator.validatePassword(iPassword)){
+                    Toast.makeText(getApplicationContext(), "Please enter a password at least 8 characters long!" ,Toast.LENGTH_SHORT).show();
+                }
 
                 if(isValid){
 
@@ -89,7 +101,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
 
     }
 
-    private boolean validate(String fname, String lname, String email, String password){
+    /*private boolean validate(String fname, String lname, String email, String password){
         if(fname.isEmpty() || lname.isEmpty() || email.isEmpty() || password.isEmpty()){
             Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
             return false;
@@ -104,7 +116,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
         }
 
         return false;
-    }
+    }*/
 
     private void choosePicture(){
         Intent itt = new Intent();
