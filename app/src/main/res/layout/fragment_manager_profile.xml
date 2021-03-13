@@ -25,7 +25,8 @@
         android:text="First Name:"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/imgPhoto"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgPhoto" />
 
     <TextView
@@ -36,46 +37,35 @@
         android:text="Email:"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="@+id/txtGivenName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtSurname" />
-
-    <TextView
-        android:id="@+id/txtPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Password: "
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="@+id/txtEmail"
-        app:layout_constraintTop_toBottomOf="@+id/txtEmail" />
 
     <Button
         android:id="@+id/btnEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="128dp"
+        android:layout_marginTop="512dp"
         android:backgroundTint="#FFC107"
         android:text="Edit"
         android:textColor="#040303"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btnLogout"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="128dp"
+        android:layout_marginTop="512dp"
         android:backgroundTint="#FFC107"
         android:text="Logout"
         android:textColor="#020202"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnEdit" />
+        app:layout_constraintStart_toEndOf="@+id/btnEdit"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtSurname"
@@ -85,43 +75,34 @@
         android:text="Last Name:"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="@+id/txtGivenName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtGivenName" />
 
     <EditText
-        android:id="@+id/edtGivenName"
+        android:id="@+id/edtNewPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="38dp"
+        android:layout_marginTop="36dp"
         android:ems="10"
-        android:hint="First Name"
-        android:inputType="textPersonName"
+        android:hint="New Password"
+        android:inputType="textPassword"
         android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="@+id/txtGivenName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgPhoto" />
 
     <EditText
-        android:id="@+id/edtSurname"
+        android:id="@+id/edtConfirmPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="11dp"
         android:ems="10"
-        android:hint="Last Name"
-        android:inputType="textPersonName"
+        android:hint="Confirm Password"
+        android:inputType="textPassword"
         android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="@+id/txtGivenName"
-        app:layout_constraintTop_toBottomOf="@+id/edtGivenName" />
-
-    <EditText
-        android:id="@+id/edtEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="11dp"
-        android:ems="10"
-        android:hint="Email"
-        android:inputType="textPersonName"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="@+id/txtSurname"
-        app:layout_constraintTop_toBottomOf="@+id/edtSurname" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtNewPassword" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
