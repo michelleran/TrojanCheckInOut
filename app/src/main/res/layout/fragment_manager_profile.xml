@@ -33,7 +33,7 @@
         android:id="@+id/txtEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:text="Email:"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
@@ -43,35 +43,31 @@
 
     <Button
         android:id="@+id/btnEdit"
-        android:layout_width="wrap_content"
+        android:layout_width="165dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="512dp"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="#FFC107"
         android:text="Edit Password"
         android:textColor="#000000"
-        app:layout_constraintEnd_toStartOf="@+id/btnLogout"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/btnLogout"
+        app:layout_constraintStart_toStartOf="@+id/btnLogout" />
 
     <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnChangePicture"
+        android:layout_width="165dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="512dp"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="#FFC107"
-        android:text="Change Picture"
+        android:text="Change Photo"
         android:textColor="#020202"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnEdit"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/btnLogout"
+        app:layout_constraintEnd_toEndOf="@+id/btnLogout" />
 
     <TextView
         android:id="@+id/txtSurname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:text="Last Name:"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
@@ -106,15 +102,15 @@
         app:layout_constraintTop_toBottomOf="@+id/edtNewPassword" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnLogout"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="500dp"
         android:backgroundTint="#FFC107"
         android:text="Logout"
         android:textColor="#000000"
-        app:layout_constraintEnd_toEndOf="@+id/btnLogout"
-        app:layout_constraintStart_toStartOf="@+id/btnEdit"
-        app:layout_constraintTop_toBottomOf="@+id/btnEdit" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
