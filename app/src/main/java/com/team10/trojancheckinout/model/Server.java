@@ -231,7 +231,47 @@ public class Server {
         });
     }
 
-    public static void deleteStudent(Callback<Boolean> callback){
+    public static void deleteManager(Callback<Void> callback) {
+        initialize();
+        if(mAuth.getCurrentUser()==null){
+            Log.d("userDelete", "no user logged in");
+            callback.onFailure(null);
+            return;
+        }
+        DocumentReference docRef = db.collection("StudentDetail")
+                .document(mAuth.getCurrentUser().getUid()); //get the current user document
+        docRef.delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("profile", "full deleted");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    callback.onSuccess(null);
+                                } else {
+                                    callback.onFailure(task.getException());
+                                }
+
+                            }
+                        });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("profile", "profile not deleted", e);
+                        callback.onFailure(e);
+                    }
+                });
+
+    }
+
+
+
+    public static void deleteStudent(Callback<Void> callback){
         initialize();
         if(mAuth.getCurrentUser()==null){
             Log.d("userDelete", "no user logged in");
@@ -246,7 +286,23 @@ public class Server {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d("userDelete", "User account deleted.");
-                            callback.onSuccess(true);
+                            DocumentReference docRef = db.collection("StudentDetail")
+                                    .document(mAuth.getCurrentUser().getUid()); //get the current user document
+                            docRef.update("deleted", true)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("profile", "profile set to deleted");
+                                            callback.onSuccess(null);
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w("profile", "Profile not set", e);
+                                            callback.onFailure(e);
+                                        }
+                                    });
                         }
                         else{
                             callback.onFailure(task.getException());
@@ -300,7 +356,7 @@ public class Server {
         });
     }
 
-    public static void changePassword(String newPassword){  //changes current user's password
+    public static void changePassword(String newPassword, Callback<Void> callback){  //changes current user's password
         initialize();
         FirebaseUser user = mAuth.getCurrentUser();
         user.updatePassword(newPassword)
@@ -310,6 +366,10 @@ public class Server {
                         if (task.isSuccessful()) {
                             Log.d("changePassword", "User password updated.");
                             //do ui stuff
+                            callback.onSuccess(null);
+                        }
+                        else{
+                            callback.onFailure(task.getException());
                         }
                     }
                 });
