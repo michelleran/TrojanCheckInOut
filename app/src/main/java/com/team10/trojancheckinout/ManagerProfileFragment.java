@@ -165,63 +165,7 @@ public class ManagerProfileFragment extends Fragment {
             }
         }
     }
-
-    public void handleRightButton() {
-        if (viewState == 1) {
-            String newPassword = edtNewPassword.getText().toString();
-            String confirmPassword = edtConfirmPassword.getText().toString();
-            int passwordValidation = validatePassword(newPassword, confirmPassword);
-            if (passwordValidation == 2) {
-                Toast.makeText(getActivity(), "Passwords do not match", Toast.LENGTH_SHORT).show();
-            }
-            else if (passwordValidation == 1) {
-                Toast.makeText(getActivity(), "Password(s) are empty", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(getActivity(), "Password successfully updated", Toast.LENGTH_LONG).show();
-                Server.changePassword(newPassword);
-//                toggleViewState();
-            }
-        }
-    }
-
-
-
-    public void toggleViewState() {
-        if (viewState == 0) {
-            viewState = 1;
-            txtGivenName.setVisibility(View.INVISIBLE);
-            edtNewPassword.setVisibility(View.VISIBLE);
-
-            txtSurname.setVisibility(View.INVISIBLE);
-            edtConfirmPassword.setVisibility(View.VISIBLE);
-
-            txtEmail.setVisibility(View.INVISIBLE);
-
-            btnEdit.setText("CANCEL");
-            btnLogout.setText("SAVE");
-
-            imgPhoto.setColorFilter(Color.rgb(64, 64, 64));
-            imgPhoto.setImageAlpha(200);
-        }
-        else {
-            viewState = 0;
-            edtNewPassword.setVisibility(View.INVISIBLE);
-            txtGivenName.setVisibility(View.VISIBLE);
-
-            edtConfirmPassword.setVisibility(View.INVISIBLE);
-            txtSurname.setVisibility(View.VISIBLE);
-
-            txtEmail.setVisibility(View.VISIBLE);
-
-            btnEdit.setText("EDIT");
-            btnLogout.setText("LOGOUT");
-
-            imgPhoto.clearColorFilter();
-            imgPhoto.setImageAlpha(255);
-        }
-    }
-
+    
     public static int validatePassword(String newPassword, String confirmPassword) {
         if (newPassword.length() == 0 || confirmPassword.length() == 0) {
             return 1;
