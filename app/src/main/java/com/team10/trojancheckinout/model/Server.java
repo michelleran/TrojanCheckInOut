@@ -1,6 +1,5 @@
 package com.team10.trojancheckinout.model;
 
-import android.os.Build;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -10,8 +9,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
-
-import org.apache.commons.lang3.ObjectUtils;
 
 import androidx.annotation.NonNull;
 
@@ -44,8 +41,8 @@ public class Server {
     }
 
     public static void getBuilding(String id, Callback<Building> callback) {
-        // TODO: replace this
         initialize();
+        // Get building from database
         DocumentReference docRef = db.collection("buildings").document(id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -54,12 +51,15 @@ public class Server {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        // Convert document to building object
                         Building building = document.toObject(Building.class);
                         callback.onSuccess(building);
                     } else {
+                        callback.onFailure(new Exception("No such document"));
                         Log.d(TAG, "No such document");
                     }
                 } else {
+                    callback.onFailure(task.getException());
                     Log.d(TAG, "get failed with ", task.getException());
                 }
             }
@@ -68,6 +68,7 @@ public class Server {
 
     public static void removeBuilding(String id, Callback<Building> callback){
         initialize();
+        // Get building to be removed
         DocumentReference docRef = db.collection("buildings").document(id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -77,6 +78,7 @@ public class Server {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         Building building = document.toObject(Building.class);
+                        // Delete building
                         docRef.delete();
                         callback.onSuccess(building);
                     } else {
@@ -92,7 +94,7 @@ public class Server {
     }
 
     public static void listenForBuildings(Listener<Building> listener) {
-        // TODO: replace this
+        initialize();
         db.collection("buildings").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -124,7 +126,10 @@ public class Server {
                         if(building.getMaxCapacity() > maxCapacity){
                             callback.onFailure(new Exception("New capacity is smaller than old capacity"));
                         }
+                        // Update capacity
                         building.setMaxCapacity(maxCapacity);
+                        // Update capacity on database
+                        docRef.update("maxCapacity", maxCapacity);
                         callback.onSuccess(building);
 
                     } else {
@@ -140,7 +145,6 @@ public class Server {
     }
 
     public static void checkIn(String id, Callback<Void> callback){
-        //TODO: replace this
         initialize();
         DocumentReference docRef = db.collection("buildings").document(id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -152,14 +156,17 @@ public class Server {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         Building building = document.toObject(Building.class);
                         Student student = (Student) getCurrentUser();
+                        // Check if student is already checked in to building
                         if(student.getCurrentBuilding() == building.getName()) {
                             callback.onFailure(new Exception("Student already checked into building"));
                         }else{
+                            // Check if building is full
                             if(building.getCurrentCapacity() == building.getMaxCapacity()){
                                 callback.onFailure(new Exception("Building Full"));
                             }else{
+                                // Check if user is already checked in to another building
                                 if(student.getCurrentBuilding() != null){
-                                    // If student is checked in at another building
+                                    // Find other building student is checked into
                                     db.collection("building").whereEqualTo("name", student.getCurrentBuilding()).get()
                                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                                 @Override
@@ -168,9 +175,15 @@ public class Server {
                                                         for (QueryDocumentSnapshot document : task.getResult()) {
                                                             Log.d(TAG, document.getId() + " => " + document.getData());
                                                             DocumentReference oldDocRef = document.getReference();
+                                                            // Decrease capacity of old building
                                                             int oldBuildingCapacity = (int)document.getData().get("currentCapacity");
                                                             oldDocRef.update("currentCapacity", oldBuildingCapacity-1);
+                                                            Record record = new Record(oldDocRef.getId(), false);
+                                                            addRecord(record);
                                                         }
+                                                        // Add capacity to new building
+                                                        Record record = new Record(id, true);
+                                                        addRecord(record);
                                                         docRef.update("currentCapacity", building.getCurrentCapacity()+1);
                                                     } else {
                                                         Log.d(TAG, "Error getting documents: ", task.getException());
@@ -179,7 +192,11 @@ public class Server {
                                             });
 
                                 }else{
+                                    // Add capacity to new building
                                     docRef.update("currentCapacity", building.getCurrentCapacity()+1);
+                                    // Add record
+                                    Record record = new Record(id, true);
+                                    addRecord(record);
 
                                 }
                             }
@@ -197,7 +214,6 @@ public class Server {
     }
 
     public static void checkOut(String id, Callback<Void> callback){
-        //TODO: replace this
         initialize();
         DocumentReference docRef = db.collection("buildings").document(id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -209,6 +225,10 @@ public class Server {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         Building building = document.toObject(Building.class);
                         docRef.update("currentCapacity", building.getCurrentCapacity()-1);
+
+                        Record record = new Record(id, false);
+                        // Add checkout record
+                        addRecord(record);
                     } else {
                         Log.d(TAG, "No such document");
                         callback.onFailure(new Exception("Error"));
@@ -222,11 +242,30 @@ public class Server {
 
     }
 
+    private static void addRecord(Record record){
+        initialize();
+        db.collection("records")
+                .add(record)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
+    }
+
 
     public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
         // TODO: listen to query "students where student's current building = building id"
-        db.collection("building")
-                .whereEqualTo("buildingID", buildingId)
+        initialize();
+        db.collection("Student")
+                .whereEqualTo("currentBuilding", buildingId)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -242,7 +281,6 @@ public class Server {
                         }
                     }
                 });
-
     }
 
     public static void searchHistory(int startYear, int startMonth, int startDay, int startHour, int startMin,
@@ -250,8 +288,25 @@ public class Server {
                                      String buildingName, int studentId, String major,
                                      Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
         // TODO: replace this
-        callback.onSuccess(new Record(buildingName, true));
-        callback.onSuccess(new Record(buildingName, false));
-        callback.onSuccess(new Record(buildingName, true));
+        initialize();
+        CollectionReference records = db.collection("record");
+        records
+                // TO DO: Add other queries
+                .whereEqualTo("studentId", studentId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Record record = document.toObject(Record.class);
+                                callback.onSuccess(record);
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
     }
 }
