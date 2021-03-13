@@ -80,7 +80,7 @@ public class ManagerProfileFragment extends Fragment {
     public void handleRightButton() {
         if (viewState == 0) {
             Server.logOutUser();
-            Toast.makeText(getActivity(), "Successfully Logged Out", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Logout Successful", Toast.LENGTH_SHORT).show();
             Intent loginPage = new Intent(getActivity(), StartPage.class);
             startActivity(loginPage);
         }

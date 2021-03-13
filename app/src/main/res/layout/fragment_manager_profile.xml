@@ -47,8 +47,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="512dp"
         android:backgroundTint="#FFC107"
-        android:text="Edit"
-        android:textColor="#040303"
+        android:text="Edit Password"
+        android:textColor="#000000"
         app:layout_constraintEnd_toStartOf="@+id/btnLogout"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="512dp"
         android:backgroundTint="#FFC107"
-        android:text="Logout"
+        android:text="Change Picture"
         android:textColor="#020202"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -104,5 +104,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtNewPassword" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#FFC107"
+        android:text="Logout"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="@+id/btnLogout"
+        app:layout_constraintStart_toStartOf="@+id/btnEdit"
+        app:layout_constraintTop_toBottomOf="@+id/btnEdit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
