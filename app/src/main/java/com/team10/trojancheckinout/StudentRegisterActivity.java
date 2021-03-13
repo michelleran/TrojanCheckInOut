@@ -28,6 +28,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
 
     private Button sBack;
     private Button sRegister;
+    private Button sPhoto;
 
     private boolean isValid = false;
 
@@ -37,19 +38,20 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         setContentView(R.layout.activity_student_register);
 
         spin = findViewById(R.id.sMajors);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, majors); // TODO: populate spinner using Server.getMajors
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, majors);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         spin.setAdapter(adapter);
         spin.setOnItemSelectedListener(this);
 
-        fname = findViewById(R.id.etMFname);
-        lname = findViewById(R.id.etMLname);
-        sEmail = findViewById(R.id.etMEmail);
-        sPassword = findViewById(R.id.etMPassword);
+        fname = findViewById(R.id.etSFname);
+        lname = findViewById(R.id.etSLname);
+        sEmail = findViewById(R.id.etSEmail);
+        sPassword = findViewById(R.id.etSPassword);
         sID = findViewById(R.id.etUSCid);
 
-        sBack = findViewById(R.id.emBackButton);
+        sBack = findViewById(R.id.esBackButton);
         sRegister = findViewById(R.id.sRegBtn);
+        sPhoto = findViewById(R.id.sAddPhoto);
 
         sRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,12 +62,12 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
                 String iPassword = sPassword.getText().toString();
                 String iID = sID.getText().toString();
 
-                isValid = validate(iFname,iLname,iEmail,iPassword,iID); // TODO: call server register method
+                isValid = validate(iFname,iLname,iEmail,iPassword,iID);
 
                 if(isValid){
                     Toast.makeText(StudentRegisterActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                    // TODO: this should lead to studentActivity class
-                    Intent intent = new Intent(StudentRegisterActivity.this, ManagerActivity.class);
+
+                    Intent intent = new Intent(StudentRegisterActivity.this, StudentActivity.class);
                     startActivity(intent);
                 }
             }
@@ -78,11 +80,18 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
                 startActivity(it);
             }
         });
+
+        sPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-        Toast.makeText(getApplicationContext(), "Selected Major: "+majors[position] ,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "Selected Major: "+majors[position] ,Toast.LENGTH_SHORT).show();
         selectedMajor = majors[position];
     }
     @Override
@@ -91,7 +100,25 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
     }
 
     private boolean validate(String fname, String lname, String email, String password, String ID){
-        return false;
+        //Toast.makeText(getApplicationContext(), "Email: " + email ,Toast.LENGTH_SHORT).show();
+        if(fname.isEmpty() || lname.isEmpty() || email.isEmpty() || password.isEmpty() || ID.isEmpty()){
+            Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if(!email.contains("usc.edu")){
+            Toast.makeText(getApplicationContext(), "Please enter a usc email!" ,Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if(password.length() < 8){
+            Toast.makeText(getApplicationContext(), "Please enter a password at least 8 characters long!" ,Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if(ID.length() != 10){
+            Toast.makeText(getApplicationContext(), "Please enter your TEN digit USC ID!" ,Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        Toast.makeText(getApplicationContext(), "Selected Major: "+ selectedMajor ,Toast.LENGTH_SHORT).show();
+        return true;
     }
 
 }
