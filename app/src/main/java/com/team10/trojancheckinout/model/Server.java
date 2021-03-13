@@ -138,6 +138,7 @@ public class Server {
         if(isStudent) {
             s.put("deleted", false);
             s.put("major", major);
+        }
             // Student s = new Student(id, givenName, surname, email, photoUrl, major);
             FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                     .set(s)
@@ -156,26 +157,26 @@ public class Server {
                             callback.onFailure(e);
                         }
                     });
-        }
-        else{
-            FirebaseFirestore.getInstance().collection("ManagerDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                    .set(s)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("add user", "DocumentSnapshot added with ID: ");
-                            // activity.changeActivitySuccess(true);
-                            getCurrentUser(callback);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w("add user", "Error adding document", e);
-                            callback.onFailure(e);
-                        }
-                    });
-        }
+//         }
+//         else{
+//             FirebaseFirestore.getInstance().collection("ManagerDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                     .set(s)
+//                     .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                         @Override
+//                         public void onSuccess(Void aVoid) {
+//                             Log.d("add user", "DocumentSnapshot added with ID: ");
+//                             // activity.changeActivitySuccess(true);
+//                             getCurrentUser(callback);
+//                         }
+//                     })
+//                     .addOnFailureListener(new OnFailureListener() {
+//                         @Override
+//                         public void onFailure(@NonNull Exception e) {
+//                             Log.w("add user", "Error adding document", e);
+//                             callback.onFailure(e);
+//                         }
+//                     });
+//         }
 
     }
 
