@@ -1,13 +1,17 @@
 package com.team10.trojancheckinout;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.team10.trojancheckinout.model.Server;
 
 public class ManagerRegisterActivity extends AppCompatActivity {
 
@@ -22,6 +26,10 @@ public class ManagerRegisterActivity extends AppCompatActivity {
     private Button mPhoto;
 
     private boolean isValid = false;
+
+    private Uri imageUri;
+    private boolean gotImage = false;
+    private Server server;
 
 
     @Override
@@ -50,7 +58,12 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                 isValid = validate(iFname,iLname,iEmail,iPassword);
 
                 if(isValid){
+
+                    //server.registerManager(iFname, iLname, iEmail, iPassword, Callback<manager> callback);
+                    //if(gotImage){server.changePhoto(imageUri, Callback<Manager> callback);}
+
                     Toast.makeText(ManagerRegisterActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+
                     Intent it = new Intent(ManagerRegisterActivity.this, ManagerActivity.class);
                     startActivity(it);
                 }
@@ -61,6 +74,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
         mBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent it = new Intent(ManagerRegisterActivity.this, StartPage.class);
                 startActivity(it);
             }
@@ -69,7 +83,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
         mPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                choosePicture();
             }
         });
 
@@ -90,6 +104,22 @@ public class ManagerRegisterActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    private void choosePicture(){
+        Intent itt = new Intent();
+        itt.setType("image/*");
+        itt.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(itt, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1 && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+            gotImage = true;
+            imageUri = data.getData();
+        }
     }
 
 }
