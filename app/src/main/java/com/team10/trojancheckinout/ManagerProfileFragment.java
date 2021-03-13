@@ -2,7 +2,11 @@ package com.team10.trojancheckinout;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.telecom.Call;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +19,8 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.google.common.util.concurrent.AsyncCallable;
+import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Manager;
 import com.team10.trojancheckinout.model.Server;
 
@@ -54,10 +60,13 @@ public class ManagerProfileFragment extends Fragment {
         edtNewPassword = (EditText) rootView.findViewById(R.id.edtNewPassword);
         edtConfirmPassword = (EditText) rootView.findViewById(R.id.edtConfirmPassword);
         imgPhoto = (ImageView) rootView.findViewById(R.id.imgPhoto);
-        Glide.with(this).load("https://www.clipartkey.com/mpngs/m/238-2383342_transparent-pizza-clip-art-transparent-cartoons-whole-pizza.png").override(400, 400).into(imgPhoto);
 
-        currentManager = (Manager) Server.getCurrentUser_manager(); // TODO: replace w/ getCurrentUser once implemented
+        currentManager = (Manager) Server.getCurrentUser_manager();
+        //TODO: Remove this (for testing purposes)
+        currentManager.setPhotoUrl("https://www.clipartkey.com/mpngs/m/238-2383342_transparent-pizza-clip-art-transparent-cartoons-whole-pizza.png");
 
+
+        Glide.with(this).load(currentManager.getPhotoUrl()).override(400, 400).into(imgPhoto);
         txtGivenName.setText("First Name: " + currentManager.getGivenName());
         txtSurname.setText("Surname: " + currentManager.getSurname());
         txtEmail.setText("Email: " + currentManager.getEmail());
@@ -148,7 +157,8 @@ public class ManagerProfileFragment extends Fragment {
             }
 
         }
-        if (viewState == 0) {
+        else if (viewState == 0) {
+            viewState = 2;
             Intent choosePic = new Intent();
             choosePic.setType("image/*");
             choosePic.setAction(Intent.ACTION_GET_CONTENT);
@@ -159,13 +169,35 @@ public class ManagerProfileFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SELECT_PHOTO_REQUEST && resultCode == RESULT_OK) {
-            if (data == null || data.getData() == null) {
-                Toast.makeText(getActivity(), "Upload error", Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode != SELECT_PHOTO_REQUEST || resultCode != RESULT_OK || data == null || data.getData() == null) {
+                return;
         }
+        else {
+            Callback<String> uploadCallback = new Callback<String>() {
+                @Override
+                public void onSuccess(String result) {
+                    Toast.makeText(getActivity(), "Successfully Updated Profile Photo", Toast.LENGTH_SHORT).show();
+                    triggerPhotoRefresh(result);
+                }
+
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e("Manager Profile Fragment", "Profile Photo Update Failure", exception);
+                    Toast.makeText(getActivity(), "Profile Photo Update Failure", Toast.LENGTH_SHORT).show();
+                }
+            };
+
+            Server.changePhotoUrl(data.getData(), uploadCallback);
+        }
+        
     }
-    
+
+    public void triggerPhotoRefresh(String url) {
+        currentManager.setPhotoUrl(url);
+        Glide.with(this).load(url).override(400, 400).into(imgPhoto);
+        viewState = 0;
+    }
+
     public static int validatePassword(String newPassword, String confirmPassword) {
         if (newPassword.length() == 0 || confirmPassword.length() == 0) {
             return 1;
