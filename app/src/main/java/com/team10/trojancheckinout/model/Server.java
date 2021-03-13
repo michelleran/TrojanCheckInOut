@@ -1,5 +1,6 @@
 package com.team10.trojancheckinout.model;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.UploadTask.TaskSnapshot;
 import com.team10.trojancheckinout.LoginActivity;
 import com.team10.trojancheckinout.StudentRegisterActivity;
 
@@ -21,7 +24,7 @@ import java.util.Map;
 public class Server {
     private static FirebaseAuth mAuth;
     private static FirebaseFirestore db;
-    private static FirebaseStorage storage;
+    private static StorageReference storageRef;
 
     // TODO: delete later
     private static final Student testStudent =
@@ -30,66 +33,44 @@ public class Server {
     public static void initialize() {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
+        storageRef = FirebaseStorage.getInstance().getReference();
 
-        // TODO: anything else
+
     }
 
     public static boolean isLoggedIn(){
         return FirebaseAuth.getInstance().getCurrentUser()!=null;
     }
 
-    public static void loginUser(String email, String password, LoginActivity loginActivity, Object[] registerRun, Callback<User> callback){
-       // initialize();
+    public static void loginUser(String email, String password, Callback<User> callback){
+        initialize();
         //LoginActivity la = new LoginActivity();
         //final boolean[] worked = {false};
-        if(FirebaseAuth.getInstance().getCurrentUser()!=null) {
-             Log.d("login", "Already Signed In");
-            //la.changeActivitySuccess(true);
-            if(registerRun.length==0) { //simple login
-                callback.onSuccess(getCurrentUser());
-                //loginActivity.changeActivitySuccess(true);
-            }
-            else{//register
-                addUser2(registerRun[0].toString(), registerRun[1].toString(), registerRun[2].toString(), registerRun[3].toString(),
-                        registerRun[4].toString(), registerRun[5].toString(), (StudentRegisterActivity) registerRun[6], callback);
-            }
+        if(mAuth.getCurrentUser()!=null) {
+            Log.d("login", "Already Signed In");
+            getCurrentUser(callback);
             return;
-           // return true;
-            //FirebaseAuth.getInstance().signOut();
         } //user already exists
         
-        else if(FirebaseAuth.getInstance().getCurrentUser()==null) {
-            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // log success
-                                Log.d("login", "signInWithEmail:success");
-                                if(registerRun.length==0) {
-                                  //  loginActivity.changeActivitySuccess(true);
-                                    callback.onSuccess(getCurrentUser());
-                                }
-                                else{
-                                    addUser2(registerRun[0].toString(), registerRun[1].toString(), registerRun[2].toString(), registerRun[3].toString(),
-                                            registerRun[4].toString(), registerRun[5].toString(), (StudentRegisterActivity) registerRun[6], callback);
-                                }
-                            }
-                            else {
-                                //log failure
-                                Log.w("login", "signInWithEmail:failure", task.getException());
-                                if(registerRun.length==0) {
-                                   // loginActivity.changeActivitySuccess(false);
-                                    callback.onFailure(task.getException());
-                                }
-                            }
+        else if(mAuth.getCurrentUser()==null) {
+            mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // log success
+                            Log.d("login", "signInWithEmail:success");
+                            getCurrentUser(callback);
                         }
-                    });
+                        else {
+                            //log failure
+                            Log.w("login", "signInWithEmail:failure", task.getException());
+                            callback.onFailure(task.getException());
+                        }
+                    }
+                });
         }
-        //return FirebaseAuth.getInstance().getCurrentUser()!=null;
     }
-
 
 
 
@@ -102,21 +83,20 @@ public class Server {
 
     public static void studentRegister(String id, String givenName, String surname, String email,
                                    String photoUrl, String major, String password, StudentRegisterActivity sRActivity, Callback<User> callback) {
-        //final boolean[] worked = {false};
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+        initialize();
+        mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            //worked[0] = true;
                             Log.d("registerStudent", "createUserWithEmail:success");
                             Object[] params = {id, givenName, surname, email, photoUrl, major, sRActivity};
-                            loginUser(email, password, null, params, callback);
-                            //addUser(id, givenName, surname, email, photoUrl, major, sRActivity);
+                            //loginUser(email, password, null, params, callback); //redundant
+                            addUser2(id, givenName, surname, email, photoUrl, major, callback);
                         }
                         else {
                             Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
-                            //worked[0] = false;
+                            callback.onFailure(task.getException());
                         }
                     }
                 });
@@ -125,8 +105,8 @@ public class Server {
     }
 
 
-    private static void addUser2(String id, String givenName, String surname, String email, String photoUrl, String major,
-                          StudentRegisterActivity activity, Callback<User> callback) { //add user to the database
+    private static void addUser2(String id, String givenName, String surname, String email, String photoUrl, String major
+            ,Callback<User> callback) { //add user to the database
         Map<String, Object> s = new HashMap<>();
         s.put("id", id);
         s.put("givenName", givenName);
@@ -144,7 +124,7 @@ public class Server {
                     public void onSuccess(Void aVoid) {
                         Log.d("database", "DocumentSnapshot added with ID: ");
                        // activity.changeActivitySuccess(true);
-                        callback.onSuccess(getCurrentUser());
+                        getCurrentUser(callback);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -160,14 +140,15 @@ public class Server {
 
 
 
-    public static User getCurrentUser() {
-        // TODO: replace this
+    public static void getCurrentUser(Callback<User> callback) {
+        initialize(); //perhaps redundant
         if(FirebaseAuth.getInstance().getCurrentUser()==null){
             Log.d("getUser", "No Logged In User");
-            return null;
+            callback.onFailure(null);
+            return;
         }
-        DocumentReference docRef = FirebaseFirestore.getInstance().collection("StudentDetail")
-                .document(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DocumentReference docRef = db.collection("StudentDetail")
+                .document(mAuth.getCurrentUser().getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -176,36 +157,67 @@ public class Server {
                     if (document.exists()) {
                         Log.d("getUser", "DocumentSnapshot data: " + document.getData());
                         //return document.getData()
-                        boolean deleted = (boolean) document.getData().get("deleted");
                         boolean student = (boolean) document.getData().get("student");
+                        String givenName = (String) document.getData().get("givenName");
+                        String surname = (String) document.getData().get("surname");
+                        String id = (String) document.getData().get("id");
+                        String email = (String) document.getData().get("email");
+                        String photoUrl = (String) document.getData().get("photoUrl");
                         if(student) { //if a student
                             //can also check if the user is deleted by checking against "deleted"
-
-                            String givenName = (String) document.getData().get("givenName");
-                            String surname = (String) document.getData().get("surname");
-                            String id = (String) document.getData().get("id");
+                            boolean deleted = (boolean) document.getData().get("deleted");
                             String major = (String) document.getData().get("major");
-                            String email = (String) document.getData().get("email");
-                            String photoUrl = (String) document.getData().get("photoUrl");
                             Student profile = new Student(id, givenName, surname, email, photoUrl, major);
+                            //Student profile = document.toObject(Student.class);  //doesn't work because i am checking if they are a student
                             //handling that we succeeded
+                            callback.onSuccess(profile);
                         }
                         else if(!student) { //manager
                             //make manager
+                            Manager manager = new Manager(id, givenName, surname, email, photoUrl);
+                            callback.onSuccess(manager);
                         }
                     } else {
                        Log.d("getUSer", "No such document");
+                       callback.onFailure(task.getException());
+
                     }
                 } else {
                     Log.d("getUser", "get failed with ", task.getException());
+                    callback.onFailure(task.getException());
                 }
             }
         });
-        return testStudent;
     }
 
+    public static void deleteStudent(Callback<Boolean> callback){
+        initialize();
+        if(mAuth.getCurrentUser()==null){
+            Log.d("userDelete", "no user logged in");
+            callback.onFailure(null);
+            return;
+        }
+        String uID = mAuth.getCurrentUser().getUid();
+        FirebaseUser user = mAuth.getCurrentUser();
+        user.delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("userDelete", "User account deleted.");
+                            callback.onSuccess(true);
+                        }
+                        else{
+                            callback.onFailure(task.getException());
+                        }
+                    }
+                });
+    }
+
+
     public static void getStudent(String uID, Callback<Student> callback) {
-        DocumentReference docRef = FirebaseFirestore.getInstance().collection("StudentDetail")
+        initialize();
+        DocumentReference docRef = db.collection("StudentDetail")
                 .document(uID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -233,12 +245,15 @@ public class Server {
                         }
                         else if(!student) { //manager
                             Log.d("getStudent", "Trying to access a manager");
+                            callback.onFailure(null);
                         }
                     } else {
                         Log.d("getStudent", "No such document");
+                        callback.onFailure(task.getException());
                     }
                 } else {
                     Log.d("getStudent", "get failed with ", task.getException());
+                    callback.onFailure(task.getException());
                 }
             }
         });
@@ -259,28 +274,54 @@ public class Server {
                 });
     }
 
-    public static void changePhotoUrl(String newURL){  //changes current user's password
+    public static void changePhotoUrl(Uri file, Callback<String> callback){  //changes current user's password
         initialize();
-        if(FirebaseAuth.getInstance().getCurrentUser()==null){
+        if(mAuth.getCurrentUser()==null){
             Log.d("changePhotoURL", "No Logged In User");
+            callback.onFailure(null);
             return;
         }
-        DocumentReference docRef = FirebaseFirestore.getInstance().collection("StudentDetail")
-                .document(FirebaseAuth.getInstance().getCurrentUser().getUid()); //get the current user document
-        docRef
-                .update("PhotoUrl", newURL)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("changePhotoUrl", "DocumentSnapshot successfully updated!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("changePhotoUrl", "Error updating document", e);
-                    }
-                });
+
+        String uID = mAuth.getCurrentUser().getUid();
+        StorageReference fileRef = storageRef.child("images/"+uID + file.getLastPathSegment());
+        UploadTask uploadTask = fileRef.putFile(file);
+        uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                Log.d("Photo Uri", "Upload is " + progress + "% done");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Log.d("Photo Uri", "could not handle Uri");
+                callback.onFailure(exception);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
+            @Override
+            public void onSuccess(TaskSnapshot taskSnapshot) {
+                Log.d("Photo Uri", "handled Uri succesfully");
+                String URL = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
+                DocumentReference docRef = db.collection("StudentDetail")
+                        .document(mAuth.getCurrentUser().getUid()); //get the current user document
+                docRef.update("PhotoUrl", URL)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("changePhotoUrl", "DocumentSnapshot successfully updated!");
+                            callback.onSuccess(URL);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("changePhotoUrl", "Error updating document", e);
+                            callback.onFailure(e);
+                        }
+                    });
+            }
+        });
     }
 
 
