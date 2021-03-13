@@ -77,6 +77,6 @@ public class LoginActivity extends AppCompatActivity {
     }
     private boolean validate(String name, String password){
         //will call the server function that allows to check if email/password combo is legitimate
-        return false;
+        return true;
     }
 }
