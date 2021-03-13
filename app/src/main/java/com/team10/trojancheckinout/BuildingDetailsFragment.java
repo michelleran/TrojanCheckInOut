@@ -38,9 +38,6 @@ public class BuildingDetailsFragment extends Fragment {
 
     private final String TAG = "BuildingDetailsFragment";
 
-    /**
-     * Don't use! Use {@link BuildingDetailsFragment#newInstance} instead.
-     */
     public BuildingDetailsFragment() {
         // Required empty public constructor
     }
