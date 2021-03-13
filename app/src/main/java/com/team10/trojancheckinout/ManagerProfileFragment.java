@@ -1,7 +1,10 @@
 package com.team10.trojancheckinout;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -58,20 +62,49 @@ public class ManagerProfileFragment extends Fragment {
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                handleLeftButton();
+                toggleViewState();
+            }
+        });
+
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handleRightButton();
             }
         });
 
         return rootView;
     }
 
-    public void handleLeftButton() {
-        /* Toggling the visibility of the First Name, Last Name, and Email fields.
-           Making the TextView invisible and EditView visible for the edit component.
-         */
+
+    public void handleRightButton() {
+        if (viewState == 0) {
+            Server.logOutUser();
+            Toast.makeText(getActivity(), "Successfully Logged Out", Toast.LENGTH_SHORT).show();
+            Intent loginPage = new Intent(getActivity(), StartPage.class);
+            startActivity(loginPage);
+        }
+        if (viewState == 1) {
+            String newPassword = edtNewPassword.getText().toString();
+            String confirmPassword = edtConfirmPassword.getText().toString();
+            int passwordValidation = validatePassword(newPassword, confirmPassword);
+            if (passwordValidation == 2) {
+                Toast.makeText(getActivity(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+            }
+            else if (passwordValidation == 1) {
+                Toast.makeText(getActivity(), "Password(s) are empty", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(getActivity(), "Password successfully updated", Toast.LENGTH_LONG).show();
+                Server.changePassword(newPassword);
+                toggleViewState();
+            }
+        }
+    }
+
+    public void toggleViewState() {
         if (viewState == 0) {
             viewState = 1;
-
             txtGivenName.setVisibility(View.INVISIBLE);
             edtNewPassword.setVisibility(View.VISIBLE);
 
@@ -86,9 +119,8 @@ public class ManagerProfileFragment extends Fragment {
             imgPhoto.setColorFilter(Color.rgb(64, 64, 64));
             imgPhoto.setImageAlpha(200);
         }
-        else if (viewState == 1) {
+        else {
             viewState = 0;
-
             edtNewPassword.setVisibility(View.INVISIBLE);
             txtGivenName.setVisibility(View.VISIBLE);
 
@@ -103,9 +135,17 @@ public class ManagerProfileFragment extends Fragment {
             imgPhoto.clearColorFilter();
             imgPhoto.setImageAlpha(255);
         }
-
-
     }
 
-
+    public static int validatePassword(String newPassword, String confirmPassword) {
+        if (newPassword.length() == 0 || confirmPassword.length() == 0) {
+            return 1;
+        }
+         else {
+            if (!newPassword.equals(confirmPassword)) {
+                return 2;
+            }
+            else return 0;
+        }
+    }
 }

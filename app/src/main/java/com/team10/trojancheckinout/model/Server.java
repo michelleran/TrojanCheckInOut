@@ -61,4 +61,10 @@ public class Server {
         callback.onSuccess(new Record(buildingName, false));
         callback.onSuccess(new Record(buildingName, true));
     }
+
+    // Based upon https://github.com/michelleran/TrojanCheckInOut/pull/27
+    public static void logOutUser() {}
+    public static void changePassword(String newPassword) {}
+
+
 }
