@@ -80,9 +80,8 @@ public class Server {
     }
 
 
-
-    public static void studentRegister(String id, String givenName, String surname, String email,
-                                   String photoUrl, String major, String password, StudentRegisterActivity sRActivity, Callback<User> callback) {
+    public static void managerRegister(String id, String givenName, String surname, String email,
+                                       String photoUrl, String password, Callback<User> callback) {
         initialize();
         mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
@@ -90,9 +89,8 @@ public class Server {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d("registerStudent", "createUserWithEmail:success");
-                            Object[] params = {id, givenName, surname, email, photoUrl, major, sRActivity};
                             //loginUser(email, password, null, params, callback); //redundant
-                            addUser2(id, givenName, surname, email, photoUrl, major, callback);
+                            addUser2(id, givenName, surname, email, photoUrl, null, callback, false);
                         }
                         else {
                             Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
@@ -101,39 +99,82 @@ public class Server {
                     }
                 });
 
-        //return worked[0];
+    }
+
+
+
+
+
+    public static void studentRegister(String id, String givenName, String surname, String email,
+                                   String photoUrl, String major, String password, Callback<User> callback) {
+        initialize();
+        mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("registerStudent", "createUserWithEmail:success");
+                            addUser2(id, givenName, surname, email, photoUrl, major, callback, true);
+                        }
+                        else {
+                            Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
+                            callback.onFailure(task.getException());
+                        }
+                    }
+                });
     }
 
 
     private static void addUser2(String id, String givenName, String surname, String email, String photoUrl, String major
-            ,Callback<User> callback) { //add user to the database
+            ,Callback<User> callback, boolean isStudent) { //add user to the database
         Map<String, Object> s = new HashMap<>();
         s.put("id", id);
         s.put("givenName", givenName);
         s.put("surname", surname);
         s.put("email", email);
         s.put("photoUrl", photoUrl);
-        s.put("major", major);
-        s.put("deleted", false);
-        s.put("student", true);
-        // Student s = new Student(id, givenName, surname, email, photoUrl, major);
-        FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .set(s)
-                .addOnSuccessListener(new OnSuccessListener<Void>(){
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("database", "DocumentSnapshot added with ID: ");
-                       // activity.changeActivitySuccess(true);
-                        getCurrentUser(callback);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("database", "Error adding document", e);
-                        callback.onFailure(e);
-                    }
-                });
+        s.put("student", isStudent);
+        if(isStudent) {
+            s.put("deleted", false);
+            s.put("major", major);
+            // Student s = new Student(id, givenName, surname, email, photoUrl, major);
+            FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .set(s)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("add user", "DocumentSnapshot added with ID: ");
+                            // activity.changeActivitySuccess(true);
+                            getCurrentUser(callback);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("add user", "Error adding document", e);
+                            callback.onFailure(e);
+                        }
+                    });
+        }
+        else{
+            FirebaseFirestore.getInstance().collection("ManagerDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .set(s)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("add user", "DocumentSnapshot added with ID: ");
+                            // activity.changeActivitySuccess(true);
+                            getCurrentUser(callback);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("add user", "Error adding document", e);
+                            callback.onFailure(e);
+                        }
+                    });
+        }
 
     }
 
