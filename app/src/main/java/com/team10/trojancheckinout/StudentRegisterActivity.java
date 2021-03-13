@@ -1,8 +1,10 @@
 package com.team10.trojancheckinout;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.team10.trojancheckinout.model.Server;
 
 public class StudentRegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -31,6 +35,10 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
     private Button sPhoto;
 
     private boolean isValid = false;
+
+    private Uri imageUri;
+    private boolean gotImage = false;
+    private Server server;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +73,10 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
                 isValid = validate(iFname,iLname,iEmail,iPassword,iID);
 
                 if(isValid){
-                    Toast.makeText(StudentRegisterActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StudentRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+
+                    //server.registerStudent(iFname, iLname, iID, iEmail, iPassword, Callback<Student> callback)
+                    //if(gotImage){server.changePhoto(imageURI, Callback<Student> callback);}
 
                     Intent intent = new Intent(StudentRegisterActivity.this, StudentActivity.class);
                     startActivity(intent);
@@ -84,7 +95,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         sPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                choosePicture();
             }
         });
     }
@@ -119,6 +130,22 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         }
         Toast.makeText(getApplicationContext(), "Selected Major: "+ selectedMajor ,Toast.LENGTH_SHORT).show();
         return true;
+    }
+
+    private void choosePicture(){
+        Intent itt = new Intent();
+        itt.setType("image/*");
+        itt.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(itt, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1 && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+            gotImage = true;
+            imageUri = data.getData();
+        }
     }
 
 }
