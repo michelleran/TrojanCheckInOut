@@ -21,7 +21,8 @@
             android:label="@string/title_activity_manager"
             android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
 
-        <activity android:name=".StartPage">
+        <activity android:name=".StartPage"
+            android:theme="@style/Theme.TrojanCheckInOut.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
