@@ -130,28 +130,6 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         // none
     }
 
-    /*private boolean validate(String fname, String lname, String email, String password, String ID){
-        //Toast.makeText(getApplicationContext(), "Email: " + email ,Toast.LENGTH_SHORT).show();
-        if(fname.isEmpty() || lname.isEmpty() || email.isEmpty() || password.isEmpty() || ID.isEmpty()){
-            Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        else if(!email.contains("usc.edu")){
-            Toast.makeText(getApplicationContext(), "Please enter a usc email!" ,Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        else if(password.length() < 8){
-            Toast.makeText(getApplicationContext(), "Please enter a password at least 8 characters long!" ,Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        else if(ID.length() != 10){
-            Toast.makeText(getApplicationContext(), "Please enter your TEN digit USC ID!" ,Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        Toast.makeText(getApplicationContext(), "Selected Major: "+ selectedMajor ,Toast.LENGTH_SHORT).show();
-        return true;
-    }*/
-
     private void choosePicture(){
         Intent itt = new Intent();
         itt.setType("image/*");
