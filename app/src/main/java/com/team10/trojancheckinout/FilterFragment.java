@@ -163,8 +163,7 @@ public class FilterFragment extends Fragment {
                     // TODO: handle
                 }
                 major = spinner.getSelectedItem().toString();
-
-                // TODO: validate
+                // inputs are allowed to be empty
 
                 // open filter results (replace this fragment)
                 final FragmentTransaction ft = getFragmentManager().beginTransaction();
