@@ -16,8 +16,6 @@ import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
-import com.team10.trojancheckinout.LoginActivity;
-import com.team10.trojancheckinout.StudentRegisterActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +40,9 @@ public class Server {
 
     }
 
-    public static boolean isLoggedIn(){
-        return FirebaseAuth.getInstance().getCurrentUser()!=null;
+    public static boolean isLoggedIn() {
+        return FirebaseAuth.getInstance().getCurrentUser() != null;
+    }
 
     public static String[] getMajors() { return majors; }
 
