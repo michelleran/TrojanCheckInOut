@@ -29,8 +29,6 @@ public class Server {
     private static FirebaseFirestore db;
     private static StorageReference storageRef;
 
-    private static final String[] majors = { "Major 1", "Major 2" };
-
     // TODO: delete later
     private static final Student testStudent =
         new Student("0", "Test", "User", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg", "CSCI");
@@ -44,8 +42,6 @@ public class Server {
     public static boolean isLoggedIn() {
         return FirebaseAuth.getInstance().getCurrentUser() != null;
     }
-
-    public static String[] getMajors() { return majors; }
 
     public static void login(String email, String password, Callback<User> callback){
         if(mAuth.getCurrentUser()!=null) {
@@ -80,7 +76,7 @@ public class Server {
     }
 
     public static void managerRegister(String id, String givenName, String surname, String email,
-                                       Uri file, String password, Callback<User> callback) {
+                                       Uri file, String password, Callback<User> callback) { // TODO: managers don't have ids
         mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
                     @Override
