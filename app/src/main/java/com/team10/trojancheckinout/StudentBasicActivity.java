@@ -43,7 +43,10 @@ public class StudentBasicActivity extends AppCompatActivity {
                 String currBuilding = result.getCurrentBuilding();
                 if(currBuilding != null) currentBuilding.setText(currBuilding);
                 else currentBuilding.setText(R.string.none);
-                Glide.with(getApplicationContext()).load(result.getPhotoUrl()).into(photoUrl);
+                Glide.with(getApplicationContext())
+                    .load(result.getPhotoUrl())
+                    .override(400, 400).centerCrop()
+                    .into(photoUrl);
             }
 
             @Override

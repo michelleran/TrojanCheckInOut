@@ -94,8 +94,6 @@
         android:id="@+id/sMajors"
         android:layout_width="193dp"
         android:layout_height="42dp"
-        android:background="#F6F3F3"
-        android:backgroundTint="#FBFBFB"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

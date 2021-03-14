@@ -29,15 +29,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity">
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>!-->
-        </activity>
+        <activity android:name=".LoginActivity" />
 
-        <activity android:name=".StudentRegisterActivity"></activity>
-        <activity android:name=".ManagerRegisterActivity"></activity>
+        <activity android:name=".StudentRegisterActivity" />
+        <activity android:name=".ManagerRegisterActivity" />
 
     </application>
 </manifest>

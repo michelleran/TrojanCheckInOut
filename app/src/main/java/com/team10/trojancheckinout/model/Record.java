@@ -20,8 +20,9 @@ public class Record {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
     public Record() { }
+
     public Record(String buildingId, String major, boolean checkIn) {
-        this.studentId = Server.getCurrentUser().getIdString(); // assumes current user is a student
+        this.studentId = Server.getCurrentUserId(); // assumes current user is a student
         this.buildingId = buildingId;
         this.time = LocalDateTime.now(pst);
         this.year = time.getYear();
@@ -30,6 +31,7 @@ public class Record {
         this.hour = time.getHour();
         this.minute = time.getMinute();
         this.checkIn = checkIn;
+        this.major = major;
     }
 
     public String getStudentId() { return studentId; }

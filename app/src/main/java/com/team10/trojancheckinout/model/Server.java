@@ -17,6 +17,9 @@ import com.google.firebase.storage.*;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,20 +47,13 @@ public class Server {
         storage = FirebaseStorage.getInstance();
         // TODO: anything else
         storageRef = FirebaseStorage.getInstance().getReference();
-
-
     }
 
     public static boolean isLoggedIn() {
         return FirebaseAuth.getInstance().getCurrentUser() != null;
     }
 
-    public static String[] getMajors() { return majors; }
-
     public static void login(String email, String password, Callback<User> callback){
-        initialize();
-        //LoginActivity la = new LoginActivity();
-        //final boolean[] worked = {false};
         if(mAuth.getCurrentUser()!=null) {
             Log.d("login", "Already Signed In");
             getCurrentUser(callback);
@@ -84,14 +80,13 @@ public class Server {
         }
     }
 
-    public static void logout(){
+    public static void logout() {
         FirebaseAuth.getInstance().signOut();
         Log.w("log out", "log out attempt");
     }
 
     public static void managerRegister(String id, String givenName, String surname, String email,
-                                       Uri file, String password, Callback<User> callback) {
-        initialize();
+                                       Uri file, String password, Callback<User> callback) { // TODO: managers don't have ids
         mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
                     @Override
@@ -111,7 +106,6 @@ public class Server {
 
     public static void studentRegister(String id, String givenName, String surname, String email,
                                    Uri file, String major, String password, Callback<User> callback) {
-        initialize();
         mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
                     @Override
@@ -131,12 +125,12 @@ public class Server {
     private static void addUser2(String id, String givenName, String surname, String email, Uri file, String major
             ,Callback<User> callback, boolean isStudent) { //add user to the database
         Map<String, Object> s = new HashMap<>();
-        //s.put("id", id);
         s.put("givenName", givenName);
         s.put("surname", surname);
         s.put("email", email);
         s.put("student", isStudent);
         if(isStudent) {
+            s.put("id", id);
             s.put("deleted", false);
             s.put("major", major);
         }
@@ -146,7 +140,7 @@ public class Server {
         UploadTask uploadTask = fileRef.putFile(file);
         uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
             @Override
-            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+            public void onProgress(@NotNull UploadTask.TaskSnapshot taskSnapshot) {
                 double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
                 Log.d("Photo Uri", "Upload is " + progress + "% done");
             }
@@ -160,81 +154,45 @@ public class Server {
         }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
             @Override
             public void onSuccess(TaskSnapshot taskSnapshot) {
-                String URL = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
-                s.put("photoUrl", URL);
-                Log.d("Photo Uri", "could not handle Uri");
-                FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        .set(s)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("add user", "DocumentSnapshot added with ID: ");
-                                // activity.changeActivitySuccess(true);
-
-                                getCurrentUser(callback);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("add user", "Error adding document", e);
-                                callback.onFailure(e);
-                            }
-                        });
+                taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        s.put("photoUrl", uri.toString());
+                        Log.d("Photo Uri", "could not handle Uri");
+                        FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .set(s)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("add user", "DocumentSnapshot added with ID: ");
+                                    getCurrentUser(callback);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("add user", "Error adding document", e);
+                                    callback.onFailure(e);
+                                }
+                            });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
             }
         });
-
-
-
-
-
-            // Student s = new Student(id, givenName, surname, email, photoUrl, major);
-//            FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-//                    .set(s)
-//                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                        @Override
-//                        public void onSuccess(Void aVoid) {
-//                            Log.d("add user", "DocumentSnapshot added with ID: ");
-//                            // activity.changeActivitySuccess(true);
-//
-//                            getCurrentUser(callback);
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Log.w("add user", "Error adding document", e);
-//                            callback.onFailure(e);
-//                        }
-//                    });
-//         }
-//         else{
-//             FirebaseFirestore.getInstance().collection("ManagerDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-//                     .set(s)
-//                     .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                         @Override
-//                         public void onSuccess(Void aVoid) {
-//                             Log.d("add user", "DocumentSnapshot added with ID: ");
-//                             // activity.changeActivitySuccess(true);
-//                             getCurrentUser(callback);
-//                         }
-//                     })
-//                     .addOnFailureListener(new OnFailureListener() {
-//                         @Override
-//                         public void onFailure(@NonNull Exception e) {
-//                             Log.w("add user", "Error adding document", e);
-//                             callback.onFailure(e);
-//                         }
-//                     });
-//         }
-
     }
 
-
-
+    public static String getCurrentUserId() {
+        if (mAuth.getCurrentUser() == null)
+            return null;
+        return mAuth.getCurrentUser().getUid();
+    }
 
     public static void getCurrentUser(Callback<User> callback) {
-        initialize(); //perhaps redundant
         if(FirebaseAuth.getInstance().getCurrentUser()==null){
             Log.d("getUser", "No Logged In User");
             callback.onFailure(null);
@@ -284,7 +242,6 @@ public class Server {
     }
 
     public static void deleteManager(Callback<Void> callback) {
-        initialize();
         if(mAuth.getCurrentUser()==null){
             Log.d("userDelete", "no user logged in");
             callback.onFailure(null);
@@ -324,7 +281,6 @@ public class Server {
 
 
     public static void deleteStudent(Callback<Void> callback){
-        initialize();
         if(mAuth.getCurrentUser()==null){
             Log.d("userDelete", "no user logged in");
             callback.onFailure(null);
@@ -365,7 +321,6 @@ public class Server {
 
 
     public static void getStudent(String uID, Callback<Student> callback) {
-        initialize();
         DocumentReference docRef = db.collection("StudentDetail")
                 .document(uID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -409,7 +364,6 @@ public class Server {
     }
 
     public static void changePassword(String newPassword, Callback<Void> callback){  //changes current user's password
-        initialize();
         FirebaseUser user = mAuth.getCurrentUser();
         user.updatePassword(newPassword)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -427,10 +381,9 @@ public class Server {
                 });
     }
 
-    public static void changePhotoUrl(Uri file, Callback<String> callback){  //changes current user's password
-        initialize();
+    public static void changePhoto(Uri file, Callback<String> callback){
         if(mAuth.getCurrentUser()==null){
-            Log.d("changePhotoURL", "No Logged In User");
+            Log.d("changePhoto", "No Logged In User");
             callback.onFailure(null);
             return;
         }
