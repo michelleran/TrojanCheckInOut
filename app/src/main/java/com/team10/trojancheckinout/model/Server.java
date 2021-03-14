@@ -8,7 +8,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import android.net.Uri;
-import android.telecom.Call;
 
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
@@ -133,15 +132,17 @@ public class Server {
                             return;
                         }
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                            listener.onAdd(dc.getDocument().toObject(Building.class));
                             switch (dc.getType()) {
                                 case ADDED:
+                                    listener.onAdd(dc.getDocument().toObject(Building.class));
                                     Log.d(TAG, "New building: " + dc.getDocument().getData());
                                     break;
                                 case MODIFIED:
+                                    listener.onUpdate(dc.getDocument().toObject(Building.class));
                                     Log.d(TAG, "Modified building: " + dc.getDocument().getData());
                                     break;
                                 case REMOVED:
+                                    listener.onRemove(dc.getDocument().toObject(Building.class));
                                     Log.d(TAG, "Removed building: " + dc.getDocument().getData());
                                     break;
                             }
@@ -213,34 +214,19 @@ public class Server {
                     Record record = new Record(newBuildingRef.getId(), (String)studentSnapshot.get("major"), true);
                     addRecord(record);
                 }else{
-                    // Get student's old building
-                    db.collection("building")
-                            .whereEqualTo("name", studentSnapshot.get("currentBuilding"))
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            Log.d(TAG, document.getId() + " => " + document.getData());
-                                            DocumentReference oldBuildingRef = document.getReference();
-                                            // Update each buildings capacity
-                                            transaction.update(newBuildingRef, "currentCapacity", (int)newBuildingSnapshot.get("currentCapacity")+1);
-                                            transaction.update(oldBuildingRef, "currentCapacity", (int)document.get("currentCapacity")-1);
-                                            // Update student's current building
-                                            transaction.update(studentRef, "currentBuilding", newBuildingSnapshot.get("name"));
+                    final DocumentReference oldBuildingRef = db.collection("buildings").document((String)studentSnapshot.get("currentBuilding"));
+                    DocumentSnapshot oldBuildingSnapshot = transaction.get(oldBuildingRef);
+                    // Update each buildings capacity
+                    transaction.update(newBuildingRef, "currentCapacity", (int)newBuildingSnapshot.get("currentCapacity")+1);
+                    transaction.update(oldBuildingRef, "currentCapacity", (int)oldBuildingSnapshot.get("currentCapacity")-1);
+                    // Update student's current building
+                    transaction.update(studentRef, "currentBuilding", newBuildingSnapshot.get("name"));
 
-                                            // Generate records
-                                            Record record1 = new Record(newBuildingRef.getId(),(String)studentSnapshot.get("major"), true);
-                                            addRecord(record1);
-                                            Record record2 = new Record(oldBuildingRef.getId(),(String)studentSnapshot.get("major"), false);
-                                            addRecord(record2);
-                                        }
-                                    } else {
-                                        Log.d(TAG, "Error getting documents: ", task.getException());
-                                    }
-                                }
-                            });
+                    // Generate records
+                    Record record1 = new Record(newBuildingRef.getId(),(String)studentSnapshot.get("major"), true);
+                    addRecord(record1);
+                    Record record2 = new Record(oldBuildingRef.getId(),(String)studentSnapshot.get("major"), false);
+                    addRecord(record2);
                 }
 
                 // Success
@@ -249,6 +235,7 @@ public class Server {
         }).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                callback.onSuccess(aVoid);
                 Log.d(TAG, "Transaction success!");
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -321,8 +308,8 @@ public class Server {
         // TODO: listen to query "students where student's current building = building id"
         initialize();
 
-        db.collection("cities")
-                .whereEqualTo("state", "CA")
+        db.collection("students")
+                .whereEqualTo("currentBuilding", buildingId)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -333,15 +320,18 @@ public class Server {
                         }
 
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                            listener.onAdd(dc.getDocument().toObject(Student.class));
+
                             switch (dc.getType()) {
                                 case ADDED:
+                                    listener.onAdd(dc.getDocument().toObject(Student.class));
                                     Log.d(TAG, "New city: " + dc.getDocument().getData());
                                     break;
                                 case MODIFIED:
+                                    listener.onUpdate(dc.getDocument().toObject(Student.class));
                                     Log.d(TAG, "Modified city: " + dc.getDocument().getData());
                                     break;
                                 case REMOVED:
+                                    listener.onRemove(dc.getDocument().toObject(Student.class));
                                     Log.d(TAG, "Removed city: " + dc.getDocument().getData());
                                     break;
                             }
@@ -357,57 +347,57 @@ public class Server {
                                      Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
         initialize();
         CollectionReference records = db.collection("records");
-
+        Query query = records;
         // Set start parameters
         if(startYear != -1){
-            records.whereGreaterThanOrEqualTo("year", startYear);
+            query = query.whereGreaterThanOrEqualTo("year", startYear);
         }
         if(startMonth != -1){
-            records.whereGreaterThanOrEqualTo("month", startMonth);
+            query = query.whereGreaterThanOrEqualTo("month", startMonth);
         }
         if(startDay != -1){
-            records.whereGreaterThanOrEqualTo("day", startDay);
+            query = query.whereGreaterThanOrEqualTo("day", startDay);
         }
         if(startHour != -1){
-            records.whereGreaterThanOrEqualTo("hour", startDay);
+            query = query.whereGreaterThanOrEqualTo("hour", startDay);
         }
         if(startMin != -1){
-            records.whereGreaterThanOrEqualTo("minute", startMin);
+            query = query.whereGreaterThanOrEqualTo("minute", startMin);
         }
 
         // Set end parameters
         if(endYear != -1){
-            records.whereLessThanOrEqualTo("year", endYear);
+            query = query.whereLessThanOrEqualTo("year", endYear);
         }
         if(endMonth != -1){
-            records.whereLessThanOrEqualTo("month", endYear);
+            query = query.whereLessThanOrEqualTo("month", endYear);
         }
         if(endDay != -1){
-            records.whereLessThanOrEqualTo("day", endDay);
+            query = query.whereLessThanOrEqualTo("day", endDay);
         }
         if(endHour != -1){
-            records.whereLessThanOrEqualTo("hour", endDay);
+            query = query.whereLessThanOrEqualTo("hour", endDay);
         }
         if(endMin != -1){
-            records.whereLessThanOrEqualTo("minute", endMin);
+            query = query.whereLessThanOrEqualTo("minute", endMin);
         }
 
         // Filter by building name
         if(buildingName != ""){
-            records.whereEqualTo("buildingID", buildingNameIDMap.get(buildingName));
+            query = query.whereEqualTo("buildingID", buildingNameIDMap.get(buildingName));
         }
 
         // Filter by student
         if(studentId != -1){
-            records.whereEqualTo("studentID", studentId);
+            query = query.whereEqualTo("studentID", studentId);
         }
 
         // Filter by major
         if(major != ""){
-            records.whereEqualTo("major", major);
+            query = query.whereEqualTo("major", major);
         }
 
-        records
+        query
             .get()
             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override

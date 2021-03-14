@@ -23,12 +23,12 @@ public class Record {
     public Record(String buildingId, String major, boolean checkIn) {
         this.studentId = Server.getCurrentUser().getIdString(); // assumes current user is a student
         this.buildingId = buildingId;
-        this.year = LocalDateTime.now(pst).getYear();
-        this.month = LocalDateTime.now(pst).getMonthValue();
-        this.day = LocalDateTime.now(pst).getDayOfYear();
-        this.hour = LocalDateTime.now(pst).getHour();
-        this.minute = LocalDateTime.now(pst).getMinute();
         this.time = LocalDateTime.now(pst);
+        this.year = time.getYear();
+        this.month = time.getMonthValue();
+        this.day = time.getDayOfYear();
+        this.hour = time.getHour();
+        this.minute = time.getMinute();
         this.checkIn = checkIn;
     }
 
