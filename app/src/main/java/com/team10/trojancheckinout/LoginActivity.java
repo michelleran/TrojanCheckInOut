@@ -73,12 +73,12 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
 
-                    counter--;
+                    /*counter--;
 
                     eAttemptsInfo.setText("No. of attempts remaining: " + counter);
                     if(counter == 0){
                         eLogin.setEnabled(false);
-                    }
+                    }*/
 
                 }
 
