@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.AsyncCallable;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Manager;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.model.User;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -61,35 +62,50 @@ public class ManagerProfileFragment extends Fragment {
         edtNewPassword = (EditText) rootView.findViewById(R.id.edtNewPassword);
         edtConfirmPassword = (EditText) rootView.findViewById(R.id.edtConfirmPassword);
         imgPhoto = (ImageView) rootView.findViewById(R.id.imgPhoto);
-
-        currentManager = (Manager) Server.getCurrentUser_manager();
-        urlImgPhoto = currentManager.getPhotoUrl();
-        Glide.with(this).load(currentManager.getPhotoUrl()).override(400, 400).into(imgPhoto);
-
-        txtGivenName.setText("First Name: " + currentManager.getGivenName());
-        txtSurname.setText("Surname: " + currentManager.getSurname());
-        txtEmail.setText("Email: " + currentManager.getEmail());
-
-        btnEdit.setOnClickListener(new View.OnClickListener() {
+        currentManager = null;
+        Server.getCurrentUser(new Callback<User>() {
             @Override
-            public void onClick(View view) {
-                handleEditPasswordButton();
+            public void onSuccess(User result) {
+                currentManager = (Manager) result;
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e("Manager Profile Fragment", "Getting User Failed", exception);
+                Toast.makeText(getActivity(), "Unable to Retrieve User Information", Toast.LENGTH_SHORT);
             }
         });
 
-        btnChangePicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleChangePasswordButton();
-            }
-        });
+        if (currentManager != null) {
+            urlImgPhoto = currentManager.getPhotoUrl();
+            Glide.with(this).load(currentManager.getPhotoUrl()).override(400, 400).into(imgPhoto);
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleLogout();
-            }
-        });
+            txtGivenName.setText("First Name: " + currentManager.getGivenName());
+            txtSurname.setText("Surname: " + currentManager.getSurname());
+            txtEmail.setText("Email: " + currentManager.getEmail());
+
+            btnEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    handleEditPasswordButton();
+                }
+            });
+
+            btnChangePicture.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    handleChangePasswordButton();
+                }
+            });
+
+            btnLogout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    handleLogout();
+                }
+            });
+        }
+
 
 
         return rootView;
