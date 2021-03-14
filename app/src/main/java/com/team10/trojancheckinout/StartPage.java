@@ -15,8 +15,6 @@ public class StartPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_page);
 
-        Server.initialize();
-
         Button elogin = findViewById(R.id.startLoginbtn);
         Button estudentRegister = findViewById(R.id.studentRegisterBtn);
         Button emanagerRegister = findViewById(R.id.managerRegisterBtn);

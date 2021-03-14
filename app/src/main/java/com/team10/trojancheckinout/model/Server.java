@@ -492,7 +492,6 @@ public class Server {
     }
 
     public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
-        initialize();
         final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
         db.runTransaction(new Transaction.Function<Void>() {
             @Override
@@ -589,8 +588,6 @@ public class Server {
     }
 
     public static void checkOut(String id, Callback<Void> callback){
-        initialize();
-
         final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
         final DocumentReference studentDocRef = db.collection(USER_COLLECTION).document(auth.getUid());
         db.runTransaction(new Transaction.Function<Void>() {
@@ -634,7 +631,6 @@ public class Server {
     }
 
     private static void addRecord(Record record){
-        initialize();
         db.collection(RECORD_COLLECTION)
                 .add(record)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

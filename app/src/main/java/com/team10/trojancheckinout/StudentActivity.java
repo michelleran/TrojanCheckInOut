@@ -64,8 +64,25 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                 lName = student.getSurname();
                 usc_id = student.getIdString();
                 major_ = student.getMajor();
+
                 //gets building name through Server.getBuilding()
-                currBuilding = getBuildingName(student.getCurrentBuilding());
+                if (student.getCurrentBuilding() != null) {
+                    Server.getBuilding(student.getCurrentBuilding(), new Callback<Building>() {
+                        @Override
+                        public void onSuccess(Building result) {
+                            currBuilding = result.getName();
+                            currentBuilding_tv.setText(currBuilding);
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            currBuilding = null;
+                            Log.e(TAG, "onFailure: getBuildingName failure");
+                        }
+                    });
+                } else {
+                    currentBuilding_tv.setText(R.string.none);
+                }
+
                 photo_url = student.getPhotoUrl();
 
                 //set student data into TextView
@@ -73,8 +90,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                 surname_tv.setText(lName);
                 id_tv.setText(usc_id);
                 major_tv.setText(major_);
-                if (student.getCurrentBuilding() != null) currentBuilding_tv.setText(currBuilding);
-                else currentBuilding_tv.setText(R.string.none);
+
                 Glide.with(getApplicationContext()).load(photo_url)
                     .placeholder(R.drawable.default_profile_picture)
                     .override(400, 400).centerCrop()
@@ -94,21 +110,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
 
         //attach onclick listener
         scanQRCode_btn.setOnClickListener(this);
-    }
-
-    public String getBuildingName(String id){
-        Server.getBuilding(id, new Callback<Building>() {
-            @Override
-            public void onSuccess(Building result) {
-                currBuilding = result.getName();
-            }
-            @Override
-            public void onFailure(Exception exception) {
-                currBuilding = null;
-                Log.e(TAG, "onFailure: getBuildingName failure");
-            }
-        });
-        return currBuilding;
     }
 
     public void deleteAccount(View view){

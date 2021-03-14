@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.Student;
@@ -40,9 +41,23 @@ public class StudentBasicActivity extends AppCompatActivity {
                 surname.setText(result.getSurname());
                 id.setText(result.getIdString());
                 major.setText(result.getMajor());
-                String currBuilding = result.getCurrentBuilding();
-                if(currBuilding != null) currentBuilding.setText(currBuilding);
-                else currentBuilding.setText(R.string.none);
+
+                //gets building name through Server.getBuilding()
+                if (result.getCurrentBuilding() != null) {
+                    Server.getBuilding(result.getCurrentBuilding(), new Callback<Building>() {
+                        @Override
+                        public void onSuccess(Building result) {
+                            currentBuilding.setText(result.getName());
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: getBuildingName failure");
+                        }
+                    });
+                } else {
+                    currentBuilding.setText(R.string.none);
+                }
+
                 Glide.with(getApplicationContext())
                     .load(result.getPhotoUrl())
                     .override(400, 400).centerCrop()
