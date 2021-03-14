@@ -6,14 +6,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.model.User;
 import com.team10.trojancheckinout.utils.Validator;
 
+import static com.team10.trojancheckinout.model.Server.managerRegister;
 import static com.team10.trojancheckinout.utils.Validator.validateEmail;
 import static com.team10.trojancheckinout.utils.Validator.validateNotEmpty;
 import static com.team10.trojancheckinout.utils.Validator.validatePassword;
@@ -34,7 +38,6 @@ public class ManagerRegisterActivity extends AppCompatActivity {
 
     private Uri imageUri;
     private boolean gotImage = false;
-    private Server server;
 
 
     @Override
@@ -61,7 +64,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                 String iPassword = mPassword.getText().toString();
 
                 String [] allEntries = new String[] {iFname, iLname, iEmail, iPassword};
-                isValid = validateNotEmpty(allEntries, allEntries.length) && validateEmail(iEmail) && validatePassword(iPassword);
+                isValid = validateNotEmpty(allEntries, allEntries.length) && validateEmail(iEmail) && validatePassword(iPassword) && gotImage;
                 if(!validateNotEmpty(allEntries, allEntries.length)){
                     Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
                 }
@@ -71,16 +74,28 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                 else if(!validatePassword(iPassword)){
                     Toast.makeText(getApplicationContext(), "Please enter a password at least 8 characters long!" ,Toast.LENGTH_SHORT).show();
                 }
+                else if (!gotImage){
+                    Toast.makeText(getApplicationContext(), "Please add a photo!" ,Toast.LENGTH_SHORT).show();
+                }
 
                 if(isValid){
 
-                    //server.registerManager(iFname, iLname, iEmail, iPassword, Callback<manager> callback);
-                    //if(gotImage){server.changePhoto(imageUri, Callback<Manager> callback);}
+                    managerRegister("", iFname, iLname, iEmail, imageUri, iPassword, new Callback<User>() {
+                        @Override
+                        public void onSuccess(User result) {
+                            Toast.makeText(ManagerRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
 
-                    Toast.makeText(ManagerRegisterActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                            Intent it = new Intent(ManagerRegisterActivity.this, ManagerActivity.class);
+                            startActivity(it);
+                        }
 
-                    Intent it = new Intent(ManagerRegisterActivity.this, ManagerActivity.class);
-                    startActivity(it);
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Toast.makeText(ManagerRegisterActivity.this, "Registration failed: " + exception, Toast.LENGTH_SHORT).show();
+                            Log.d("Frontend Manager Register", "Failed to add manager to server");
+                        }
+                    });
+
                 }
 
             }
@@ -101,25 +116,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                 choosePicture();
             }
         });
-
     }
-
-    /*private boolean validate(String fname, String lname, String email, String password){
-        if(fname.isEmpty() || lname.isEmpty() || email.isEmpty() || password.isEmpty()){
-            Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        else if(!email.contains("usc.edu")){
-            Toast.makeText(getApplicationContext(), "Please enter a usc email!" ,Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        else if(password.length() < 8){
-            Toast.makeText(getApplicationContext(), "Please enter a password at least 8 characters long!" ,Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        return false;
-    }*/
 
     private void choosePicture(){
         Intent itt = new Intent();

@@ -124,6 +124,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         Toast.makeText(getApplicationContext(), "Selected Major: "+majors[position] ,Toast.LENGTH_SHORT).show();
         selectedMajor = majors[position];
     }
+
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {
         // none
