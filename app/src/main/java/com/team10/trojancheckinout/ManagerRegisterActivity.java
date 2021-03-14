@@ -116,9 +116,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                 choosePicture();
             }
         });
-
     }
-
 
     private void choosePicture(){
         Intent itt = new Intent();
