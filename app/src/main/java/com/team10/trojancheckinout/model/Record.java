@@ -9,24 +9,44 @@ public class Record {
     private String buildingId;
     private LocalDateTime time;
     private boolean checkIn;
+    private int year;
+    private int month;
+    private int day;
+    private int hour;
+    private int minute;
+    private String major;
 
     private static final ZoneId pst = ZoneId.of("America/Los_Angeles");
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
     public Record() { }
-    public Record(String buildingId, boolean checkIn) {
+
+    public Record(String buildingId, String major, boolean checkIn) {
         this.studentId = Server.getCurrentUserId(); // assumes current user is a student
         this.buildingId = buildingId;
         this.time = LocalDateTime.now(pst);
+        this.year = time.getYear();
+        this.month = time.getMonthValue();
+        this.day = time.getDayOfYear();
+        this.hour = time.getHour();
+        this.minute = time.getMinute();
         this.checkIn = checkIn;
+        this.major = major;
     }
 
     public String getStudentId() { return studentId; }
     public String getBuildingId() { return buildingId; }
     public LocalDateTime getTime() { return time; }
     public boolean getCheckIn() { return checkIn; }
-
     public String getTimeString() {
         return time.format(formatter);
     }
+
+
+    public int getYear() { return year; }
+    public int getMonth() { return month; }
+    public int getDay() { return day; }
+    public int getHour() { return hour; }
+    public int getMinute() { return minute; }
+    public String getMajor(){ return major;}
 }
