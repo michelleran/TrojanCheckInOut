@@ -6,8 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".StudentRegisterActivity">
 
+
+
     <Button
-        android:id="@+id/emBackButton"
+        android:id="@+id/esBackButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Go Back"
@@ -19,12 +21,12 @@
         app:layout_constraintVertical_bias="0.023" />
 
     <EditText
-        android:id="@+id/etMFname"
+        android:id="@+id/etSFname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
+        android:hint="First Name"
         android:inputType="textPersonName"
-        android:text="First Name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -33,21 +35,21 @@
         app:layout_constraintVertical_bias="0.155" />
 
     <EditText
-        android:id="@+id/etMLname"
+        android:id="@+id/etSLname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
+        android:hint="Last Name"
         android:inputType="textPersonName"
-        android:text="Last Name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etMFname"
+        app:layout_constraintTop_toBottomOf="@+id/etSFname"
         app:layout_constraintVertical_bias="0.037" />
 
     <EditText
-        android:id="@+id/etMEmail"
+        android:id="@+id/etSEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -57,11 +59,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etMLname"
+        app:layout_constraintTop_toBottomOf="@+id/etSLname"
         app:layout_constraintVertical_bias="0.029" />
 
     <EditText
-        android:id="@+id/etMPassword"
+        android:id="@+id/etSPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -71,7 +73,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etMEmail"
+        app:layout_constraintTop_toBottomOf="@+id/etSEmail"
         app:layout_constraintVertical_bias="0.034" />
 
     <EditText
@@ -85,13 +87,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etMPassword"
+        app:layout_constraintTop_toBottomOf="@+id/etSPassword"
         app:layout_constraintVertical_bias="0.025" />
 
     <Spinner
         android:id="@+id/sMajors"
         android:layout_width="193dp"
         android:layout_height="42dp"
+        android:background="#F6F3F3"
+        android:backgroundTint="#FBFBFB"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -107,5 +111,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sMajors"
-        app:layout_constraintVertical_bias="0.228" />
+        app:layout_constraintVertical_bias="0.495" />
+
+    <Button
+        android:id="@+id/sAddPhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Photo"
+        app:layout_constraintBottom_toTopOf="@+id/sRegBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sMajors" />
 </androidx.constraintlayout.widget.ConstraintLayout>
