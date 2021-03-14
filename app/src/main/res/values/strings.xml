@@ -23,10 +23,10 @@
     <string name="student_major">Major</string>
 
     <!-- TODO -->
-    <array name="majors">
+    <string-array name="majors">
         <item>Major 1</item>
         <item>Major 2</item>
-    </array>
+    </string-array>
     
     <string name="title_activity_test">test</string>
     <string name="firstname"><u>First Name:</u></string>

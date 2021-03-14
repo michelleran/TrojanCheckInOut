@@ -146,9 +146,8 @@ public class FilterFragment extends Fragment {
         EditText buildingNameField = rootView.findViewById(R.id.filter_building_field);
         EditText studentIdField = rootView.findViewById(R.id.filter_student_id_field);
 
-        String[] majors = Server.getMajors();
         Spinner spinner = rootView.findViewById(R.id.filter_major_spinner);
-        ArrayAdapter adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, majors);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.majors, android.R.layout.simple_spinner_item);
         spinner.setAdapter(adapter);
 
         Button filter = rootView.findViewById(R.id.filter_button);
@@ -168,7 +167,7 @@ public class FilterFragment extends Fragment {
                 // TODO: validate
 
                 // open filter results (replace this fragment)
-                final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                final FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.filter_tab_content,
                     FilterResultsFragment.newInstance(
                         startYear, startMonth, startDay, startHour, startMin,

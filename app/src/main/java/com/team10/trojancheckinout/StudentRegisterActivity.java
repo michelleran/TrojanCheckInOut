@@ -26,10 +26,7 @@ import static com.team10.trojancheckinout.utils.Validator.validateID;
 import static com.team10.trojancheckinout.utils.Validator.validateNotEmpty;
 import static com.team10.trojancheckinout.utils.Validator.validatePassword;
 
-public class StudentRegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
-    //Student stud = new Student(1, "ho", "brah", "man@usc.edu", "https://photo.jpg", "CS");
-    String[] majors = new String[]{"CSCI", "CECS", "CSBA", "BME", "AME", "BISC", "CHEM", "PHYS"};
+public class StudentRegisterActivity extends AppCompatActivity {
     Spinner spin;
 
     private EditText fname;
@@ -37,8 +34,6 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
     private EditText sEmail;
     private EditText sPassword;
     private EditText sID;
-
-    private String selectedMajor;
 
     private Button sBack;
     private Button sRegister;
@@ -56,10 +51,9 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         setContentView(R.layout.activity_student_register);
 
         spin = findViewById(R.id.sMajors);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, majors);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.majors, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         spin.setAdapter(adapter);
-        spin.setOnItemSelectedListener(this);
 
         fname = findViewById(R.id.etSFname);
         lname = findViewById(R.id.etSLname);
@@ -79,7 +73,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
                 String iEmail = sEmail.getText().toString().trim();
                 String iPassword = sPassword.getText().toString();
                 String iID = sID.getText().toString().trim();
-                String iMajor = selectedMajor;
+                String iMajor = spin.getSelectedItem().toString();
 
                 String [] allEntries = new String[] {iFname, iLname, iEmail, iPassword, iID};
                 isValid = validateNotEmpty(allEntries, allEntries.length) && validateEmail(iEmail) && validatePassword(iPassword) && validateID(iID) && gotImage;
@@ -134,17 +128,6 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
                 choosePicture();
             }
         });
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-        Toast.makeText(getApplicationContext(), "Selected Major: "+majors[position] ,Toast.LENGTH_SHORT).show();
-        selectedMajor = majors[position];
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> arg0) {
-        // none
     }
 
     private void choosePicture(){
