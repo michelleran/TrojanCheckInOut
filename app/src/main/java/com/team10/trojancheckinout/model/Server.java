@@ -117,12 +117,12 @@ public class Server {
     private static void addUser2(String id, String givenName, String surname, String email, Uri file, String major
             ,Callback<User> callback, boolean isStudent) { //add user to the database
         Map<String, Object> s = new HashMap<>();
-        //s.put("id", id);
         s.put("givenName", givenName);
         s.put("surname", surname);
         s.put("email", email);
         s.put("student", isStudent);
         if(isStudent) {
+            s.put("id", id);
             s.put("deleted", false);
             s.put("major", major);
         }
