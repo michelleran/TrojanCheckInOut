@@ -63,9 +63,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                 String iEmail = mEmail.getText().toString().trim();
                 String iPassword = mPassword.getText().toString();
 
-                String [] allEntries = new String[] {iFname, iLname, iEmail, iPassword};
-                isValid = validateNotEmpty(allEntries, allEntries.length) && validateEmail(iEmail) && validatePassword(iPassword) && gotImage;
-                if(!validateNotEmpty(allEntries, allEntries.length)){
+                if(!validateNotEmpty(iFname, iLname, iEmail, iPassword)){
                     Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
                 }
                 else if(!validateEmail(iEmail)){
@@ -76,10 +74,8 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                 }
                 else if (!gotImage){
                     Toast.makeText(getApplicationContext(), "Please add a photo!" ,Toast.LENGTH_SHORT).show();
-                }
-
-                if(isValid){
-
+                } else {
+                    // all inputs are valid
                     managerRegister("", iFname, iLname, iEmail, imageUri, iPassword, new Callback<User>() {
                         @Override
                         public void onSuccess(User result) {
@@ -95,9 +91,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                             Log.d("Frontend Manager Register", "Failed to add manager to server");
                         }
                     });
-
                 }
-
             }
         });
 

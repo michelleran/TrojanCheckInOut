@@ -1,17 +1,16 @@
 package com.team10.trojancheckinout.utils;
 
 public class Validator {
-    public static boolean validateNotEmpty(String [] text , int size){
-        for(int i=0; i<size; i++){
-            if(text[i].isEmpty()){
+    public static boolean validateNotEmpty(String... text){
+        for (String t : text) {
+            if (t.trim().isEmpty())
                 return false;
-            }
         }
         return true;
     }
 
     public static boolean validateEmail(String email){
-        String emailPattern = "^[a-zA-Z]+@usc\\.edu$"; // TODO: allow numeric characters, as long as it's not the first
+        String emailPattern = "^[a-zA-Z]+[a-zA-Z0-9]+@usc\\.edu$";
         if(email.matches(emailPattern) && email.length() > 0){
             return true;
         }
