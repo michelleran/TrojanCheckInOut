@@ -10,23 +10,26 @@ import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
 
+import java.util.HashMap;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 
 public class Server {
     private static FirebaseAuth auth;
     private static FirebaseFirestore db;
     private static FirebaseStorage storage;
-    private static final String TAG = "MyActivity";
+    private static final String TAG = "Server";
     // TODO: delete later
     private static final Student testStudent =
         new Student(0, "Test", "User", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg", "CSCI");
 
+    private static final HashMap<String,String> buildingNameIDMap = new HashMap<>();
     public static void initialize() {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
-
         // TODO: anything else
     }
 
@@ -95,148 +98,176 @@ public class Server {
 
     public static void listenForBuildings(Listener<Building> listener) {
         initialize();
-        db.collection("buildings").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection("building")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                                Building building = document.toObject(Building.class);
-                                listener.onAdd(building);
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "listen:error", e);
+                            return;
                         }
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            listener.onAdd(dc.getDocument().toObject(Building.class));
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    Log.d(TAG, "New building: " + dc.getDocument().getData());
+                                    break;
+                                case MODIFIED:
+                                    Log.d(TAG, "Modified building: " + dc.getDocument().getData());
+                                    break;
+                                case REMOVED:
+                                    Log.d(TAG, "Removed building: " + dc.getDocument().getData());
+                                    break;
+                            }
+                        }
+
                     }
                 });
     }
 
     public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
         initialize();
-        DocumentReference docRef = db.collection("buildings").document(id);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        final DocumentReference buildingDocRef = db.collection("buildings").document(id);
+        db.runTransaction(new Transaction.Function<Void>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        Building building = document.toObject(Building.class);
-                        if(building.getMaxCapacity() > maxCapacity){
-                            callback.onFailure(new Exception("New capacity is smaller than old capacity"));
-                        }
-                        // Update capacity
-                        building.setMaxCapacity(maxCapacity);
-                        // Update capacity on database
-                        docRef.update("maxCapacity", maxCapacity);
-                        callback.onSuccess(building);
-
-                    } else {
-                        Log.d(TAG, "No such document");
-                        callback.onFailure(new Exception("No such document"));
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                    callback.onFailure(task.getException());
+            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+                DocumentSnapshot snapshot = transaction.get(buildingDocRef);
+                // If new max capacity is smaller than old max capacity
+                if((int)snapshot.get("maxCapacity") > maxCapacity){
+                    callback.onFailure(new Exception("New capacity is smaller than old capacity"));
+                }else{
+                    transaction.update(buildingDocRef, "maxCapacity", maxCapacity);
+                    Building building = snapshot.toObject(Building.class);
+                    building.setMaxCapacity(maxCapacity);
+                    callback.onSuccess(building);
                 }
+
+                // Success
+                return null;
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Transaction success!");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(TAG, "Transaction failure.", e);
             }
         });
     }
 
     public static void checkIn(String id, Callback<Void> callback){
         initialize();
-        DocumentReference docRef = db.collection("buildings").document(id);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        // Get building and student document references
+        final DocumentReference newBuildingRef = db.collection("buildings").document("id");
+        final DocumentReference studentRef = db.collection("students").document(auth.getUid());
+        db.runTransaction(new Transaction.Function<Void>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        Building building = document.toObject(Building.class);
-                        Student student = (Student) getCurrentUser();
-                        // Check if student is already checked in to building
-                        if(student.getCurrentBuilding() == building.getName()) {
-                            callback.onFailure(new Exception("Student already checked into building"));
-                        }else{
-                            // Check if building is full
-                            if(building.getCurrentCapacity() == building.getMaxCapacity()){
-                                callback.onFailure(new Exception("Building Full"));
-                            }else{
-                                // Check if user is already checked in to another building
-                                if(student.getCurrentBuilding() != null){
-                                    // Find other building student is checked into
-                                    db.collection("building").whereEqualTo("name", student.getCurrentBuilding()).get()
-                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                    if (task.isSuccessful()) {
-                                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                                            Log.d(TAG, document.getId() + " => " + document.getData());
-                                                            DocumentReference oldDocRef = document.getReference();
-                                                            // Decrease capacity of old building
-                                                            int oldBuildingCapacity = (int)document.getData().get("currentCapacity");
-                                                            oldDocRef.update("currentCapacity", oldBuildingCapacity-1);
-                                                            Record record = new Record(oldDocRef.getId(), false);
-                                                            addRecord(record);
-                                                        }
-                                                        // Add capacity to new building
-                                                        Record record = new Record(id, true);
-                                                        addRecord(record);
-                                                        docRef.update("currentCapacity", building.getCurrentCapacity()+1);
-                                                    } else {
-                                                        Log.d(TAG, "Error getting documents: ", task.getException());
-                                                    }
-                                                }
-                                            });
-
-                                }else{
-                                    // Add capacity to new building
-                                    docRef.update("currentCapacity", building.getCurrentCapacity()+1);
-                                    // Add record
-                                    Record record = new Record(id, true);
-                                    addRecord(record);
-
-                                }
-                            }
-                        }
-                    } else {
-                        callback.onFailure(new Exception("No such document"));
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    callback.onFailure(task.getException());
-                    Log.d(TAG, "get failed with ", task.getException());
+            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+                DocumentSnapshot newBuildingSnapshot = transaction.get(newBuildingRef);
+                DocumentSnapshot studentSnapshot = transaction.get(studentRef);
+                // Check if student is already checked in to building
+                if(studentSnapshot.get("currentBuilding") == newBuildingSnapshot.get("name")) {
+                    callback.onFailure(new Exception("Student is already checked into building"));
+                    return null;
                 }
+
+                // Check if building is full
+                if(newBuildingSnapshot.get("currentCapacity") == newBuildingSnapshot.get("maxCapacity")) {
+                    callback.onFailure(new Exception("Building Full"));
+                    return null;
+                }
+
+                // Check if student is already checked into a building
+                if(studentSnapshot.get("currentBuilding") == null) {
+                    transaction.update(newBuildingRef, "currentCapacity", (int)newBuildingSnapshot.get("currentCapacity")+1);
+                    transaction.update(studentRef, "currentBuilding", newBuildingSnapshot.get("name"));
+                    Record record = new Record(newBuildingRef.getId(), (String)studentSnapshot.get("major"), true);
+                    addRecord(record);
+                }else{
+                    // Get student's old building
+                    db.collection("building")
+                            .whereEqualTo("name", studentSnapshot.get("currentBuilding"))
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                            Log.d(TAG, document.getId() + " => " + document.getData());
+                                            DocumentReference oldBuildingRef = document.getReference();
+                                            // Update each buildings capacity
+                                            transaction.update(newBuildingRef, "currentCapacity", (int)newBuildingSnapshot.get("currentCapacity")+1);
+                                            transaction.update(oldBuildingRef, "currentCapacity", (int)document.get("currentCapacity")-1);
+                                            // Update student's current building
+                                            transaction.update(studentRef, "currentBuilding", newBuildingSnapshot.get("name"));
+
+                                            // Generate records
+                                            Record record1 = new Record(newBuildingRef.getId(),(String)studentSnapshot.get("major"), true);
+                                            addRecord(record1);
+                                            Record record2 = new Record(oldBuildingRef.getId(),(String)studentSnapshot.get("major"), false);
+                                            addRecord(record2);
+                                        }
+                                    } else {
+                                        Log.d(TAG, "Error getting documents: ", task.getException());
+                                    }
+                                }
+                            });
+                }
+
+                // Success
+                return null;
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Transaction success!");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(TAG, "Transaction failure.", e);
             }
         });
     }
 
     public static void checkOut(String id, Callback<Void> callback){
         initialize();
-        DocumentReference docRef = db.collection("buildings").document(id);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        Building building = document.toObject(Building.class);
-                        docRef.update("currentCapacity", building.getCurrentCapacity()-1);
 
-                        Record record = new Record(id, false);
-                        // Add checkout record
-                        addRecord(record);
-                    } else {
-                        Log.d(TAG, "No such document");
-                        callback.onFailure(new Exception("Error"));
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                    callback.onFailure(task.getException());
+        final DocumentReference buildingDocRef = db.collection("buildings").document(id);
+        final DocumentReference studentDocRef = db.collection("students").document(auth.getUid());
+        db.runTransaction(new Transaction.Function<Void>() {
+            @Override
+            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+                DocumentSnapshot buildingSnapshot = transaction.get(buildingDocRef);
+                DocumentSnapshot studentSnapshot = transaction.get(studentDocRef);
+                if(studentSnapshot.get("currentBuilding") == null){
+                    callback.onFailure(new Exception("Student is not checked into a building"));
+                    return null;
                 }
+
+                // Update database
+                transaction.update(buildingDocRef, "currentCapacity", (int)buildingSnapshot.get("currentCapacity")-1);
+                transaction.update(studentDocRef, "currentBuilding", null);
+
+                // Generate records
+                Record record = new Record(buildingDocRef.getId(),(String)studentSnapshot.get("major"), false);
+                addRecord(record);
+                // Success
+                return null;
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Transaction success!");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(TAG, "Transaction failure.", e);
             }
         });
 
@@ -264,21 +295,33 @@ public class Server {
     public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
         // TODO: listen to query "students where student's current building = building id"
         initialize();
-        db.collection("Student")
-                .whereEqualTo("currentBuilding", buildingId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+        db.collection("cities")
+                .whereEqualTo("state", "CA")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Student student = document.toObject(Student.class);
-                                listener.onAdd(student);
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "listen:error", e);
+                            return;
                         }
+
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            listener.onAdd(dc.getDocument().toObject(Student.class));
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    Log.d(TAG, "New city: " + dc.getDocument().getData());
+                                    break;
+                                case MODIFIED:
+                                    Log.d(TAG, "Modified city: " + dc.getDocument().getData());
+                                    break;
+                                case REMOVED:
+                                    Log.d(TAG, "Removed city: " + dc.getDocument().getData());
+                                    break;
+                            }
+                        }
+
                     }
                 });
     }
@@ -287,26 +330,73 @@ public class Server {
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
                                      String buildingName, int studentId, String major,
                                      Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
-        // TODO: replace this
         initialize();
-        CollectionReference records = db.collection("record");
+        CollectionReference records = db.collection("records");
+
+        // Set start parameters
+        if(startYear != -1){
+            records.whereGreaterThanOrEqualTo("year", startYear);
+        }
+        if(startMonth != -1){
+            records.whereGreaterThanOrEqualTo("month", startMonth);
+        }
+        if(startDay != -1){
+            records.whereGreaterThanOrEqualTo("day", startDay);
+        }
+        if(startHour != -1){
+            records.whereGreaterThanOrEqualTo("hour", startDay);
+        }
+        if(startMin != -1){
+            records.whereGreaterThanOrEqualTo("minute", startMin);
+        }
+
+        // Set end parameters
+        if(endYear != -1){
+            records.whereLessThanOrEqualTo("year", endYear);
+        }
+        if(endMonth != -1){
+            records.whereLessThanOrEqualTo("month", endYear);
+        }
+        if(endDay != -1){
+            records.whereLessThanOrEqualTo("day", endDay);
+        }
+        if(endHour != -1){
+            records.whereLessThanOrEqualTo("hour", endDay);
+        }
+        if(endMin != -1){
+            records.whereLessThanOrEqualTo("minute", endMin);
+        }
+
+        // Filter by building name
+        if(buildingName != ""){
+            records.whereEqualTo("buildingID", buildingNameIDMap.get(buildingName));
+        }
+
+        // Filter by student
+        if(studentId != -1){
+            records.whereEqualTo("studentID", studentId);
+        }
+
+        // Filter by major
+        if(major != ""){
+            records.whereEqualTo("major", major);
+        }
+
         records
-                // TO DO: Add other queries
-                .whereEqualTo("studentId", studentId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Record record = document.toObject(Record.class);
-                                callback.onSuccess(record);
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Record record = document.toObject(Record.class);
+                            callback.onSuccess(record);
+                            Log.d(TAG, document.getId() + " => " + document.getData());
                         }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
                     }
-                });
+                }
+            });
     }
 }
