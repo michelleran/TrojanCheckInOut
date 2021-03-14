@@ -19,7 +19,6 @@ import com.google.firebase.storage.UploadTask.TaskSnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,25 +27,26 @@ import androidx.annotation.Nullable;
 
 
 public class Server {
-    private static FirebaseAuth mAuth;
+    private static FirebaseAuth auth;
     private static FirebaseFirestore db;
-    private static FirebaseStorage storage;
-    private static final String TAG = "Server";
-    private static StorageReference storageRef;
+    private static StorageReference storage;
 
-    private static final String[] majors = { "Major 1", "Major 2" };
-    private static final HashMap<String,String> buildingNameIDMap = new HashMap<>();
+    private static final String USER_COLLECTION = "users";
+    private static final String BUILDING_COLLECTION = "buildings";
+    private static final String RECORD_COLLECTION = "records";
+
+    private static final String TAG = "Server";
+
+    private static final HashMap<String,String> buildingNameIDMap = new HashMap<>(); // TODO: this needs to be set!
 
     // TODO: delete later
     private static final Student testStudent =
         new Student("0", "Test", "User", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg", "CSCI");
 
     public static void initialize() {
-        mAuth = FirebaseAuth.getInstance();
+        auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
-        // TODO: anything else
-        storageRef = FirebaseStorage.getInstance().getReference();
+        storage = FirebaseStorage.getInstance().getReference();
     }
 
     public static boolean isLoggedIn() {
@@ -54,14 +54,15 @@ public class Server {
     }
 
     public static void login(String email, String password, Callback<User> callback){
-        if(mAuth.getCurrentUser()!=null) {
+        if(auth.getCurrentUser()!=null) {
             Log.d("login", "Already Signed In");
             getCurrentUser(callback);
             return;
         } //user already exists
         
-        else if(mAuth.getCurrentUser()==null) {
-            mAuth.signInWithEmailAndPassword(email, password)
+        else {
+            auth.getCurrentUser();
+            auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -87,7 +88,7 @@ public class Server {
 
     public static void managerRegister(String id, String givenName, String surname, String email,
                                        Uri file, String password, Callback<User> callback) { // TODO: managers don't have ids
-        mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
+        auth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -106,7 +107,7 @@ public class Server {
 
     public static void studentRegister(String id, String givenName, String surname, String email,
                                    Uri file, String major, String password, Callback<User> callback) {
-        mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
+        auth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -135,8 +136,8 @@ public class Server {
             s.put("major", major);
         }
 
-        String uID = mAuth.getCurrentUser().getUid();
-        StorageReference fileRef = storageRef.child("images/"+uID + file.getLastPathSegment());
+        String uID = auth.getCurrentUser().getUid();
+        StorageReference fileRef = storage.child("images/"+uID + file.getLastPathSegment());
         UploadTask uploadTask = fileRef.putFile(file);
         uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
             @Override
@@ -159,7 +160,7 @@ public class Server {
                     public void onSuccess(Uri uri) {
                         s.put("photoUrl", uri.toString());
                         Log.d("Photo Uri", "could not handle Uri");
-                        FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        FirebaseFirestore.getInstance().collection(USER_COLLECTION).document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                             .set(s)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -187,9 +188,9 @@ public class Server {
     }
 
     public static String getCurrentUserId() {
-        if (mAuth.getCurrentUser() == null)
+        if (auth.getCurrentUser() == null)
             return null;
-        return mAuth.getCurrentUser().getUid();
+        return auth.getCurrentUser().getUid();
     }
 
     public static void getCurrentUser(Callback<User> callback) {
@@ -198,8 +199,8 @@ public class Server {
             callback.onFailure(null);
             return;
         }
-        DocumentReference docRef = db.collection("StudentDetail")
-                .document(mAuth.getCurrentUser().getUid());
+        DocumentReference docRef = db.collection(USER_COLLECTION)
+                .document(auth.getCurrentUser().getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -242,19 +243,19 @@ public class Server {
     }
 
     public static void deleteManager(Callback<Void> callback) {
-        if(mAuth.getCurrentUser()==null){
+        if(auth.getCurrentUser()==null){
             Log.d("userDelete", "no user logged in");
             callback.onFailure(null);
             return;
         }
-        DocumentReference docRef = db.collection("StudentDetail")
-                .document(mAuth.getCurrentUser().getUid()); //get the current user document
+        DocumentReference docRef = db.collection(USER_COLLECTION)
+                .document(auth.getCurrentUser().getUid()); //get the current user document
         docRef.delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d("profile", "full deleted");
-                        FirebaseUser user = mAuth.getCurrentUser();
+                        FirebaseUser user = auth.getCurrentUser();
                         user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -281,21 +282,21 @@ public class Server {
 
 
     public static void deleteStudent(Callback<Void> callback){
-        if(mAuth.getCurrentUser()==null){
+        if(auth.getCurrentUser()==null){
             Log.d("userDelete", "no user logged in");
             callback.onFailure(null);
             return;
         }
-        String uID = mAuth.getCurrentUser().getUid();
-        FirebaseUser user = mAuth.getCurrentUser();
+        String uID = auth.getCurrentUser().getUid();
+        FirebaseUser user = auth.getCurrentUser();
         user.delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d("userDelete", "User account deleted.");
-                            DocumentReference docRef = db.collection("StudentDetail")
-                                    .document(mAuth.getCurrentUser().getUid()); //get the current user document
+                            DocumentReference docRef = db.collection(USER_COLLECTION)
+                                    .document(auth.getCurrentUser().getUid()); //get the current user document
                             docRef.update("deleted", true)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -321,7 +322,7 @@ public class Server {
 
 
     public static void getStudent(String uID, Callback<Student> callback) {
-        DocumentReference docRef = db.collection("StudentDetail")
+        DocumentReference docRef = db.collection(USER_COLLECTION)
                 .document(uID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -364,7 +365,7 @@ public class Server {
     }
 
     public static void changePassword(String newPassword, Callback<Void> callback){  //changes current user's password
-        FirebaseUser user = mAuth.getCurrentUser();
+        FirebaseUser user = auth.getCurrentUser();
         user.updatePassword(newPassword)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -382,14 +383,14 @@ public class Server {
     }
 
     public static void changePhoto(Uri file, Callback<String> callback){
-        if(mAuth.getCurrentUser()==null){
+        if(auth.getCurrentUser()==null){
             Log.d("changePhoto", "No Logged In User");
             callback.onFailure(null);
             return;
         }
 
-        String uID = mAuth.getCurrentUser().getUid();
-        StorageReference fileRef = storageRef.child("images/"+uID + file.getLastPathSegment());
+        String uID = auth.getCurrentUser().getUid();
+        StorageReference fileRef = storage.child("images/"+uID + file.getLastPathSegment());
         UploadTask uploadTask = fileRef.putFile(file);
         uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
             @Override
@@ -409,8 +410,8 @@ public class Server {
             public void onSuccess(TaskSnapshot taskSnapshot) {
                 Log.d("Photo Uri", "handled Uri succesfully");
                 String URL = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
-                DocumentReference docRef = db.collection("StudentDetail")
-                        .document(mAuth.getCurrentUser().getUid()); //get the current user document
+                DocumentReference docRef = db.collection(USER_COLLECTION)
+                        .document(auth.getCurrentUser().getUid()); //get the current user document
                 docRef.update("PhotoUrl", URL)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -433,7 +434,7 @@ public class Server {
     public static void getBuilding(String id, Callback<Building> callback) {
         initialize();
         // Get building from database
-        DocumentReference docRef = db.collection("buildings").document(id);
+        DocumentReference docRef = db.collection(BUILDING_COLLECTION).document(id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -456,10 +457,14 @@ public class Server {
         });
     }
 
+    public static void addBuilding() {
+        // TODO
+    }
+
     public static void removeBuilding(String id, Callback<Building> callback){
         initialize();
         // Get building to be removed
-        DocumentReference docRef = db.collection("buildings").document(id);
+        DocumentReference docRef = db.collection(BUILDING_COLLECTION).document(id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -486,7 +491,7 @@ public class Server {
 
     public static void listenForBuildings(Listener<Building> listener) {
         initialize();
-        db.collection("building")
+        db.collection(BUILDING_COLLECTION)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -518,7 +523,7 @@ public class Server {
 
     public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
         initialize();
-        final DocumentReference buildingDocRef = db.collection("buildings").document(id);
+        final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
         db.runTransaction(new Transaction.Function<Void>() {
             @Override
             public Void apply(Transaction transaction) throws FirebaseFirestoreException {
@@ -552,8 +557,8 @@ public class Server {
     public static void checkIn(String id, Callback<Void> callback){
         initialize();
         // Get building and student document references
-        final DocumentReference newBuildingRef = db.collection("buildings").document("id");
-        final DocumentReference studentRef = db.collection("students").document(mAuth.getUid());
+        final DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document("id");
+        final DocumentReference studentRef = db.collection(USER_COLLECTION).document(auth.getUid());
         db.runTransaction(new Transaction.Function<Void>() {
             @Override
             public Void apply(Transaction transaction) throws FirebaseFirestoreException {
@@ -578,7 +583,7 @@ public class Server {
                     Record record = new Record(newBuildingRef.getId(), (String)studentSnapshot.get("major"), true);
                     addRecord(record);
                 }else{
-                    final DocumentReference oldBuildingRef = db.collection("buildings").document((String)studentSnapshot.get("currentBuilding"));
+                    final DocumentReference oldBuildingRef = db.collection(BUILDING_COLLECTION).document((String)studentSnapshot.get("currentBuilding"));
                     DocumentSnapshot oldBuildingSnapshot = transaction.get(oldBuildingRef);
                     // Update each buildings capacity
                     transaction.update(newBuildingRef, "currentCapacity", (int)newBuildingSnapshot.get("currentCapacity")+1);
@@ -613,8 +618,8 @@ public class Server {
     public static void checkOut(String id, Callback<Void> callback){
         initialize();
 
-        final DocumentReference buildingDocRef = db.collection("buildings").document(id);
-        final DocumentReference studentDocRef = db.collection("students").document(mAuth.getUid());
+        final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
+        final DocumentReference studentDocRef = db.collection(USER_COLLECTION).document(auth.getUid());
         db.runTransaction(new Transaction.Function<Void>() {
             @Override
             public Void apply(Transaction transaction) throws FirebaseFirestoreException {
@@ -651,7 +656,7 @@ public class Server {
 
     private static void addRecord(Record record){
         initialize();
-        db.collection("records")
+        db.collection(RECORD_COLLECTION)
                 .add(record)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -669,10 +674,7 @@ public class Server {
 
 
     public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
-        // TODO: listen to query "students where student's current building = building id"
-        initialize();
-
-        db.collection("students")
+        db.collection(USER_COLLECTION)
                 .whereEqualTo("currentBuilding", buildingId)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -684,7 +686,6 @@ public class Server {
                         }
 
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-
                             switch (dc.getType()) {
                                 case ADDED:
                                     listener.onAdd(dc.getDocument().toObject(Student.class));
@@ -709,9 +710,7 @@ public class Server {
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
                                      String buildingName, long studentId, String major,
                                      Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
-        initialize();
-        CollectionReference records = db.collection("records");
-        Query query = records;
+        Query query = db.collection(RECORD_COLLECTION);
         // Set start parameters
         if(startYear != -1){
             query = query.whereGreaterThanOrEqualTo("year", startYear);
@@ -747,17 +746,17 @@ public class Server {
         }
 
         // Filter by building name
-        if(buildingName != ""){
-            query = query.whereEqualTo("buildingID", buildingNameIDMap.get(buildingName));
+        if (!buildingName.isEmpty()) {
+            query = query.whereEqualTo("buildingName", buildingName);
         }
 
         // Filter by student
         if(studentId != -1){
-            query = query.whereEqualTo("studentID", studentId);
+            query = query.whereEqualTo("studentId", studentId);
         }
 
         // Filter by major
-        if(major != ""){
+        if(!major.isEmpty()){
             query = query.whereEqualTo("major", major);
         }
 
