@@ -14,6 +14,10 @@ import android.widget.Toast;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.utils.Validator;
 
+import static com.team10.trojancheckinout.utils.Validator.validateEmail;
+import static com.team10.trojancheckinout.utils.Validator.validateNotEmpty;
+import static com.team10.trojancheckinout.utils.Validator.validatePassword;
+
 public class ManagerRegisterActivity extends AppCompatActivity {
 
 
@@ -26,7 +30,6 @@ public class ManagerRegisterActivity extends AppCompatActivity {
     private Button mRegister;
     private Button mPhoto;
 
-    private Validator val;
     private boolean isValid = false;
 
     private Uri imageUri;
@@ -58,14 +61,14 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                 String iPassword = mPassword.getText().toString();
 
                 String [] allEntries = new String[] {iFname, iLname, iEmail, iPassword};
-                isValid = Validator.validateNotEmpty(allEntries, allEntries.length) && Validator.validateEmail(iEmail) && Validator.validatePassword(iPassword);
-                if(!Validator.validateNotEmpty(allEntries, allEntries.length)){
+                isValid = validateNotEmpty(allEntries, allEntries.length) && validateEmail(iEmail) && validatePassword(iPassword);
+                if(!validateNotEmpty(allEntries, allEntries.length)){
                     Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
                 }
-                else if(!Validator.validateEmail(iEmail)){
+                else if(!validateEmail(iEmail)){
                     Toast.makeText(getApplicationContext(), "Please enter a valid usc email!" ,Toast.LENGTH_SHORT).show();
                 }
-                else if(!Validator.validatePassword(iPassword)){
+                else if(!validatePassword(iPassword)){
                     Toast.makeText(getApplicationContext(), "Please enter a password at least 8 characters long!" ,Toast.LENGTH_SHORT).show();
                 }
 

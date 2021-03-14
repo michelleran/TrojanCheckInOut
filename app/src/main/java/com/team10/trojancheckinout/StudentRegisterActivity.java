@@ -17,6 +17,11 @@ import android.widget.Toast;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.utils.Validator;
 
+import static com.team10.trojancheckinout.utils.Validator.validateEmail;
+import static com.team10.trojancheckinout.utils.Validator.validateID;
+import static com.team10.trojancheckinout.utils.Validator.validateNotEmpty;
+import static com.team10.trojancheckinout.utils.Validator.validatePassword;
+
 public class StudentRegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     //Student stud = new Student(1, "ho", "brah", "man@usc.edu", "https://photo.jpg", "CS");
@@ -35,7 +40,6 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
     private Button sRegister;
     private Button sPhoto;
 
-    private Validator val;
     private boolean isValid = false;
 
     private Uri imageUri;
@@ -73,17 +77,17 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
                 String iID = sID.getText().toString().trim();
 
                 String [] allEntries = new String[] {iFname, iLname, iEmail, iPassword, iID};
-                isValid = Validator.validateNotEmpty(allEntries, allEntries.length) && Validator.validateEmail(iEmail) && Validator.validatePassword(iPassword) && Validator.validateID(iID);
-                if(!Validator.validateNotEmpty(allEntries, allEntries.length)){
+                isValid = validateNotEmpty(allEntries, allEntries.length) && validateEmail(iEmail) && validatePassword(iPassword) && validateID(iID);
+                if(!validateNotEmpty(allEntries, allEntries.length)){
                     Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
                 }
-                else if(!Validator.validateEmail(iEmail)){
+                else if(!validateEmail(iEmail)){
                     Toast.makeText(getApplicationContext(), "Please enter a valid usc email!" ,Toast.LENGTH_SHORT).show();
                 }
-                else if(!Validator.validatePassword(iPassword)){
+                else if(!validatePassword(iPassword)){
                     Toast.makeText(getApplicationContext(), "Please enter a password at least 8 characters long!" ,Toast.LENGTH_SHORT).show();
                 }
-                else if(!Validator.validateID(iID)){
+                else if(!validateID(iID)){
                     Toast.makeText(getApplicationContext(), "Please enter your TEN digit USC ID!" ,Toast.LENGTH_SHORT).show();
                 }
 
