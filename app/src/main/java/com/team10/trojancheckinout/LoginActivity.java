@@ -46,9 +46,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 String inputName = eEmail.getText().toString();
                 String inputPassword = ePassword.getText().toString();
-                String [] inputs = new String[]{inputName, inputPassword};
 
-                if(!validateNotEmpty(inputs, inputs.length)){
+                if(!validateNotEmpty(inputName, inputPassword)){
                     Toast.makeText(LoginActivity.this, "Please do not leave any fields empty!", Toast.LENGTH_SHORT).show();
                 }
                 else{

@@ -75,9 +75,7 @@ public class StudentRegisterActivity extends AppCompatActivity {
                 String iID = sID.getText().toString().trim();
                 String iMajor = spin.getSelectedItem().toString();
 
-                String [] allEntries = new String[] {iFname, iLname, iEmail, iPassword, iID};
-                isValid = validateNotEmpty(allEntries, allEntries.length) && validateEmail(iEmail) && validatePassword(iPassword) && validateID(iID) && gotImage;
-                if(!validateNotEmpty(allEntries, allEntries.length)){
+                if(!validateNotEmpty(iFname, iLname, iEmail, iPassword, iID)) {
                     Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
                 }
                 else if(!validateEmail(iEmail)){
@@ -91,10 +89,8 @@ public class StudentRegisterActivity extends AppCompatActivity {
                 }
                 else if(!gotImage){
                     Toast.makeText(getApplicationContext(), "Please add a photo!" ,Toast.LENGTH_SHORT).show();
-                }
-
-                if(isValid){
-
+                } else {
+                    // all inputs are valid
                     studentRegister(iID, iFname, iLname, iEmail, imageUri, iMajor, iPassword, new Callback<User>() {
                         @Override
                         public void onSuccess(User result) {
@@ -109,7 +105,6 @@ public class StudentRegisterActivity extends AppCompatActivity {
                             Log.d("Frontend Student Register", "Failed to add student to server");
                         }
                     });
-
                 }
             }
         });
