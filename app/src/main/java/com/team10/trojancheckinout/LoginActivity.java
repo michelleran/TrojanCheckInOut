@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.team10.trojancheckinout.model.Callback;
+import com.team10.trojancheckinout.model.Student;
 import com.team10.trojancheckinout.model.User;
 
 import static com.team10.trojancheckinout.model.Server.getCurrentUser;
@@ -55,31 +56,27 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(User result) {
                             Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                            boolean isStudent = false;
 
-                            //getCurrentUser(this);
-
-                            if(isStudent){
-                                Intent it = new Intent(LoginActivity.this, StudentActivity.class);
-                                startActivity(it);
+                            // open user's profile
+                            Intent intent;
+                            if (result instanceof Student) {
+                                intent = new Intent(LoginActivity.this, StudentActivity.class);
+                            } else {
+                                intent = new Intent(LoginActivity.this, ManagerActivity.class);
                             }
-                            else {
-                                Intent intent = new Intent(LoginActivity.this, ManagerActivity.class);
-                                startActivity(intent);
-                            }
+                            startActivity(intent);
                         }
 
                         @Override
                         public void onFailure(Exception exception) {
                             Toast.makeText(LoginActivity.this,"Error: "+ exception, Toast.LENGTH_SHORT).show();
+
                         }
                     });
 
                     counter--;
-                    Toast.makeText(LoginActivity.this, "Incorrect credentials entered!", Toast.LENGTH_SHORT).show();
 
                     eAttemptsInfo.setText("No. of attempts remaining: " + counter);
-
                     if(counter == 0){
                         eLogin.setEnabled(false);
                     }
