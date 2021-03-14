@@ -77,6 +77,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                 else currentBuilding_tv.setText(R.string.none);
                 Glide.with(getApplicationContext()).load(photo_url)
                     .placeholder(R.drawable.default_profile_picture)
+                    .override(400, 400).centerCrop()
                     .into(photoUrl);
             }
 

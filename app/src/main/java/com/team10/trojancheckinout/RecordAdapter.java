@@ -92,6 +92,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
                 // set student photo
                 Glide.with(holder.itemView)
                      .load(result.getPhotoUrl())
+                     .override(400, 400).centerCrop()
                      .into(holder.studentPhoto);
                 // set student name
                 holder.studentName.setText(
