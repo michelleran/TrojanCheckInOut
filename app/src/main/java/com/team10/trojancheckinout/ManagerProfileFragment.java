@@ -38,6 +38,7 @@ public class ManagerProfileFragment extends Fragment {
     private EditText edtNewPassword;
     private EditText edtConfirmPassword;
     private ImageView imgPhoto;
+    private String urlImgPhoto;
     private int viewState;
     private static final int SELECT_PHOTO_REQUEST = 1;
 
@@ -62,11 +63,9 @@ public class ManagerProfileFragment extends Fragment {
         imgPhoto = (ImageView) rootView.findViewById(R.id.imgPhoto);
 
         currentManager = (Manager) Server.getCurrentUser_manager();
-        //TODO: Remove this (for testing purposes)
-        currentManager.setPhotoUrl("https://www.clipartkey.com/mpngs/m/238-2383342_transparent-pizza-clip-art-transparent-cartoons-whole-pizza.png");
-
-
+        urlImgPhoto = currentManager.getPhotoUrl();
         Glide.with(this).load(currentManager.getPhotoUrl()).override(400, 400).into(imgPhoto);
+
         txtGivenName.setText("First Name: " + currentManager.getGivenName());
         txtSurname.setText("Surname: " + currentManager.getSurname());
         txtEmail.setText("Email: " + currentManager.getEmail());
@@ -170,7 +169,7 @@ public class ManagerProfileFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != SELECT_PHOTO_REQUEST || resultCode != RESULT_OK || data == null || data.getData() == null) {
-                return;
+                viewState = 0;
         }
         else {
             Callback<String> uploadCallback = new Callback<String>() {
@@ -184,16 +183,15 @@ public class ManagerProfileFragment extends Fragment {
                 public void onFailure(Exception exception) {
                     Log.e("Manager Profile Fragment", "Profile Photo Update Failure", exception);
                     Toast.makeText(getActivity(), "Profile Photo Update Failure", Toast.LENGTH_SHORT).show();
+                    viewState = 0;
                 }
             };
 
             Server.changePhotoUrl(data.getData(), uploadCallback);
         }
-        
     }
 
     public void triggerPhotoRefresh(String url) {
-        currentManager.setPhotoUrl(url);
         Glide.with(this).load(url).override(400, 400).into(imgPhoto);
         viewState = 0;
     }
