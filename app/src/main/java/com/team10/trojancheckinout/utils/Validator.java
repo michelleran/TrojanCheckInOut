@@ -1,11 +1,10 @@
 package com.team10.trojancheckinout.utils;
 
 public class Validator {
-    public static boolean validateNotEmpty(String [] text , int size){
-        for(int i=0; i<size; i++){
-            if(text[i].isEmpty()){
+    public static boolean validateNotEmpty(String... text){
+        for (String t : text) {
+            if (t.trim().isEmpty())
                 return false;
-            }
         }
         return true;
     }
