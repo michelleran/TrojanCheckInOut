@@ -7,20 +7,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.team10.trojancheckinout.model.Server;
+
 public class StartPage extends AppCompatActivity {
-
-    private Button elogin;
-    private Button estudentRegister;
-    private Button emanagerRegister;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_page);
 
-        elogin = findViewById(R.id.startLoginbtn);
-        estudentRegister = findViewById(R.id.studentRegisterBtn);
-        emanagerRegister = findViewById(R.id.managerRegisterBtn);
+        Server.initialize();
+
+        Button elogin = findViewById(R.id.startLoginbtn);
+        Button estudentRegister = findViewById(R.id.studentRegisterBtn);
+        Button emanagerRegister = findViewById(R.id.managerRegisterBtn);
 
         elogin.setOnClickListener(new View.OnClickListener() {
             @Override
