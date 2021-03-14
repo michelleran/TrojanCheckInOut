@@ -1,5 +1,7 @@
 package com.team10.trojancheckinout.model;
 
+import java.lang.reflect.Field;
+
 public class Building {
     private String id;
     private String name;
@@ -21,4 +23,6 @@ public class Building {
     public String getQrCodeUrl() { return qrCodeUrl; }
     public int getMaxCapacity() { return maxCapacity; }
     public int getCurrentCapacity() { return currentCapacity; }
+    void setMaxCapacity(int capacity){maxCapacity = capacity;}
+
 }
