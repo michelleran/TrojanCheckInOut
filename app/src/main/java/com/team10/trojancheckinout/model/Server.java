@@ -146,25 +146,34 @@ public class Server {
         }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
             @Override
             public void onSuccess(TaskSnapshot taskSnapshot) {
-                String URL = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
-                s.put("photoUrl", URL);
-                Log.d("Photo Uri", "could not handle Uri");
-                FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        .set(s)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("add user", "DocumentSnapshot added with ID: ");
-                                getCurrentUser(callback);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("add user", "Error adding document", e);
-                                callback.onFailure(e);
-                            }
-                        });
+                taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        s.put("photoUrl", uri.toString());
+                        Log.d("Photo Uri", "could not handle Uri");
+                        FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .set(s)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("add user", "DocumentSnapshot added with ID: ");
+                                    getCurrentUser(callback);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("add user", "Error adding document", e);
+                                    callback.onFailure(e);
+                                }
+                            });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
             }
         });
     }
