@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -14,9 +15,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.model.User;
 import com.team10.trojancheckinout.utils.Validator;
 
+import static com.team10.trojancheckinout.model.Server.studentRegister;
 import static com.team10.trojancheckinout.utils.Validator.validateEmail;
 import static com.team10.trojancheckinout.utils.Validator.validateID;
 import static com.team10.trojancheckinout.utils.Validator.validateNotEmpty;
@@ -75,9 +79,10 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
                 String iEmail = sEmail.getText().toString().trim();
                 String iPassword = sPassword.getText().toString();
                 String iID = sID.getText().toString().trim();
+                String iMajor = selectedMajor;
 
                 String [] allEntries = new String[] {iFname, iLname, iEmail, iPassword, iID};
-                isValid = validateNotEmpty(allEntries, allEntries.length) && validateEmail(iEmail) && validatePassword(iPassword) && validateID(iID);
+                isValid = validateNotEmpty(allEntries, allEntries.length) && validateEmail(iEmail) && validatePassword(iPassword) && validateID(iID) && gotImage;
                 if(!validateNotEmpty(allEntries, allEntries.length)){
                     Toast.makeText(getApplicationContext(), "Please don't leave any field blank!" ,Toast.LENGTH_SHORT).show();
                 }
@@ -90,15 +95,27 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
                 else if(!validateID(iID)){
                     Toast.makeText(getApplicationContext(), "Please enter your TEN digit USC ID!" ,Toast.LENGTH_SHORT).show();
                 }
+                else if(!gotImage){
+                    Toast.makeText(getApplicationContext(), "Please add a photo!" ,Toast.LENGTH_SHORT).show();
+                }
 
                 if(isValid){
-                    Toast.makeText(StudentRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
 
-                    //server.registerStudent(iFname, iLname, iID, iEmail, iPassword, Callback<Student> callback)
-                    //if(gotImage){server.changePhoto(imageURI, Callback<Student> callback);}
+                    studentRegister(iID, iFname, iLname, iEmail, imageUri, iMajor, iPassword, new Callback<User>() {
+                        @Override
+                        public void onSuccess(User result) {
+                            Toast.makeText(StudentRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(StudentRegisterActivity.this, StudentActivity.class);
+                            startActivity(intent);
+                        }
 
-                    Intent intent = new Intent(StudentRegisterActivity.this, StudentActivity.class);
-                    startActivity(intent);
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Toast.makeText(StudentRegisterActivity.this, "Registration failed: " + exception, Toast.LENGTH_SHORT).show();
+                            Log.d("Frontend Student Register", "Failed to add student to server");
+                        }
+                    });
+
                 }
             }
         });
