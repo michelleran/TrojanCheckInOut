@@ -10,6 +10,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.team10.trojancheckinout.model.Callback;
+import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.model.Student;
+import com.team10.trojancheckinout.model.User;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText eEmail;
@@ -41,29 +46,35 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(inputName.isEmpty() || inputPassword.isEmpty()){
                     Toast.makeText(LoginActivity.this, "Please do not leave any fields empty", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    isValid = validate(inputName, inputPassword);
-                    if(!isValid){
-                        counter--;
-                        Toast.makeText(LoginActivity.this, "Incorrect credentials entered!", Toast.LENGTH_SHORT).show();
-
-                        eAttemptsInfo.setText("No. of attempts remaining: " + counter);
-
-                        if(counter == 0){
-                            eLogin.setEnabled(false);
+                } else {
+                    Server.login(inputName, inputPassword, new Callback<User>() {
+                        @Override
+                        public void onSuccess(User result) {
+                            Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                            // open user's profile
+                            Intent intent;
+                            if (result instanceof Student) {
+                                intent = new Intent(LoginActivity.this, StudentActivity.class);
+                            } else {
+                                intent = new Intent(LoginActivity.this, ManagerActivity.class);
+                            }
+                            startActivity(intent);
                         }
-                    }
-                    else{
-                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                        //add the code to go to the new activity
-                        Intent intent = new Intent(LoginActivity.this, ManagerActivity.class);
-                        startActivity(intent);
-                        //this should be the landing page after logging in regardless of user's class
-                        // TODO: false: open StudentActivity if user is student
-                    }
-                }
 
+                        @Override
+                        public void onFailure(Exception exception) {
+                            // TODO: not necessarily b/c of incorrect credentials
+                            counter--;
+                            Toast.makeText(LoginActivity.this, "Incorrect credentials entered!", Toast.LENGTH_SHORT).show();
+
+                            eAttemptsInfo.setText("No. of attempts remaining: " + counter);
+
+                            if(counter == 0){
+                                eLogin.setEnabled(false);
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -75,9 +86,5 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-    }
-    private boolean validate(String name, String password){
-        //will call the server function that allows to check if email/password combo is legitimate
-        return true;
     }
 }

@@ -27,6 +27,7 @@ import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.Student;
+import com.team10.trojancheckinout.model.User;
 import com.team10.trojancheckinout.utils.QRCodeHelper;
 
 public class StudentActivity extends AppCompatActivity implements View.OnClickListener{
@@ -55,25 +56,35 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         photoUrl = findViewById(R.id.student_photo);
 
         //assume current user is student, gets student data
-        student = (Student) Server.getCurrentUser();
-        fName = student.getGivenName();
-        lName = student.getSurname();
-        usc_id = student.getIdString();
-        major_ = student.getMajor();
-        //gets building name through Server.getBuilding()
-        currBuilding = getBuildingName(student.getCurrentBuilding());
-        photo_url = student.getPhotoUrl();
+        Server.getCurrentUser(new Callback<User>() {
+            @Override
+            public void onSuccess(User result) {
+                student = (Student) result;
+                fName = student.getGivenName();
+                lName = student.getSurname();
+                usc_id = student.getIdString();
+                major_ = student.getMajor();
+                //gets building name through Server.getBuilding()
+                currBuilding = getBuildingName(student.getCurrentBuilding());
+                photo_url = student.getPhotoUrl();
 
-        //set student data into TextView
-        givenName_tv.setText(fName);
-        surname_tv.setText(lName);
-        id_tv.setText(usc_id);
-        major_tv.setText(major_);
-        if (student.getCurrentBuilding() != null) currentBuilding_tv.setText(currBuilding);
-        else currentBuilding_tv.setText(R.string.none);
-        Glide.with(getApplicationContext()).load(photo_url)
-                .placeholder(R.drawable.default_profile_picture)
-                .into(photoUrl);
+                //set student data into TextView
+                givenName_tv.setText(fName);
+                surname_tv.setText(lName);
+                id_tv.setText(usc_id);
+                major_tv.setText(major_);
+                if (student.getCurrentBuilding() != null) currentBuilding_tv.setText(currBuilding);
+                else currentBuilding_tv.setText(R.string.none);
+                Glide.with(getApplicationContext()).load(photo_url)
+                    .placeholder(R.drawable.default_profile_picture)
+                    .into(photoUrl);
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                // TODO: handle
+            }
+        });
 
         scanQRCode_btn = (Button) findViewById(R.id.scanQRCode);
 
@@ -104,7 +115,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         builder.setMessage(R.string.delete_dialog_message)
                 .setTitle(R.string.delete_dialog_title)
                 .setPositiveButton(R.string.confirm, (dialog, id) -> {
-                    Server.deleteAccount(new Callback<Void>() {
+                    Server.deleteStudent(new Callback<Void>() {
                         @Override
                         public void onSuccess(Void result) {
                             Toast.makeText(getApplicationContext(), "Account deleted", Toast.LENGTH_LONG).show();
@@ -170,16 +181,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void signOut(View view){
-        Server.logout(new Callback<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-                Toast.makeText(StudentActivity.this, "Logged out", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onFailure(Exception exception) {
-                Log.e(TAG, "onFailure: logout failure");
-            }
-        });
+        Server.logout();
         startActivity(new Intent(StudentActivity.this, LoginActivity.class));
         finish();
     }
