@@ -11,7 +11,7 @@ public class Validator {
     }
 
     public static boolean validateEmail(String email){
-        String emailPattern = "^[a-zA-Z]+@usc\\.edu$";
+        String emailPattern = "^[a-zA-Z]+@usc\\.edu$"; // TODO: allow numeric characters, as long as it's not the first
         if(email.matches(emailPattern) && email.length() > 0){
             return true;
         }
