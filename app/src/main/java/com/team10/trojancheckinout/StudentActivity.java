@@ -244,7 +244,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                     else{
                         Server.checkIn(buildingID, new Callback<Void>() {
                             @Override
-                            public void onSuccess(Void res) {
+                            public void onSuccess(Void res) { // TODO: both success and failure are fired
                                 currBuilding = result.getName();
                                 currentBuilding_tv.setText(currBuilding);
                                 Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
