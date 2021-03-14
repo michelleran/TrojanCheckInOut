@@ -6,6 +6,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
+import android.net.Uri;
+import android.telecom.Call;
+
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
@@ -21,6 +25,8 @@ public class Server {
     private static FirebaseFirestore db;
     private static FirebaseStorage storage;
     private static final String TAG = "Server";
+    private static final String[] majors = { "Major 1", "Major 2" };
+
     // TODO: delete later
     private static final Student testStudent =
         new Student(0, "Test", "User", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg", "CSCI");
@@ -33,6 +39,8 @@ public class Server {
         // TODO: anything else
     }
 
+    public static String[] getMajors() { return majors; }
+
     public static User getCurrentUser() {
         // TODO: replace this
         return testStudent;
@@ -41,6 +49,22 @@ public class Server {
     public static void getStudent(String id, Callback<Student> callback) {
         // TODO: replace this
         callback.onSuccess(testStudent);
+    }
+
+    public static void logout(Callback<Void> callback){
+        //TODO: replace this
+    }
+
+    public static void changePassword(String newPassword, Callback<Void> callback){
+        //TODO: replace this
+    }
+
+    public static void changePhoto(Uri uri, Callback<String> callback){
+        //TODO: replace this
+    }
+
+    public static void deleteAccount(Callback<Void> callback){
+        //TODO: replace this
     }
 
     public static void getBuilding(String id, Callback<Building> callback) {
@@ -95,6 +119,7 @@ public class Server {
             }
         });
     }
+
 
     public static void listenForBuildings(Listener<Building> listener) {
         initialize();
@@ -328,7 +353,7 @@ public class Server {
 
     public static void searchHistory(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
-                                     String buildingName, int studentId, String major,
+                                     String buildingName, long studentId, String major,
                                      Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
         initialize();
         CollectionReference records = db.collection("records");

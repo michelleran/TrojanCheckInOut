@@ -60,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                         Intent intent = new Intent(LoginActivity.this, ManagerActivity.class);
                         startActivity(intent);
                         //this should be the landing page after logging in regardless of user's class
+                        // TODO: false: open StudentActivity if user is student
                     }
                 }
 

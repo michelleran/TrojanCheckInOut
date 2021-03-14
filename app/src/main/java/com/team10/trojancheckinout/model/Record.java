@@ -17,7 +17,7 @@ public class Record {
     private String major;
 
     private static final ZoneId pst = ZoneId.of("America/Los_Angeles");
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
     public Record() { }
     public Record(String buildingId, String major, boolean checkIn) {

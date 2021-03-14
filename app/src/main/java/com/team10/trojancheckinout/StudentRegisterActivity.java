@@ -37,7 +37,7 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
         setContentView(R.layout.activity_student_register);
 
         spin = findViewById(R.id.sMajors);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, majors);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, majors); // TODO: populate spinner using Server.getMajors
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         spin.setAdapter(adapter);
         spin.setOnItemSelectedListener(this);
@@ -60,14 +60,13 @@ public class StudentRegisterActivity extends AppCompatActivity implements Adapte
                 String iPassword = sPassword.getText().toString();
                 String iID = sID.getText().toString();
 
-                isValid = validate(iFname,iLname,iEmail,iPassword,iID);
+                isValid = validate(iFname,iLname,iEmail,iPassword,iID); // TODO: call server register method
 
                 if(isValid){
                     Toast.makeText(StudentRegisterActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                    //this should lead to studentActivity class which currently doesn't exist
+                    // TODO: this should lead to studentActivity class
                     Intent intent = new Intent(StudentRegisterActivity.this, ManagerActivity.class);
                     startActivity(intent);
-                    //this should be the landing page after logging in regardless of user's class
                 }
             }
         });
