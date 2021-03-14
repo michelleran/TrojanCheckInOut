@@ -76,7 +76,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Please add a photo!" ,Toast.LENGTH_SHORT).show();
                 } else {
                     // all inputs are valid
-                    managerRegister("", iFname, iLname, iEmail, imageUri, iPassword, new Callback<User>() {
+                    managerRegister(iFname, iLname, iEmail, imageUri, iPassword, new Callback<User>() {
                         @Override
                         public void onSuccess(User result) {
                             Toast.makeText(ManagerRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();

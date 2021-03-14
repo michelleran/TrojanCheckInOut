@@ -37,20 +37,10 @@ public class Server {
 
     private static final String TAG = "Server";
 
-    private static final HashMap<String,String> buildingNameIDMap = new HashMap<>(); // TODO: this needs to be set!
-
-    // TODO: delete later
-    private static final Student testStudent =
-        new Student("0", "Test", "User", "test@usc.edu", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kittyply_edit1.jpg", "CSCI");
-
     public static void initialize() {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
-    }
-
-    public static boolean isLoggedIn() {
-        return FirebaseAuth.getInstance().getCurrentUser() != null;
     }
 
     public static void login(String email, String password, Callback<User> callback){
@@ -59,7 +49,6 @@ public class Server {
             getCurrentUser(callback);
             return;
         } //user already exists
-        
         else {
             auth.getCurrentUser();
             auth.signInWithEmailAndPassword(email, password)
@@ -86,8 +75,8 @@ public class Server {
         Log.w("log out", "log out attempt");
     }
 
-    public static void managerRegister(String id, String givenName, String surname, String email,
-                                       Uri file, String password, Callback<User> callback) { // TODO: managers don't have ids
+    public static void managerRegister(String givenName, String surname, String email,
+                                       Uri file, String password, Callback<User> callback) {
         auth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
                     @Override
@@ -95,7 +84,7 @@ public class Server {
                         if (task.isSuccessful()) {
                             Log.d("registerStudent", "createUserWithEmail:success");
                             //loginUser(email, password, null, params, callback); //redundant
-                            addUser2(id, givenName, surname, email, file, null, callback, false);
+                            writeUserData("", givenName, surname, email, file, null, callback, false);
                         }
                         else {
                             Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
@@ -113,7 +102,7 @@ public class Server {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d("registerStudent", "createUserWithEmail:success");
-                            addUser2(id, givenName, surname, email, file, major, callback, true);
+                            writeUserData(id, givenName, surname, email, file, major, callback, true);
                         }
                         else {
                             Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
@@ -123,8 +112,8 @@ public class Server {
                 });
     }
 
-    private static void addUser2(String id, String givenName, String surname, String email, Uri file, String major
-            ,Callback<User> callback, boolean isStudent) { //add user to the database
+    private static void writeUserData(String id, String givenName, String surname, String email,
+                                      Uri file, String major, Callback<User> callback, boolean isStudent) {
         Map<String, Object> s = new HashMap<>();
         s.put("givenName", givenName);
         s.put("surname", surname);
@@ -279,8 +268,6 @@ public class Server {
 
     }
 
-
-
     public static void deleteStudent(Callback<Void> callback){
         if(auth.getCurrentUser()==null){
             Log.d("userDelete", "no user logged in");
@@ -319,7 +306,6 @@ public class Server {
                     }
                 });
     }
-
 
     public static void getStudent(String uID, Callback<Student> callback) {
         DocumentReference docRef = db.collection(USER_COLLECTION)
@@ -432,7 +418,6 @@ public class Server {
     }
 
     public static void getBuilding(String id, Callback<Building> callback) {
-        initialize();
         // Get building from database
         DocumentReference docRef = db.collection(BUILDING_COLLECTION).document(id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -461,36 +446,21 @@ public class Server {
         // TODO
     }
 
-    public static void removeBuilding(String id, Callback<Building> callback){
-        initialize();
-        // Get building to be removed
-        DocumentReference docRef = db.collection(BUILDING_COLLECTION).document(id);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+    public static void removeBuilding(String id, Callback<Void> callback){
+        db.collection(BUILDING_COLLECTION).document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        Building building = document.toObject(Building.class);
-                        // Delete building
-                        docRef.delete();
-                        callback.onSuccess(building);
-                    } else {
-                        callback.onFailure(new Exception("No such document"));
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    callback.onFailure(task.getException());
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
+            public void onSuccess(Void aVoid) {
+                callback.onSuccess(aVoid);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                callback.onFailure(e);
             }
         });
     }
 
-
     public static void listenForBuildings(Listener<Building> listener) {
-        initialize();
         db.collection(BUILDING_COLLECTION)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -527,17 +497,15 @@ public class Server {
         db.runTransaction(new Transaction.Function<Void>() {
             @Override
             public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-                DocumentSnapshot snapshot = transaction.get(buildingDocRef);
+                Building building = transaction.get(buildingDocRef).toObject(Building.class);
                 // If new max capacity is smaller than old max capacity
-                if((int)snapshot.get("maxCapacity") > maxCapacity){
+                if(building.getMaxCapacity() > maxCapacity){
                     callback.onFailure(new Exception("New capacity is smaller than old capacity"));
                 }else{
                     transaction.update(buildingDocRef, "maxCapacity", maxCapacity);
-                    Building building = snapshot.toObject(Building.class);
                     building.setMaxCapacity(maxCapacity);
                     callback.onSuccess(building);
                 }
-
                 // Success
                 return null;
             }
@@ -555,46 +523,51 @@ public class Server {
     }
 
     public static void checkIn(String id, Callback<Void> callback){
-        initialize();
         // Get building and student document references
         final DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document("id");
         final DocumentReference studentRef = db.collection(USER_COLLECTION).document(auth.getUid());
         db.runTransaction(new Transaction.Function<Void>() {
             @Override
             public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-                DocumentSnapshot newBuildingSnapshot = transaction.get(newBuildingRef);
-                DocumentSnapshot studentSnapshot = transaction.get(studentRef);
+                Building newBuilding = transaction.get(newBuildingRef).toObject(Building.class);
+                Student student = transaction.get(studentRef).toObject(Student.class);
+
+                if (newBuilding == null || student == null) {
+                    callback.onFailure(new Exception("Failed to get building or student"));
+                    return null;
+                }
+
                 // Check if student is already checked in to building
-                if(studentSnapshot.get("currentBuilding") == newBuildingSnapshot.get("name")) {
+                if(student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(id)) {
                     callback.onFailure(new Exception("Student is already checked into building"));
                     return null;
                 }
 
                 // Check if building is full
-                if(newBuildingSnapshot.get("currentCapacity") == newBuildingSnapshot.get("maxCapacity")) {
+                if(newBuilding.getCurrentCapacity() == newBuilding.getMaxCapacity()) {
                     callback.onFailure(new Exception("Building Full"));
                     return null;
                 }
 
                 // Check if student is already checked into a building
-                if(studentSnapshot.get("currentBuilding") == null) {
-                    transaction.update(newBuildingRef, "currentCapacity", (int)newBuildingSnapshot.get("currentCapacity")+1);
-                    transaction.update(studentRef, "currentBuilding", newBuildingSnapshot.get("name"));
-                    Record record = new Record(newBuildingRef.getId(), (String)studentSnapshot.get("major"), true);
+                if(student.getCurrentBuilding() == null) {
+                    transaction.update(newBuildingRef, "currentCapacity", newBuilding.getCurrentCapacity() + 1);
+                    transaction.update(studentRef, "currentBuilding", newBuilding.getName());
+                    Record record = new Record(id, newBuilding.getName(), student.getMajor(), true);
                     addRecord(record);
                 }else{
-                    final DocumentReference oldBuildingRef = db.collection(BUILDING_COLLECTION).document((String)studentSnapshot.get("currentBuilding"));
-                    DocumentSnapshot oldBuildingSnapshot = transaction.get(oldBuildingRef);
+                    final DocumentReference oldBuildingRef = db.collection(BUILDING_COLLECTION).document(student.getCurrentBuilding());
+                    Building oldBuilding = transaction.get(oldBuildingRef).toObject(Building.class);
                     // Update each buildings capacity
-                    transaction.update(newBuildingRef, "currentCapacity", (int)newBuildingSnapshot.get("currentCapacity")+1);
-                    transaction.update(oldBuildingRef, "currentCapacity", (int)oldBuildingSnapshot.get("currentCapacity")-1);
+                    transaction.update(newBuildingRef, "currentCapacity", newBuilding.getCurrentCapacity() + 1);
+                    transaction.update(oldBuildingRef, "currentCapacity", oldBuilding.getCurrentCapacity() - 1);
                     // Update student's current building
-                    transaction.update(studentRef, "currentBuilding", newBuildingSnapshot.get("name"));
+                    transaction.update(studentRef, "currentBuilding", newBuilding.getName());
 
                     // Generate records
-                    Record record1 = new Record(newBuildingRef.getId(),(String)studentSnapshot.get("major"), true);
+                    Record record1 = new Record(id, newBuilding.getName(), student.getMajor(), true);
                     addRecord(record1);
-                    Record record2 = new Record(oldBuildingRef.getId(),(String)studentSnapshot.get("major"), false);
+                    Record record2 = new Record(oldBuilding.getId(), oldBuilding.getName(), student.getMajor(), false);
                     addRecord(record2);
                 }
 
@@ -622,20 +595,26 @@ public class Server {
         final DocumentReference studentDocRef = db.collection(USER_COLLECTION).document(auth.getUid());
         db.runTransaction(new Transaction.Function<Void>() {
             @Override
-            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-                DocumentSnapshot buildingSnapshot = transaction.get(buildingDocRef);
-                DocumentSnapshot studentSnapshot = transaction.get(studentDocRef);
-                if(studentSnapshot.get("currentBuilding") == null){
+            public Void apply(@NotNull Transaction transaction) throws FirebaseFirestoreException {
+                Building building = transaction.get(buildingDocRef).toObject(Building.class);
+                Student student = transaction.get(studentDocRef).toObject(Student.class);
+
+                if (building == null || student == null) {
+                    callback.onFailure(new Exception("Failed to get student or building"));
+                    return null;
+                }
+
+                if(student.getCurrentBuilding() == null){
                     callback.onFailure(new Exception("Student is not checked into a building"));
                     return null;
                 }
 
                 // Update database
-                transaction.update(buildingDocRef, "currentCapacity", (int)buildingSnapshot.get("currentCapacity")-1);
+                transaction.update(buildingDocRef, "currentCapacity", building.getCurrentCapacity() - 1);
                 transaction.update(studentDocRef, "currentBuilding", null);
 
                 // Generate records
-                Record record = new Record(buildingDocRef.getId(),(String)studentSnapshot.get("major"), false);
+                Record record = new Record(id, building.getName(), student.getMajor(), false);
                 addRecord(record);
                 // Success
                 return null;
@@ -706,10 +685,10 @@ public class Server {
                 });
     }
 
-    public static void searchHistory(int startYear, int startMonth, int startDay, int startHour, int startMin,
+    public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
                                      String buildingName, long studentId, String major,
-                                     Callback<Record> callback) { // TODO: change to listener? technically a callback would suffice, though, b/c records are never removed/updated
+                                     Callback<Record> callback) {
         Query query = db.collection(RECORD_COLLECTION);
         // Set start parameters
         if(startYear != -1){
@@ -760,7 +739,23 @@ public class Server {
             query = query.whereEqualTo("major", major);
         }
 
-        query
+        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    callback.onFailure(new Exception(error.getMessage()));
+                    return;
+                }
+
+                for (DocumentChange dc : value.getDocumentChanges()) {
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        callback.onSuccess(dc.getDocument().toObject(Record.class));
+                    }
+                }
+            }
+        });
+
+        /*query
             .get()
             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
@@ -775,6 +770,6 @@ public class Server {
                         Log.d(TAG, "Error getting documents: ", task.getException());
                     }
                 }
-            });
+            });*/
     }
 }
