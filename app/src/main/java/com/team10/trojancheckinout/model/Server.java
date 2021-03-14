@@ -17,6 +17,7 @@ import com.google.firebase.storage.*;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,7 +86,7 @@ public class Server {
 
 
     public static void managerRegister(String id, String givenName, String surname, String email,
-                                       String photoUrl, String password, Callback<User> callback) {
+                                       Uri file, String password, Callback<User> callback) {
         initialize();
         mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
@@ -94,7 +95,7 @@ public class Server {
                         if (task.isSuccessful()) {
                             Log.d("registerStudent", "createUserWithEmail:success");
                             //loginUser(email, password, null, params, callback); //redundant
-                            addUser2(id, givenName, surname, email, photoUrl, null, callback, false);
+                            addUser2(id, givenName, surname, email, file, null, callback, false);
                         }
                         else {
                             Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
@@ -106,7 +107,7 @@ public class Server {
     }
 
     public static void studentRegister(String id, String givenName, String surname, String email,
-                                   String photoUrl, String major, String password, Callback<User> callback) {
+                                   Uri file, String major, String password, Callback<User> callback) {
         initialize();
         mAuth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
@@ -114,7 +115,7 @@ public class Server {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d("registerStudent", "createUserWithEmail:success");
-                            addUser2(id, givenName, surname, email, photoUrl, major, callback, true);
+                            addUser2(id, givenName, surname, email, file, major, callback, true);
                         }
                         else {
                             Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
@@ -125,37 +126,85 @@ public class Server {
     }
 
 
-    private static void addUser2(String id, String givenName, String surname, String email, String photoUrl, String major
+    private static void addUser2(String id, String givenName, String surname, String email, Uri file, String major
             ,Callback<User> callback, boolean isStudent) { //add user to the database
         Map<String, Object> s = new HashMap<>();
-        s.put("id", id);
+        //s.put("id", id);
         s.put("givenName", givenName);
         s.put("surname", surname);
         s.put("email", email);
-        s.put("photoUrl", photoUrl);
         s.put("student", isStudent);
         if(isStudent) {
             s.put("deleted", false);
             s.put("major", major);
         }
+
+        String uID = mAuth.getCurrentUser().getUid();
+        StorageReference fileRef = storageRef.child("images/"+uID + file.getLastPathSegment());
+        UploadTask uploadTask = fileRef.putFile(file);
+        uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                Log.d("Photo Uri", "Upload is " + progress + "% done");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Log.d("Photo Uri", "could not handle Uri");
+                callback.onFailure(exception);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
+            @Override
+            public void onSuccess(TaskSnapshot taskSnapshot) {
+                String URL = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
+                s.put("photoUrl", URL);
+                Log.d("Photo Uri", "could not handle Uri");
+                FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .set(s)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("add user", "DocumentSnapshot added with ID: ");
+                                // activity.changeActivitySuccess(true);
+
+                                getCurrentUser(callback);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("add user", "Error adding document", e);
+                                callback.onFailure(e);
+                            }
+                        });
+            }
+        });
+
+
+
+
+
             // Student s = new Student(id, givenName, surname, email, photoUrl, major);
-            FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                    .set(s)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("add user", "DocumentSnapshot added with ID: ");
-                            // activity.changeActivitySuccess(true);
-                            getCurrentUser(callback);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w("add user", "Error adding document", e);
-                            callback.onFailure(e);
-                        }
-                    });
+//            FirebaseFirestore.getInstance().collection("StudentDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                    .set(s)
+//                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        @Override
+//                        public void onSuccess(Void aVoid) {
+//                            Log.d("add user", "DocumentSnapshot added with ID: ");
+//                            // activity.changeActivitySuccess(true);
+//
+//                            getCurrentUser(callback);
+//                        }
+//                    })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Log.w("add user", "Error adding document", e);
+//                            callback.onFailure(e);
+//                        }
+//                    });
 //         }
 //         else{
 //             FirebaseFirestore.getInstance().collection("ManagerDetail").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
