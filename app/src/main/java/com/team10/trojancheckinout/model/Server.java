@@ -541,8 +541,7 @@ public class Server {
                 if(student.getCurrentBuilding() == null) {
                     transaction.update(newBuildingRef, "currentCapacity", newBuilding.getCurrentCapacity() + 1);
                     transaction.update(studentRef, "currentBuilding", newBuilding.getId());
-                    Record record = new Record(id, newBuilding.getName(), student.getMajor(), true);
-                    addRecord(record);
+                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(id, newBuilding.getName(), student.getMajor(), true));
                 }else{
                     final DocumentReference oldBuildingRef = db.collection(BUILDING_COLLECTION).document(student.getCurrentBuilding());
                     Building oldBuilding = transaction.get(oldBuildingRef).toObject(Building.class);
@@ -552,11 +551,8 @@ public class Server {
                     // Update student's current building
                     transaction.update(studentRef, "currentBuilding", newBuilding.getId());
 
-                    // Generate records
-                    Record record2 = new Record(oldBuilding.getId(), oldBuilding.getName(), student.getMajor(), false);
-                    addRecord(record2);
-                    Record record1 = new Record(id, newBuilding.getName(), student.getMajor(), true);
-                    addRecord(record1);
+                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(oldBuilding.getId(), oldBuilding.getName(), student.getMajor(), false));
+                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(id, newBuilding.getName(), student.getMajor(), true));
                 }
 
                 // Success
@@ -577,7 +573,7 @@ public class Server {
         });
     }
 
-    public static void checkOut(String id, Callback<Building> callback){ // TODO: rework
+    public static void checkOut(String id, Callback<Building> callback){
         final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
         final DocumentReference studentDocRef = db.collection(USER_COLLECTION).document(auth.getUid());
         db.runTransaction(new Transaction.Function<Building>() {
@@ -599,10 +595,8 @@ public class Server {
                 // Update database
                 transaction.update(buildingDocRef, "currentCapacity", building.getCurrentCapacity() - 1);
                 transaction.update(studentDocRef, "currentBuilding", null);
+                transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(id, building.getName(), student.getMajor(), false));
 
-                // Generate records
-                Record record = new Record(id, building.getName(), student.getMajor(), false);
-                addRecord(record);
                 // Success
                 return building;
             }
@@ -619,24 +613,6 @@ public class Server {
                 Log.w(TAG, "Transaction failure.", e);
             }
         });
-
-    }
-
-    private static void addRecord(Record record){
-        db.collection(RECORD_COLLECTION)
-                .add(record)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
     }
 
 
