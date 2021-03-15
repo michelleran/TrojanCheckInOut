@@ -493,65 +493,67 @@ public class Server {
 
     public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
         final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
-        db.runTransaction(new Transaction.Function<Void>() {
+        db.runTransaction(new Transaction.Function<Building>() {
             @Override
-            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+            public Building apply(Transaction transaction) throws FirebaseFirestoreException {
                 Building building = transaction.get(buildingDocRef).toObject(Building.class);
                 // If new max capacity is smaller than old max capacity
                 if(building.getMaxCapacity() > maxCapacity){
-                    callback.onFailure(new Exception("New capacity is smaller than old capacity"));
+                    throw new FirebaseFirestoreException("New capacity is smaller than old capacity",
+                        FirebaseFirestoreException.Code.ABORTED);
                 }else{
                     transaction.update(buildingDocRef, "maxCapacity", maxCapacity);
                     building.setMaxCapacity(maxCapacity);
-                    callback.onSuccess(building);
                 }
                 // Success
-                return null;
+                return building;
             }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+        }).addOnSuccessListener(new OnSuccessListener<Building>() {
             @Override
-            public void onSuccess(Void aVoid) {
+            public void onSuccess(Building building) {
+                callback.onSuccess(building);
                 Log.d(TAG, "Transaction success!");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                callback.onFailure(e);
                 Log.w(TAG, "Transaction failure.", e);
             }
         });
     }
 
-    public static void checkIn(String id, Callback<Void> callback){
+    public static void checkIn(String id, Callback<Building> callback){ // TODO: may not need to call back w/ the building
         // Get building and student document references
-        final DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document("id");
+        final DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document(id);
         final DocumentReference studentRef = db.collection(USER_COLLECTION).document(auth.getUid());
-        db.runTransaction(new Transaction.Function<Void>() {
+        db.runTransaction(new Transaction.Function<Building>() {
             @Override
-            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+            public Building apply(Transaction transaction) throws FirebaseFirestoreException {
                 Building newBuilding = transaction.get(newBuildingRef).toObject(Building.class);
                 Student student = transaction.get(studentRef).toObject(Student.class);
 
                 if (newBuilding == null || student == null) {
-                    callback.onFailure(new Exception("Failed to get building or student"));
-                    return null;
+                    throw new FirebaseFirestoreException("Failed to get building or student",
+                        FirebaseFirestoreException.Code.ABORTED);
                 }
 
                 // Check if student is already checked in to building
                 if(student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(id)) {
-                    callback.onFailure(new Exception("Student is already checked into building"));
-                    return null;
+                    throw new FirebaseFirestoreException("Student is already checked into this building",
+                        FirebaseFirestoreException.Code.ABORTED);
                 }
 
                 // Check if building is full
                 if(newBuilding.getCurrentCapacity() == newBuilding.getMaxCapacity()) {
-                    callback.onFailure(new Exception("Building Full"));
-                    return null;
+                    throw new FirebaseFirestoreException("Building is full",
+                        FirebaseFirestoreException.Code.ABORTED);
                 }
 
                 // Check if student is already checked into a building
                 if(student.getCurrentBuilding() == null) {
                     transaction.update(newBuildingRef, "currentCapacity", newBuilding.getCurrentCapacity() + 1);
-                    transaction.update(studentRef, "currentBuilding", newBuilding.getName());
+                    transaction.update(studentRef, "currentBuilding", newBuilding.getId());
                     Record record = new Record(id, newBuilding.getName(), student.getMajor(), true);
                     addRecord(record);
                 }else{
@@ -561,49 +563,50 @@ public class Server {
                     transaction.update(newBuildingRef, "currentCapacity", newBuilding.getCurrentCapacity() + 1);
                     transaction.update(oldBuildingRef, "currentCapacity", oldBuilding.getCurrentCapacity() - 1);
                     // Update student's current building
-                    transaction.update(studentRef, "currentBuilding", newBuilding.getName());
+                    transaction.update(studentRef, "currentBuilding", newBuilding.getId());
 
                     // Generate records
-                    Record record1 = new Record(id, newBuilding.getName(), student.getMajor(), true);
-                    addRecord(record1);
                     Record record2 = new Record(oldBuilding.getId(), oldBuilding.getName(), student.getMajor(), false);
                     addRecord(record2);
+                    Record record1 = new Record(id, newBuilding.getName(), student.getMajor(), true);
+                    addRecord(record1);
                 }
 
                 // Success
-                return null;
+                return newBuilding;
             }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+        }).addOnSuccessListener(new OnSuccessListener<Building>() {
             @Override
-            public void onSuccess(Void aVoid) {
-                callback.onSuccess(aVoid);
+            public void onSuccess(Building building) {
+                callback.onSuccess(building);
                 Log.d(TAG, "Transaction success!");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.w(TAG, "Transaction failure.", e);
+                callback.onFailure(e);
             }
         });
     }
 
-    public static void checkOut(String id, Callback<Void> callback){
+    public static void checkOut(String id, Callback<Building> callback){ // TODO: rework
         final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
         final DocumentReference studentDocRef = db.collection(USER_COLLECTION).document(auth.getUid());
-        db.runTransaction(new Transaction.Function<Void>() {
+        db.runTransaction(new Transaction.Function<Building>() {
             @Override
-            public Void apply(@NotNull Transaction transaction) throws FirebaseFirestoreException {
+            public Building apply(@NotNull Transaction transaction) throws FirebaseFirestoreException {
                 Building building = transaction.get(buildingDocRef).toObject(Building.class);
                 Student student = transaction.get(studentDocRef).toObject(Student.class);
 
                 if (building == null || student == null) {
-                    callback.onFailure(new Exception("Failed to get student or building"));
-                    return null;
+                    throw new FirebaseFirestoreException("Failed to get student or building",
+                        FirebaseFirestoreException.Code.ABORTED);
                 }
 
                 if(student.getCurrentBuilding() == null){
-                    callback.onFailure(new Exception("Student is not checked into a building"));
-                    return null;
+                    throw new FirebaseFirestoreException("Student is not checked into a building",
+                        FirebaseFirestoreException.Code.ABORTED);
                 }
 
                 // Update database
@@ -614,16 +617,18 @@ public class Server {
                 Record record = new Record(id, building.getName(), student.getMajor(), false);
                 addRecord(record);
                 // Success
-                return null;
+                return building;
             }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+        }).addOnSuccessListener(new OnSuccessListener<Building>() {
             @Override
-            public void onSuccess(Void aVoid) {
+            public void onSuccess(Building building) {
+                callback.onSuccess(building);
                 Log.d(TAG, "Transaction success!");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                callback.onFailure(e);
                 Log.w(TAG, "Transaction failure.", e);
             }
         });

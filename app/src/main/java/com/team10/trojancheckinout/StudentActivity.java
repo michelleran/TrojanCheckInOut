@@ -198,9 +198,9 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         //set Current Building to None and Server.checkOut()
         currBuilding = "None";
         currentBuilding_tv.setText(R.string.none);
-        Server.checkOut(student.getCurrentBuilding(), new Callback<Void>() {
+        Server.checkOut(student.getCurrentBuilding(), new Callback<Building>() { // TODO: crashes
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(Building building) {
                 Toast.makeText(getApplicationContext(), "Successfully checked out!", Toast.LENGTH_LONG).show();
             }
             @Override
@@ -222,45 +222,33 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             //QR SCAN - set UI
             String buildingID = QRCodeHelper.process(requestCode, resultCode, data, this);
-            Server.getBuilding(buildingID, new Callback<Building>() {
-                @Override
-                public void onSuccess(Building result) {
-                    //if user already checked into this building, check out
-                    if(currBuilding != null && currBuilding.equals(result.getName())){
-                        Server.checkOut(buildingID, new Callback<Void>() {
-                            @Override
-                            public void onSuccess(Void res) {
-                                currBuilding = "None";
-                                currentBuilding_tv.setText(R.string.none);
-                                Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
-                            }
-                            @Override
-                            public void onFailure(Exception exception) {
-                                Log.e(TAG, "onFailure: checkOut failure");
-                            }
-                        });
+            if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingID)) {
+                Server.checkOut(buildingID, new Callback<Building>() {
+                    @Override
+                    public void onSuccess(Building building) {
+                        currBuilding = "None";
+                        currentBuilding_tv.setText(R.string.none);
+                        Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
                     }
-                    //else check in
-                    else{
-                        Server.checkIn(buildingID, new Callback<Void>() {
-                            @Override
-                            public void onSuccess(Void res) { // TODO: both success and failure are fired
-                                currBuilding = result.getName();
-                                currentBuilding_tv.setText(currBuilding);
-                                Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
-                            }
-                            @Override
-                            public void onFailure(Exception exception) {
-                                Log.e(TAG, "onFailure: checkIn failure");
-                            }
-                        });
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Log.e(TAG, "onFailure: checkOut failure");
                     }
-                }
-                @Override
-                public void onFailure(Exception exception) {
-                    Log.e(TAG, "onFailure: QR code getBuilding error");
-                }
-            });
+                });
+            } else {
+                Server.checkIn(buildingID, new Callback<Building>() {
+                    @Override
+                    public void onSuccess(Building building) {
+                        currBuilding = building.getName();
+                        currentBuilding_tv.setText(currBuilding);
+                        Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
+                    }
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Log.e(TAG, "onFailure: checkIn failure");
+                    }
+                });
+            }
         }
     }
 

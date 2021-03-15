@@ -29,7 +29,7 @@ public class Record {
         this.time = LocalDateTime.now(pst);
         this.year = time.getYear();
         this.month = time.getMonthValue();
-        this.day = time.getDayOfYear();
+        this.day = time.getDayOfMonth();
         this.hour = time.getHour();
         this.minute = time.getMinute();
         this.checkIn = checkIn;
