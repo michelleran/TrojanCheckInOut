@@ -197,31 +197,18 @@ public class Server {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         Log.d("getUser", "DocumentSnapshot data: " + document.getData());
-                        //return document.getData()
-                        boolean student = (boolean) document.getData().get("student");
-                        String givenName = (String) document.getData().get("givenName");
-                        String surname = (String) document.getData().get("surname");
-                        String id = (String) document.getData().get("id");
-                        String email = (String) document.getData().get("email");
-                        String photoUrl = (String) document.getData().get("photoUrl");
-                        if(student) { //if a student
+                        if(document.getBoolean("student")) {
                             //can also check if the user is deleted by checking against "deleted"
-                            boolean deleted = (boolean) document.getData().get("deleted");
-                            String major = (String) document.getData().get("major");
-                            Student profile = new Student(id, givenName, surname, email, photoUrl, major);
-                            //Student profile = document.toObject(Student.class);  //doesn't work because i am checking if they are a student
-                            //handling that we succeeded
-                            callback.onSuccess(profile);
+                            Student student = document.toObject(Student.class);
+                            callback.onSuccess(student);
                         }
-                        else if(!student) { //manager
+                        else {
                             //make manager
-                            Manager manager = new Manager(id, givenName, surname, email, photoUrl);
-                            callback.onSuccess(manager);
+                            callback.onSuccess(document.toObject(Manager.class));
                         }
                     } else {
                        Log.d("getUSer", "No such document");
                        callback.onFailure(task.getException());
-
                     }
                 } else {
                     Log.d("getUser", "get failed with ", task.getException());
