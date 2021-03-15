@@ -189,7 +189,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     //manually check out of building
-    public void checkOut(View view){
+    public void checkOut(View view){// TODO: crashes if you check in, then check right back out
         //show Toast if user not checked into a building
         if(currBuilding == null || currBuilding.equals("None")){
             Toast.makeText(getApplicationContext(), "Not currently checked into a building", Toast.LENGTH_LONG)
@@ -198,7 +198,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         //set Current Building to None and Server.checkOut()
         currBuilding = "None";
         currentBuilding_tv.setText(R.string.none);
-        Server.checkOut(student.getCurrentBuilding(), new Callback<Building>() { // TODO: crashes
+        Server.checkOut(student.getCurrentBuilding(), new Callback<Building>() {
             @Override
             public void onSuccess(Building building) {
                 Toast.makeText(getApplicationContext(), "Successfully checked out!", Toast.LENGTH_LONG).show();
