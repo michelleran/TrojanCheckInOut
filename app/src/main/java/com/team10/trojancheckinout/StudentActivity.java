@@ -62,7 +62,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                 student = (Student) result;
                 fName = student.getGivenName();
                 lName = student.getSurname();
-                usc_id = student.getIdString();
+                usc_id = student.getId();
                 major_ = student.getMajor();
 
                 //gets building name through Server.getBuilding()

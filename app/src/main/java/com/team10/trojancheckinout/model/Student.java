@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout.model;
 
 public class Student implements User {
+    private String uid;
     private String id;
     private String givenName;
     private String surname;
@@ -12,22 +13,10 @@ public class Student implements User {
 
     public Student(){}
 
-    public Student(String id, String givenName, String surname, String email,
-                   String photoUrl, String major) {
-        this.id = id;
-        this.givenName = givenName;
-        this.surname = surname;
-        this.email = email;
-        this.photoUrl = photoUrl;
-        this.major = major;
-    }
-
-    public String getId() {
-        return id;
-    } // TODO: there could be confusion between student id and firebase id
+    public String getId() { return id; }
 
     @Override
-    public String getIdString() { return id; }
+    public String getUid() { return uid; }
 
     public String getGivenName() {
         return givenName;

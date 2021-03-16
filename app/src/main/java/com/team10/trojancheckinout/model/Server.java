@@ -80,12 +80,11 @@ public class Server {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d("registerStudent", "createUserWithEmail:success");
-                            //loginUser(email, password, null, params, callback); //redundant
+                            Log.d("registerManager", "createUserWithEmail:success");
                             writeUserData("", givenName, surname, email, file, null, callback, false);
                         }
                         else {
-                            Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
+                            Log.w("registerManager", "createUserWithEmail:failure", task.getException());
                             callback.onFailure(task.getException());
                         }
                     }
@@ -112,7 +111,9 @@ public class Server {
 
     private static void writeUserData(String id, String givenName, String surname, String email,
                                       Uri file, String major, Callback<User> callback, boolean isStudent) {
+        String uID = auth.getCurrentUser().getUid();
         Map<String, Object> s = new HashMap<>();
+        s.put("uid", uID);
         s.put("givenName", givenName);
         s.put("surname", surname);
         s.put("email", email);
@@ -123,7 +124,6 @@ public class Server {
             s.put("major", major);
         }
 
-        String uID = auth.getCurrentUser().getUid();
         StorageReference fileRef = storage.child("images/"+uID + file.getLastPathSegment());
         UploadTask uploadTask = fileRef.putFile(file);
         uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
@@ -306,19 +306,9 @@ public class Server {
                         boolean student = (boolean) document.getData().get("student");
                         if(student) { //if a student
                             //can also check if the user is deleted by checking against "deleted"
-
-                            String givenName = (String) document.getData().get("givenName");
-                            String surname = (String) document.getData().get("surname");
-                            String id = (String) document.getData().get("id");
-                            String major = (String) document.getData().get("major");
-                            String email = (String) document.getData().get("email");
-                            String photoUrl = (String) document.getData().get("photoUrl");
-                            Student profile = new Student(id, givenName, surname, email, photoUrl, major);
-                            //handling that we succeeded
-//                            callback.notify();
-                            callback.onSuccess(profile);
+                            callback.onSuccess(document.toObject(Student.class));
                         }
-                        else if(!student) { //manager
+                        else { //manager
                             Log.d("getStudent", "Trying to access a manager");
                             callback.onFailure(null);
                         }

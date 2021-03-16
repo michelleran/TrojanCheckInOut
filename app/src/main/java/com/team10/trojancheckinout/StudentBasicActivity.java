@@ -39,7 +39,7 @@ public class StudentBasicActivity extends AppCompatActivity {
             public void onSuccess(Student result) {
                 givenName.setText(result.getGivenName());
                 surname.setText(result.getSurname());
-                id.setText(result.getIdString());
+                id.setText(result.getId());
                 major.setText(result.getMajor());
 
                 //gets building name through Server.getBuilding()
