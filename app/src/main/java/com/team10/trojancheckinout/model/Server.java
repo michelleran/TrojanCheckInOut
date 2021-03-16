@@ -411,7 +411,7 @@ public class Server {
                 String URL = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
                 DocumentReference docRef = db.collection("StudentDetail")
                         .document(mAuth.getCurrentUser().getUid()); //get the current user document
-                docRef.update("PhotoUrl", URL)
+                docRef.update("photoUrl", URL)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
