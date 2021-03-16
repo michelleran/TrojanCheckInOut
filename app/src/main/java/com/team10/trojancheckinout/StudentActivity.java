@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
@@ -194,6 +195,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         if(currBuilding == null || currBuilding.equals("None")){
             Toast.makeText(getApplicationContext(), "Not currently checked into a building", Toast.LENGTH_LONG)
                     .show();
+            return;
         }
         //set Current Building to None and Server.checkOut()
         currBuilding = "None";
@@ -221,33 +223,39 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             }
         } else {
             //QR SCAN - set UI
-            String buildingID = QRCodeHelper.process(requestCode, resultCode, data, this);
-            if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingID)) {
-                Server.checkOut(new Callback<Building>() {
-                    @Override
-                    public void onSuccess(Building building) {
-                        currBuilding = "None";
-                        currentBuilding_tv.setText(R.string.none);
-                        Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
-                    }
-                    @Override
-                    public void onFailure(Exception exception) {
-                        Log.e(TAG, "onFailure: checkOut failure");
-                    }
-                });
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if (result != null && result.getContents() != null) {
+                String buildingId = result.getContents();
+                // TODO: below doesn't work if called right after checking in b/c local student obj is not updated
+                if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
+                    Server.checkOut(new Callback<Building>() {
+                        @Override
+                        public void onSuccess(Building building) {
+                            currBuilding = "None";
+                            currentBuilding_tv.setText(R.string.none);
+                            Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: checkOut failure");
+                        }
+                    });
+                } else {
+                    Server.checkIn(buildingId, new Callback<Building>() {
+                        @Override
+                        public void onSuccess(Building building) {
+                            currBuilding = building.getName();
+                            currentBuilding_tv.setText(currBuilding);
+                            Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: checkIn failure");
+                        }
+                    });
+                }
             } else {
-                Server.checkIn(buildingID, new Callback<Building>() {
-                    @Override
-                    public void onSuccess(Building building) {
-                        currBuilding = building.getName();
-                        currentBuilding_tv.setText(currBuilding);
-                        Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
-                    }
-                    @Override
-                    public void onFailure(Exception exception) {
-                        Log.e(TAG, "onFailure: checkIn failure");
-                    }
-                });
+                Toast.makeText(this, "Not a valid building QR code", Toast.LENGTH_LONG).show();
             }
         }
     }
