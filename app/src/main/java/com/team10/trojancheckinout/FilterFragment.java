@@ -148,7 +148,7 @@ public class FilterFragment extends Fragment {
 
         Spinner spinner = rootView.findViewById(R.id.filter_major_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.majors, android.R.layout.simple_spinner_item);
-        spinner.setAdapter(adapter);
+        spinner.setAdapter(adapter); // TODO: allow user to not select anything
 
         Button filter = rootView.findViewById(R.id.filter_button);
         filter.setOnClickListener(new View.OnClickListener() {
