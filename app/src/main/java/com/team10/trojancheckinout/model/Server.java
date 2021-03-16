@@ -147,7 +147,7 @@ public class Server {
                     public void onSuccess(Uri uri) {
                         s.put("photoUrl", uri.toString());
                         Log.d("Photo Uri", "could not handle Uri");
-                        FirebaseFirestore.getInstance().collection(USER_COLLECTION).document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        FirebaseFirestore.getInstance().collection(USER_COLLECTION).document(uID)
                             .set(s)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -174,11 +174,11 @@ public class Server {
         });
     }
 
-    public static String getCurrentUserId() {
+    /*public static String getCurrentUserId() {
         if (auth.getCurrentUser() == null)
             return null;
         return auth.getCurrentUser().getUid();
-    }
+    }*/
 
     public static void getCurrentUser(Callback<User> callback) {
         if(auth.getCurrentUser()==null){
@@ -538,7 +538,7 @@ public class Server {
                 if(student.getCurrentBuilding() == null) {
                     transaction.update(newBuildingRef, "currentCapacity", newBuilding.getCurrentCapacity() + 1);
                     transaction.update(studentRef, "currentBuilding", newBuilding.getId());
-                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(id, newBuilding.getName(), student.getMajor(), true));
+                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(studentRef.getId(), id, newBuilding.getName(), student.getMajor(), true));
                 }else{
                     final DocumentReference oldBuildingRef = db.collection(BUILDING_COLLECTION).document(student.getCurrentBuilding());
                     Building oldBuilding = transaction.get(oldBuildingRef).toObject(Building.class);
@@ -548,8 +548,8 @@ public class Server {
                     // Update student's current building
                     transaction.update(studentRef, "currentBuilding", newBuilding.getId());
 
-                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(oldBuilding.getId(), oldBuilding.getName(), student.getMajor(), false));
-                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(id, newBuilding.getName(), student.getMajor(), true));
+                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(studentRef.getId(), oldBuilding.getId(), oldBuilding.getName(), student.getMajor(), false));
+                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(studentRef.getId(), id, newBuilding.getName(), student.getMajor(), true));
                 }
 
                 // Success
@@ -596,7 +596,7 @@ public class Server {
                 // Update database
                 transaction.update(buildingDocRef, "currentCapacity", building.getCurrentCapacity() - 1);
                 transaction.update(studentDocRef, "currentBuilding", null);
-                transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(building.getId(), building.getName(), student.getMajor(), false));
+                transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(studentDocRef.getId(), building.getId(), building.getName(), student.getMajor(), false));
 
                 // Success
                 return building;

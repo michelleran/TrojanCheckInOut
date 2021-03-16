@@ -22,8 +22,8 @@ public class Record {
 
     public Record() { }
 
-    public Record(String buildingId, String buildingName, String major, boolean checkIn) {
-        this.studentId = Server.getCurrentUserId(); // assumes current user is a student
+    public Record(String studentId, String buildingId, String buildingName, String major, boolean checkIn) {
+        this.studentId = studentId;
         this.buildingId = buildingId;
         this.buildingName = buildingName;
         this.time = LocalDateTime.now(pst);

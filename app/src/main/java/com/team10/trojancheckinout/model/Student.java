@@ -24,10 +24,10 @@ public class Student implements User {
 
     public String getId() {
         return id;
-    }
+    } // TODO: there could be confusion between student id and firebase id
 
     @Override
-    public String getIdString() { return String.valueOf(id); }
+    public String getIdString() { return id; }
 
     public String getGivenName() {
         return givenName;
