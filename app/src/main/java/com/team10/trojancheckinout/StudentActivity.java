@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
@@ -62,10 +63,27 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                 student = (Student) result;
                 fName = student.getGivenName();
                 lName = student.getSurname();
-                usc_id = student.getIdString();
+                usc_id = student.getId();
                 major_ = student.getMajor();
+
                 //gets building name through Server.getBuilding()
-                currBuilding = getBuildingName(student.getCurrentBuilding());
+                if (student.getCurrentBuilding() != null) {
+                    Server.getBuilding(student.getCurrentBuilding(), new Callback<Building>() {
+                        @Override
+                        public void onSuccess(Building result) {
+                            currBuilding = result.getName();
+                            currentBuilding_tv.setText(currBuilding);
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            currBuilding = null;
+                            Log.e(TAG, "onFailure: getBuildingName failure");
+                        }
+                    });
+                } else {
+                    currentBuilding_tv.setText(R.string.none);
+                }
+
                 photo_url = student.getPhotoUrl();
 
                 //set student data into TextView
@@ -73,8 +91,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                 surname_tv.setText(lName);
                 id_tv.setText(usc_id);
                 major_tv.setText(major_);
-                if (student.getCurrentBuilding() != null) currentBuilding_tv.setText(currBuilding);
-                else currentBuilding_tv.setText(R.string.none);
+
                 Glide.with(getApplicationContext()).load(photo_url)
                     .placeholder(R.drawable.default_profile_picture)
                     .override(400, 400).centerCrop()
@@ -94,21 +111,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
 
         //attach onclick listener
         scanQRCode_btn.setOnClickListener(this);
-    }
-
-    public String getBuildingName(String id){
-        Server.getBuilding(id, new Callback<Building>() {
-            @Override
-            public void onSuccess(Building result) {
-                currBuilding = result.getName();
-            }
-            @Override
-            public void onFailure(Exception exception) {
-                currBuilding = null;
-                Log.e(TAG, "onFailure: getBuildingName failure");
-            }
-        });
-        return currBuilding;
     }
 
     public void deleteAccount(View view){
@@ -166,21 +168,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         startActivityForResult(openGalleryIntent, PICK_PHOTO_REQUEST);
     }
 
-    //upload image URI retrieved from Image Gallery to Firebase - update Student's photo URL field
-    private void uploadImagetoFirebase(Uri imageUri){
-        //upload profile picture to firebase
-        Server.changePhoto(imageUri, new Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onFailure(Exception exception) {
-                Log.e(TAG, "onFailure: upload prof pic failure");
-            }
-        });
-    }
-
     public void signOut(View view){
         Server.logout();
         startActivity(new Intent(StudentActivity.this, LoginActivity.class));
@@ -193,13 +180,14 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         if(currBuilding == null || currBuilding.equals("None")){
             Toast.makeText(getApplicationContext(), "Not currently checked into a building", Toast.LENGTH_LONG)
                     .show();
+            return;
         }
         //set Current Building to None and Server.checkOut()
         currBuilding = "None";
         currentBuilding_tv.setText(R.string.none);
-        Server.checkOut(student.getCurrentBuilding(), new Callback<Void>() {
+        Server.checkOut(new Callback<Building>() {
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(Building building) {
                 Toast.makeText(getApplicationContext(), "Successfully checked out!", Toast.LENGTH_LONG).show();
             }
             @Override
@@ -215,51 +203,59 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         if(requestCode == PICK_PHOTO_REQUEST){
             if(resultCode == Activity.RESULT_OK){
                 Uri imageUri = data.getData();
-                photoUrl.setImageURI(imageUri);
-                uploadImagetoFirebase(imageUri);
+                Server.changePhoto(imageUri, new Callback<String>() {
+                    @Override
+                    public void onSuccess(String result) {
+                        Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
+                        // replace photo
+                        photo_url = result;
+                        Glide.with(getApplicationContext()).load(photo_url)
+                            .placeholder(R.drawable.default_profile_picture)
+                            .override(400, 400).centerCrop()
+                            .into(photoUrl);
+                    }
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Log.e(TAG, "onFailure: upload prof pic failure");
+                    }
+                });
             }
         } else {
             //QR SCAN - set UI
-            String buildingID = QRCodeHelper.process(requestCode, resultCode, data, this);
-            Server.getBuilding(buildingID, new Callback<Building>() {
-                @Override
-                public void onSuccess(Building result) {
-                    //if user already checked into this building, check out
-                    if(currBuilding != null && currBuilding.equals(result.getName())){
-                        Server.checkOut(buildingID, new Callback<Void>() {
-                            @Override
-                            public void onSuccess(Void res) {
-                                currBuilding = "None";
-                                currentBuilding_tv.setText(R.string.none);
-                                Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
-                            }
-                            @Override
-                            public void onFailure(Exception exception) {
-                                Log.e(TAG, "onFailure: checkOut failure");
-                            }
-                        });
-                    }
-                    //else check in
-                    else{
-                        Server.checkIn(buildingID, new Callback<Void>() {
-                            @Override
-                            public void onSuccess(Void res) {
-                                currBuilding = result.getName();
-                                currentBuilding_tv.setText(currBuilding);
-                                Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
-                            }
-                            @Override
-                            public void onFailure(Exception exception) {
-                                Log.e(TAG, "onFailure: checkIn failure");
-                            }
-                        });
-                    }
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if (result != null && result.getContents() != null) {
+                String buildingId = result.getContents();
+                // TODO: below doesn't work if called right after checking in b/c local student obj is not updated
+                if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
+                    Server.checkOut(new Callback<Building>() {
+                        @Override
+                        public void onSuccess(Building building) {
+                            currBuilding = "None";
+                            currentBuilding_tv.setText(R.string.none);
+                            Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: checkOut failure");
+                        }
+                    });
+                } else {
+                    Server.checkIn(buildingId, new Callback<Building>() {
+                        @Override
+                        public void onSuccess(Building building) {
+                            currBuilding = building.getName();
+                            currentBuilding_tv.setText(currBuilding);
+                            Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: checkIn failure");
+                        }
+                    });
                 }
-                @Override
-                public void onFailure(Exception exception) {
-                    Log.e(TAG, "onFailure: QR code getBuilding error");
-                }
-            });
+            } else {
+                Toast.makeText(this, "Not a valid building QR code", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

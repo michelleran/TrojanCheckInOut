@@ -17,7 +17,6 @@ import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Record;
 import com.team10.trojancheckinout.model.Server;
 
-import java.util.Collections;
 import java.util.Locale;
 
 /**
@@ -90,7 +89,7 @@ public class BuildingDetailsFragment extends Fragment {
         adapter = new CheckedInStudentAdapter();
         recordList.setAdapter(adapter);
 
-        Server.searchHistory(
+        Server.filterRecords(
             -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1,
             buildingName, -1, "", new Callback<Record>() {

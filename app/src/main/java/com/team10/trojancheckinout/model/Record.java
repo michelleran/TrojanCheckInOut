@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 public class Record {
     private String studentId;
     private String buildingId;
+    private String buildingName;
     private LocalDateTime time;
     private boolean checkIn;
     private int year;
@@ -21,13 +22,14 @@ public class Record {
 
     public Record() { }
 
-    public Record(String buildingId, String major, boolean checkIn) {
-        this.studentId = Server.getCurrentUserId(); // assumes current user is a student
+    public Record(String studentId, String buildingId, String buildingName, String major, boolean checkIn) {
+        this.studentId = studentId;
         this.buildingId = buildingId;
+        this.buildingName = buildingName;
         this.time = LocalDateTime.now(pst);
         this.year = time.getYear();
         this.month = time.getMonthValue();
-        this.day = time.getDayOfYear();
+        this.day = time.getDayOfMonth();
         this.hour = time.getHour();
         this.minute = time.getMinute();
         this.checkIn = checkIn;
@@ -36,6 +38,7 @@ public class Record {
 
     public String getStudentId() { return studentId; }
     public String getBuildingId() { return buildingId; }
+    public String getBuildingName() { return buildingName; }
     public LocalDateTime getTime() { return time; }
     public boolean getCheckIn() { return checkIn; }
     public String getTimeString() {

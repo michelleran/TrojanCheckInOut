@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout.model;
 
 public class Student implements User {
+    private String uid;
     private String id;
     private String givenName;
     private String surname;
@@ -12,22 +13,10 @@ public class Student implements User {
 
     public Student(){}
 
-    public Student(String id, String givenName, String surname, String email,
-                   String photoUrl, String major) {
-        this.id = id;
-        this.givenName = givenName;
-        this.surname = surname;
-        this.email = email;
-        this.photoUrl = photoUrl;
-        this.major = major;
-    }
-
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
 
     @Override
-    public String getIdString() { return String.valueOf(id); }
+    public String getUid() { return uid; }
 
     public String getGivenName() {
         return givenName;
@@ -57,10 +46,10 @@ public class Student implements User {
         return deleted;
     }
 
+    void setPhotoUrl(String url) { this.photoUrl = url; }
     void setBuilding(String currentBuilding) {
         this.currentBuilding = currentBuilding;
     }
-
     void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }

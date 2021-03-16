@@ -126,7 +126,7 @@ public class FilterResultsFragment extends Fragment {
 
         Log.d(TAG, String.format("%d/%d/%d %02d:%02d - %d/%d/%d %02d:%02d, %s, %d, %s", startYear, startMonth, startDay, startHour, startMin, endYear, endMonth, endDay, endHour, endMin, buildingName, studentId, major));
 
-        Server.searchHistory(startYear, startMonth, startDay, startHour, startMin,
+        Server.filterRecords(startYear, startMonth, startDay, startHour, startMin,
             endYear, endMonth, endDay, endHour, endMin,
             buildingName, studentId, major, new Callback<Record>() {
                 @Override
