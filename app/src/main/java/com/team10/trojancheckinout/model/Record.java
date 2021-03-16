@@ -38,6 +38,7 @@ public class Record {
 
     public String getStudentId() { return studentId; }
     public String getBuildingId() { return buildingId; }
+    public String getBuildingName() { return buildingName; }
     public LocalDateTime getTime() { return time; }
     public boolean getCheckIn() { return checkIn; }
     public String getTimeString() {

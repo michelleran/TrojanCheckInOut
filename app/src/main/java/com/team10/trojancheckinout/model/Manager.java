@@ -30,7 +30,7 @@ public class Manager implements User {
         return photoUrl;
     }
 
-    public void setPhotoUrl(String photoUrl) {
+    void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
 }
