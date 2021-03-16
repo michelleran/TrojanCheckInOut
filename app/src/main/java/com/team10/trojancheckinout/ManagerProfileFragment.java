@@ -41,7 +41,7 @@ public class ManagerProfileFragment extends Fragment {
     private ImageView imgPhoto;
     private String urlImgPhoto;
     private int viewState;
-    private static final int SELECT_PHOTO_REQUEST = 1;
+
 
 
 
@@ -67,6 +67,34 @@ public class ManagerProfileFragment extends Fragment {
             @Override
             public void onSuccess(User result) {
                 currentManager = (Manager) result;
+
+                urlImgPhoto = currentManager.getPhotoUrl();
+                Glide.with(getActivity()).load(currentManager.getPhotoUrl()).override(400, 400).into(imgPhoto);
+
+                txtGivenName.setText("First Name: " + currentManager.getGivenName());
+                txtSurname.setText("Surname: " + currentManager.getSurname());
+                txtEmail.setText("Email: " + currentManager.getEmail());
+
+                btnEdit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        handleEditPasswordButton();
+                    }
+                });
+
+                btnChangePicture.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        handleChangePasswordButton();
+                    }
+                });
+
+                btnLogout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        handleLogout();
+                    }
+                });
             }
 
             @Override
@@ -76,43 +104,13 @@ public class ManagerProfileFragment extends Fragment {
             }
         });
 
-        if (currentManager != null) {
-            urlImgPhoto = currentManager.getPhotoUrl();
-            Glide.with(this).load(currentManager.getPhotoUrl()).override(400, 400).into(imgPhoto);
-
-            txtGivenName.setText("First Name: " + currentManager.getGivenName());
-            txtSurname.setText("Surname: " + currentManager.getSurname());
-            txtEmail.setText("Email: " + currentManager.getEmail());
-
-            btnEdit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    handleEditPasswordButton();
-                }
-            });
-
-            btnChangePicture.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    handleChangePasswordButton();
-                }
-            });
-
-            btnLogout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    handleLogout();
-                }
-            });
-        }
-
 
 
         return rootView;
     }
 
     public void handleLogout() {
-        Server.logOutUser();
+        Server.logout();
         Toast.makeText(getActivity(), "Logout Successful", Toast.LENGTH_SHORT).show();
         Intent loginPage = new Intent(getActivity(), StartPage.class);
         startActivity(loginPage);
@@ -158,8 +156,18 @@ public class ManagerProfileFragment extends Fragment {
             }
             else {
                 viewState = 0;
-                Toast.makeText(getActivity(), "Password successfully updated", Toast.LENGTH_LONG).show();
-                Server.changePassword(newPassword);
+
+                Server.changePassword(newPassword, new Callback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Toast.makeText(getActivity(), "Password successfully updated", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Toast.makeText(getActivity(), "Error: Unable to Update Password", Toast.LENGTH_LONG).show();
+                    }
+                });
 
                 edtNewPassword.setVisibility(View.INVISIBLE);
                 txtGivenName.setVisibility(View.VISIBLE);
@@ -177,18 +185,21 @@ public class ManagerProfileFragment extends Fragment {
             Intent choosePic = new Intent();
             choosePic.setType("image/*");
             choosePic.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(choosePic,"Select Photo"), SELECT_PHOTO_REQUEST);
+            startActivityForResult(choosePic, 1);
         }
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != SELECT_PHOTO_REQUEST || resultCode != RESULT_OK || data == null || data.getData() == null) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != 1 || resultCode != RESULT_OK || data == null || data.getData() == null) {
                 viewState = 0;
         }
         else {
-            Callback<String> uploadCallback = new Callback<String>() {
+            Uri newImage = data.getData();
+            Log.d("Manager Profile Fragment PHOTO UPDATE", newImage.toString());
+            Server.changePhoto(newImage, new Callback<String>() {
                 @Override
                 public void onSuccess(String result) {
                     Toast.makeText(getActivity(), "Successfully Updated Profile Photo", Toast.LENGTH_SHORT).show();
@@ -201,9 +212,7 @@ public class ManagerProfileFragment extends Fragment {
                     Toast.makeText(getActivity(), "Profile Photo Update Failure", Toast.LENGTH_SHORT).show();
                     viewState = 0;
                 }
-            };
-
-            Server.changePhotoUrl(data.getData(), uploadCallback);
+            });
         }
     }
 

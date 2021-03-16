@@ -15,9 +15,6 @@ public class Manager implements User {
         this.surname = surname;
         this.email = email;
         this.photoUrl = photoUrl;
-
-        //TODO: get rid of this (for testing purposes only)
-        this.photoUrl = "https://www.clipartkey.com/mpngs/m/238-2383342_transparent-pizza-clip-art-transparent-cartoons-whole-pizza.png";
     }
 
     @Override
