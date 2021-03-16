@@ -189,7 +189,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     //manually check out of building
-    public void checkOut(View view){// TODO: crashes if you check in, then check right back out
+    public void checkOut(View view){
         //show Toast if user not checked into a building
         if(currBuilding == null || currBuilding.equals("None")){
             Toast.makeText(getApplicationContext(), "Not currently checked into a building", Toast.LENGTH_LONG)
@@ -198,7 +198,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         //set Current Building to None and Server.checkOut()
         currBuilding = "None";
         currentBuilding_tv.setText(R.string.none);
-        Server.checkOut(student.getCurrentBuilding(), new Callback<Building>() {
+        Server.checkOut(new Callback<Building>() {
             @Override
             public void onSuccess(Building building) {
                 Toast.makeText(getApplicationContext(), "Successfully checked out!", Toast.LENGTH_LONG).show();
@@ -223,7 +223,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             //QR SCAN - set UI
             String buildingID = QRCodeHelper.process(requestCode, resultCode, data, this);
             if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingID)) {
-                Server.checkOut(buildingID, new Callback<Building>() {
+                Server.checkOut(new Callback<Building>() {
                     @Override
                     public void onSuccess(Building building) {
                         currBuilding = "None";

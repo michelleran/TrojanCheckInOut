@@ -573,17 +573,21 @@ public class Server {
         });
     }
 
-    public static void checkOut(String id, Callback<Building> callback){
-        final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
+    public static void checkOut(Callback<Building> callback) {
         final DocumentReference studentDocRef = db.collection(USER_COLLECTION).document(auth.getUid());
         db.runTransaction(new Transaction.Function<Building>() {
             @Override
             public Building apply(@NotNull Transaction transaction) throws FirebaseFirestoreException {
-                Building building = transaction.get(buildingDocRef).toObject(Building.class);
                 Student student = transaction.get(studentDocRef).toObject(Student.class);
+                if (student == null) {
+                    throw new FirebaseFirestoreException("Failed to get student",
+                        FirebaseFirestoreException.Code.ABORTED);
+                }
 
-                if (building == null || student == null) {
-                    throw new FirebaseFirestoreException("Failed to get student or building",
+                final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(student.getCurrentBuilding());
+                Building building = transaction.get(buildingDocRef).toObject(Building.class);
+                if (building == null) {
+                    throw new FirebaseFirestoreException("Failed to get building",
                         FirebaseFirestoreException.Code.ABORTED);
                 }
 
@@ -595,7 +599,7 @@ public class Server {
                 // Update database
                 transaction.update(buildingDocRef, "currentCapacity", building.getCurrentCapacity() - 1);
                 transaction.update(studentDocRef, "currentBuilding", null);
-                transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(id, building.getName(), student.getMajor(), false));
+                transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(building.getId(), building.getName(), student.getMajor(), false));
 
                 // Success
                 return building;
