@@ -52,12 +52,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
     public void addRecord(Record record) {
         records.add(record);
         // sort by time (listeners may not be fired in the order data is written)
-        Collections.sort(records, new Comparator<Record>() {
-            @Override
-            public int compare(Record r1, Record r2) {
-                return r1.getTime().compareTo(r2.getTime());
-            }
-        });
+        Collections.sort(records);
         notifyDataSetChanged();
     }
 

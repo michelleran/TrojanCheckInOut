@@ -69,7 +69,7 @@ public class ManagerProfileFragment extends Fragment {
                 currentManager = (Manager) result;
 
                 urlImgPhoto = currentManager.getPhotoUrl();
-                Glide.with(getActivity()).load(currentManager.getPhotoUrl()).override(400, 400).into(imgPhoto);
+                Glide.with(getActivity()).load(currentManager.getPhotoUrl()).override(400, 400).centerCrop().into(imgPhoto);
 
                 txtGivenName.setText("First Name: " + currentManager.getGivenName());
                 txtSurname.setText("Surname: " + currentManager.getSurname());
@@ -217,7 +217,7 @@ public class ManagerProfileFragment extends Fragment {
     }
 
     public void triggerPhotoRefresh(String url) {
-        Glide.with(this).load(url).override(400, 400).into(imgPhoto);
+        Glide.with(this).load(url).override(400, 400).centerCrop().into(imgPhoto);
         viewState = 0;
     }
 
