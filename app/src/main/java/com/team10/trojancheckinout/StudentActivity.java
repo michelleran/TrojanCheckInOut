@@ -168,21 +168,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         startActivityForResult(openGalleryIntent, PICK_PHOTO_REQUEST);
     }
 
-    //upload image URI retrieved from Image Gallery to Firebase - update Student's photo URL field
-    private void uploadImagetoFirebase(Uri imageUri){
-        //upload profile picture to firebase
-        Server.changePhoto(imageUri, new Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onFailure(Exception exception) {
-                Log.e(TAG, "onFailure: upload prof pic failure");
-            }
-        });
-    }
-
     public void signOut(View view){
         Server.logout();
         startActivity(new Intent(StudentActivity.this, LoginActivity.class));
@@ -218,8 +203,22 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         if(requestCode == PICK_PHOTO_REQUEST){
             if(resultCode == Activity.RESULT_OK){
                 Uri imageUri = data.getData();
-                photoUrl.setImageURI(imageUri);
-                uploadImagetoFirebase(imageUri);
+                Server.changePhoto(imageUri, new Callback<String>() {
+                    @Override
+                    public void onSuccess(String result) {
+                        Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
+                        // replace photo
+                        photo_url = result;
+                        Glide.with(getApplicationContext()).load(photo_url)
+                            .placeholder(R.drawable.default_profile_picture)
+                            .override(400, 400).centerCrop()
+                            .into(photoUrl);
+                    }
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Log.e(TAG, "onFailure: upload prof pic failure");
+                    }
+                });
             }
         } else {
             //QR SCAN - set UI

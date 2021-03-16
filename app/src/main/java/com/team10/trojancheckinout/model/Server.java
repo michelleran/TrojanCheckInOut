@@ -363,24 +363,35 @@ public class Server {
             @Override
             public void onSuccess(TaskSnapshot taskSnapshot) {
                 Log.d("Photo Uri", "handled Uri succesfully");
-                String URL = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
-                DocumentReference docRef = db.collection(USER_COLLECTION)
-                        .document(auth.getCurrentUser().getUid()); //get the current user document
-                docRef.update("PhotoUrl", URL)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("changePhotoUrl", "DocumentSnapshot successfully updated!");
-                            callback.onSuccess(URL);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w("changePhotoUrl", "Error updating document", e);
-                            callback.onFailure(e);
-                        }
-                    });
+
+                taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        String url = uri.toString();
+                        DocumentReference docRef = db.collection(USER_COLLECTION)
+                            .document(auth.getCurrentUser().getUid()); //get the current user document
+                        docRef.update("photoUrl", url)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("changePhotoUrl", "DocumentSnapshot successfully updated!");
+                                    callback.onSuccess(url);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("changePhotoUrl", "Error updating document", e);
+                                    callback.onFailure(e);
+                                }
+                            });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
             }
         });
     }
