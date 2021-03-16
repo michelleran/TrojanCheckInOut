@@ -13,11 +13,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.team10.trojancheckinout.model.Callback;
-import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.User;
-import com.team10.trojancheckinout.utils.Validator;
 
-import static com.team10.trojancheckinout.model.Server.managerRegister;
+import static com.team10.trojancheckinout.model.Server.registerManager;
 import static com.team10.trojancheckinout.utils.Validator.validateEmail;
 import static com.team10.trojancheckinout.utils.Validator.validateNotEmpty;
 import static com.team10.trojancheckinout.utils.Validator.validatePassword;
@@ -76,7 +74,7 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Please add a photo!" ,Toast.LENGTH_SHORT).show();
                 } else {
                     // all inputs are valid
-                    managerRegister(iFname, iLname, iEmail, imageUri, iPassword, new Callback<User>() {
+                    registerManager(iFname, iLname, iEmail, imageUri, iPassword, new Callback<User>() {
                         @Override
                         public void onSuccess(User result) {
                             Toast.makeText(ManagerRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();

@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,9 +17,8 @@ import android.widget.Toast;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.User;
-import com.team10.trojancheckinout.utils.Validator;
 
-import static com.team10.trojancheckinout.model.Server.studentRegister;
+import static com.team10.trojancheckinout.model.Server.registerStudent;
 import static com.team10.trojancheckinout.utils.Validator.validateEmail;
 import static com.team10.trojancheckinout.utils.Validator.validateID;
 import static com.team10.trojancheckinout.utils.Validator.validateNotEmpty;
@@ -91,7 +89,7 @@ public class StudentRegisterActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Please add a photo!" ,Toast.LENGTH_SHORT).show();
                 } else {
                     // all inputs are valid
-                    studentRegister(iID, iFname, iLname, iEmail, imageUri, iMajor, iPassword, new Callback<User>() {
+                    registerStudent(iID, iFname, iLname, iEmail, imageUri, iMajor, iPassword, new Callback<User>() {
                         @Override
                         public void onSuccess(User result) {
                             Toast.makeText(StudentRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();

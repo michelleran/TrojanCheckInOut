@@ -73,7 +73,7 @@ public class Server {
         Log.w("log out", "log out attempt");
     }
 
-    public static void managerRegister(String givenName, String surname, String email,
+    public static void registerManager(String givenName, String surname, String email,
                                        Uri file, String password, Callback<User> callback) {
         auth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
@@ -91,8 +91,8 @@ public class Server {
                 });
     }
 
-    public static void studentRegister(String id, String givenName, String surname, String email,
-                                   Uri file, String major, String password, Callback<User> callback) {
+    public static void registerStudent(String id, String givenName, String surname, String email,
+                                       Uri file, String major, String password, Callback<User> callback) {
         auth.createUserWithEmailAndPassword(email, password) //also logs in the user
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() { //auth register
                     @Override
@@ -111,9 +111,9 @@ public class Server {
 
     private static void writeUserData(String id, String givenName, String surname, String email,
                                       Uri file, String major, Callback<User> callback, boolean isStudent) {
-        String uID = auth.getCurrentUser().getUid();
+        String uid = auth.getCurrentUser().getUid();
         Map<String, Object> s = new HashMap<>();
-        s.put("uid", uID);
+        s.put("uid", uid);
         s.put("givenName", givenName);
         s.put("surname", surname);
         s.put("email", email);
@@ -124,7 +124,7 @@ public class Server {
             s.put("major", major);
         }
 
-        StorageReference fileRef = storage.child("images/"+uID + file.getLastPathSegment());
+        StorageReference fileRef = storage.child("images/"+uid + file.getLastPathSegment());
         UploadTask uploadTask = fileRef.putFile(file);
         uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
             @Override
@@ -147,7 +147,7 @@ public class Server {
                     public void onSuccess(Uri uri) {
                         s.put("photoUrl", uri.toString());
                         Log.d("Photo Uri", "could not handle Uri");
-                        FirebaseFirestore.getInstance().collection(USER_COLLECTION).document(uID)
+                        FirebaseFirestore.getInstance().collection(USER_COLLECTION).document(uid)
                             .set(s)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -173,12 +173,6 @@ public class Server {
             }
         });
     }
-
-    /*public static String getCurrentUserId() {
-        if (auth.getCurrentUser() == null)
-            return null;
-        return auth.getCurrentUser().getUid();
-    }*/
 
     public static void getCurrentUser(Callback<User> callback) {
         if(auth.getCurrentUser()==null){
@@ -291,9 +285,9 @@ public class Server {
                 });
     }
 
-    public static void getStudent(String uID, Callback<Student> callback) {
+    public static void getStudent(String uid, Callback<Student> callback) {
         DocumentReference docRef = db.collection(USER_COLLECTION)
-                .document(uID);
+                .document(uid);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
