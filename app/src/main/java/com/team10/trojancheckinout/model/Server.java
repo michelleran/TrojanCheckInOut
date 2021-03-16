@@ -252,37 +252,36 @@ public class Server {
             callback.onFailure(null);
             return;
         }
-        String uID = auth.getCurrentUser().getUid();
         FirebaseUser user = auth.getCurrentUser();
-        user.delete()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("userDelete", "User account deleted.");
-                            DocumentReference docRef = db.collection(USER_COLLECTION)
-                                    .document(auth.getCurrentUser().getUid()); //get the current user document
-                            docRef.update("deleted", true)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d("profile", "profile set to deleted");
-                                            callback.onSuccess(null);
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w("profile", "Profile not set", e);
-                                            callback.onFailure(e);
-                                        }
-                                    });
+        String uid = user.getUid();
+        user.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("deleteStudent", "account deleted.");
+                DocumentReference docRef = db.collection(USER_COLLECTION)
+                    .document(uid); //get the current user document
+                docRef.update("deleted", true) // TODO: this fails
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("deleteStudent", "profile set to deleted");
+                            callback.onSuccess(null);
                         }
-                        else{
-                            callback.onFailure(task.getException());
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("deleteStudent", "profile not set", e);
+                            callback.onFailure(e);
                         }
-                    }
-                });
+                    });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                callback.onFailure(e);
+            }
+        });
     }
 
     public static void getStudent(String uid, Callback<Student> callback) {

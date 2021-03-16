@@ -122,6 +122,9 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onSuccess(Void result) {
                             Toast.makeText(getApplicationContext(), "Account deleted", Toast.LENGTH_LONG).show();
+                            // return to start page
+                            Intent intent = new Intent(StudentActivity.this, StartPage.class);
+                            startActivity(intent);
                         }
                         @Override
                         public void onFailure(Exception exception) {
