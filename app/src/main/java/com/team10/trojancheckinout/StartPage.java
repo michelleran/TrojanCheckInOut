@@ -4,16 +4,39 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.model.Student;
+import com.team10.trojancheckinout.model.User;
 
 public class StartPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_page);
+
+        Server.getCurrentUser(new Callback<User>() {
+            @Override
+            public void onSuccess(User result) {
+                // open user's profile
+                Intent intent;
+                if (result instanceof Student) {
+                    intent = new Intent(StartPage.this, StudentActivity.class);
+                } else {
+                    intent = new Intent(StartPage.this, ManagerActivity.class);
+                }
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e("StartPage", exception.getMessage());
+            }
+        });
 
         Button elogin = findViewById(R.id.startLoginbtn);
         Button estudentRegister = findViewById(R.id.studentRegisterBtn);

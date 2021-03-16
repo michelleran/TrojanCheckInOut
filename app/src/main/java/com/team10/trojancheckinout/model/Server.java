@@ -47,10 +47,8 @@ public class Server {
         if(auth.getCurrentUser()!=null) {
             Log.d("login", "Already Signed In");
             getCurrentUser(callback);
-            return;
         } //user already exists
         else {
-            auth.getCurrentUser();
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -183,9 +181,8 @@ public class Server {
     }
 
     public static void getCurrentUser(Callback<User> callback) {
-        if(FirebaseAuth.getInstance().getCurrentUser()==null){
-            Log.d("getUser", "No Logged In User");
-            callback.onFailure(null);
+        if(auth.getCurrentUser()==null){
+            callback.onFailure(new Exception("No logged in user"));
             return;
         }
         DocumentReference docRef = db.collection(USER_COLLECTION)
