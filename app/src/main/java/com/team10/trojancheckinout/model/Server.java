@@ -649,19 +649,7 @@ public class Server {
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
                                      String buildingName, String studentId, String major,
                                      Callback<Record> callback) {
-        Query query = db.collection(RECORD_COLLECTION).orderBy("epochTime");
-
-        if (startYear != -1) {
-            // startMonth . . . startMin must be valid too
-            ZonedDateTime start = ZonedDateTime.of(startYear, startMonth, startDay, startHour, startMin, 0, 0, Record.pst);
-            query = query.startAt(start.toEpochSecond());
-        }
-
-        if (endYear != -1) {
-            // endMonth . . . endMin must be valid too
-            ZonedDateTime end = ZonedDateTime.of(endYear, endMonth, endDay, endHour, endMin, 0, 0, Record.pst);
-            query = query.endAt(end.toEpochSecond());
-        }
+        Query query = db.collection(RECORD_COLLECTION);
 
         // Filter by building name
         if (!buildingName.isEmpty()) {
@@ -678,6 +666,19 @@ public class Server {
             query = query.whereEqualTo("major", major);
         }
 
+        query = query.orderBy("epochTime", Query.Direction.DESCENDING);
+        if (startYear != -1) {
+            // startMonth . . . startMin must be valid too
+            ZonedDateTime start = ZonedDateTime.of(startYear, startMonth, startDay, startHour, startMin, 0, 0, Record.pst);
+            query = query.startAt(start.toEpochSecond());
+        }
+
+        if (endYear != -1) {
+            // endMonth . . . endMin must be valid too
+            ZonedDateTime end = ZonedDateTime.of(endYear, endMonth, endDay, endHour, endMin, 0, 0, Record.pst);
+            query = query.endAt(end.toEpochSecond());
+        }
+
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -688,7 +689,9 @@ public class Server {
 
                 for (DocumentChange dc : value.getDocumentChanges()) {
                     if (dc.getType() == DocumentChange.Type.ADDED) {
-                        callback.onSuccess(dc.getDocument().toObject(Record.class));
+                        Record record = dc.getDocument().toObject(Record.class);
+                        Log.d("filterRecords", "Found: " + record);
+                        callback.onSuccess(record);
                     }
                 }
             }

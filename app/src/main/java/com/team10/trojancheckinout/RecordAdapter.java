@@ -51,8 +51,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     public void addRecord(Record record) {
         records.add(record);
-        // sort by time (listeners may not be fired in the order data is written)
-        Collections.sort(records);
         notifyDataSetChanged();
     }
 
