@@ -23,10 +23,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Record;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.utils.Validator;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -53,7 +55,7 @@ public class FilterFragment extends Fragment {
     private int endMin = -1;
 
     private String buildingName;
-    private long studentId;
+    private String studentId;
     private String major;
 
     @Override
@@ -155,12 +157,12 @@ public class FilterFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // get remaining inputs
-                buildingName = buildingNameField.getText().toString();
-                try {
-                    studentId = Long.parseLong(studentIdField.getText().toString());
-                } catch (Exception e) {
-                    Log.e("FilterFragment", e.getMessage());
-                    // TODO: handle
+                buildingName = buildingNameField.getText().toString().trim();
+                studentId = studentIdField.getText().toString().trim();
+                if (!studentId.isEmpty() && !Validator.validateID(studentId)) {
+                    // invalid student id
+                    Toast.makeText(getContext(), "Please enter a valid USC id or leave the field blank", Toast.LENGTH_LONG).show();
+                    return;
                 }
                 major = spinner.getSelectedItem().toString();
                 // inputs are allowed to be empty

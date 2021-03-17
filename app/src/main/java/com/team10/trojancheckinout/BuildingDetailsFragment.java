@@ -92,7 +92,7 @@ public class BuildingDetailsFragment extends Fragment {
         Server.filterRecords(
             -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1,
-            buildingName, -1, "", new Callback<Record>() {
+            buildingName, "", "", new Callback<Record>() {
             @Override
             public void onSuccess(Record result) {
                 adapter.addRecord(result);
@@ -120,7 +120,7 @@ class CheckedInStudentAdapter extends RecordAdapter {
         }
         // a student checked out
         for (int i = 0; i < records.size(); i++) {
-            if (records.get(i).getStudentId().equals(record.getStudentId())) {
+            if (records.get(i).getStudentUid().equals(record.getStudentUid())) {
                 // remove corresponding check-in record
                 records.remove(i);
                 break;

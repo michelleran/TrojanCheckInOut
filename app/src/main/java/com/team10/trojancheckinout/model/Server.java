@@ -19,6 +19,7 @@ import com.google.firebase.storage.UploadTask.TaskSnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -501,9 +502,9 @@ public class Server {
         });
     }
 
-    public static void checkIn(String id, Callback<Building> callback){ // TODO: may not need to call back w/ the building
+    public static void checkIn(String buildingId, Callback<Building> callback){
         // Get building and student document references
-        final DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document(id);
+        final DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document(buildingId);
         final DocumentReference studentRef = db.collection(USER_COLLECTION).document(auth.getUid());
         db.runTransaction(new Transaction.Function<Building>() {
             @Override
@@ -517,7 +518,7 @@ public class Server {
                 }
 
                 // Check if student is already checked in to building
-                if(student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(id)) {
+                if(student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
                     throw new FirebaseFirestoreException("Student is already checked into this building",
                         FirebaseFirestoreException.Code.ABORTED);
                 }
@@ -532,7 +533,7 @@ public class Server {
                 if(student.getCurrentBuilding() == null) {
                     transaction.update(newBuildingRef, "currentCapacity", newBuilding.getCurrentCapacity() + 1);
                     transaction.update(studentRef, "currentBuilding", newBuilding.getId());
-                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(studentRef.getId(), id, newBuilding.getName(), student.getMajor(), true));
+                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, buildingId, newBuilding.getName(), true));
                 }else{
                     final DocumentReference oldBuildingRef = db.collection(BUILDING_COLLECTION).document(student.getCurrentBuilding());
                     Building oldBuilding = transaction.get(oldBuildingRef).toObject(Building.class);
@@ -542,8 +543,8 @@ public class Server {
                     // Update student's current building
                     transaction.update(studentRef, "currentBuilding", newBuilding.getId());
 
-                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(studentRef.getId(), oldBuilding.getId(), oldBuilding.getName(), student.getMajor(), false));
-                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(studentRef.getId(), id, newBuilding.getName(), student.getMajor(), true));
+                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, oldBuilding.getId(), oldBuilding.getName(), false));
+                    transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, buildingId, newBuilding.getName(), true));
                 }
 
                 // Success
@@ -590,7 +591,7 @@ public class Server {
                 // Update database
                 transaction.update(buildingDocRef, "currentCapacity", building.getCurrentCapacity() - 1);
                 transaction.update(studentDocRef, "currentBuilding", null);
-                transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(studentDocRef.getId(), building.getId(), building.getName(), student.getMajor(), false));
+                transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, building.getId(), building.getName(), false));
 
                 // Success
                 return building;
@@ -646,41 +647,20 @@ public class Server {
 
     public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
-                                     String buildingName, long studentId, String major,
+                                     String buildingName, String studentId, String major,
                                      Callback<Record> callback) {
-        Query query = db.collection(RECORD_COLLECTION);
-        // Set start parameters
-        if(startYear != -1){
-            query = query.whereGreaterThanOrEqualTo("year", startYear);
-        }
-        if(startMonth != -1){
-            query = query.whereGreaterThanOrEqualTo("month", startMonth);
-        }
-        if(startDay != -1){
-            query = query.whereGreaterThanOrEqualTo("day", startDay);
-        }
-        if(startHour != -1){
-            query = query.whereGreaterThanOrEqualTo("hour", startDay);
-        }
-        if(startMin != -1){
-            query = query.whereGreaterThanOrEqualTo("minute", startMin);
+        Query query = db.collection(RECORD_COLLECTION).orderBy("epochTime");
+
+        if (startYear != -1) {
+            // startMonth . . . startMin must be valid too
+            ZonedDateTime start = ZonedDateTime.of(startYear, startMonth, startDay, startHour, startMin, 0, 0, Record.pst);
+            query = query.startAt(start.toEpochSecond());
         }
 
-        // Set end parameters
-        if(endYear != -1){
-            query = query.whereLessThanOrEqualTo("year", endYear);
-        }
-        if(endMonth != -1){
-            query = query.whereLessThanOrEqualTo("month", endYear);
-        }
-        if(endDay != -1){
-            query = query.whereLessThanOrEqualTo("day", endDay);
-        }
-        if(endHour != -1){
-            query = query.whereLessThanOrEqualTo("hour", endDay);
-        }
-        if(endMin != -1){
-            query = query.whereLessThanOrEqualTo("minute", endMin);
+        if (endYear != -1) {
+            // endMonth . . . endMin must be valid too
+            ZonedDateTime end = ZonedDateTime.of(endYear, endMonth, endDay, endHour, endMin, 0, 0, Record.pst);
+            query = query.endAt(end.toEpochSecond());
         }
 
         // Filter by building name
@@ -689,7 +669,7 @@ public class Server {
         }
 
         // Filter by student
-        if(studentId != -1){
+        if(!studentId.isEmpty()){
             query = query.whereEqualTo("studentId", studentId);
         }
 
@@ -713,23 +693,6 @@ public class Server {
                 }
             }
         });
-
-        /*query
-            .get()
-            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Record record = document.toObject(Record.class);
-                            callback.onSuccess(record);
-                            Log.d(TAG, document.getId() + " => " + document.getData());
-                        }
-                    } else {
-                        Log.d(TAG, "Error getting documents: ", task.getException());
-                    }
-                }
-            });*/
     }
 
     // Based upon https://github.com/michelleran/TrojanCheckInOut/pull/27
