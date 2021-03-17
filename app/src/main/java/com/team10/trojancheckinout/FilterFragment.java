@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -102,34 +103,34 @@ public class FilterFragment extends Fragment {
         EditText studentIdField = rootView.findViewById(R.id.filter_student_id_field);
 
         Spinner spinner = rootView.findViewById(R.id.filter_major_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.majors, android.R.layout.simple_spinner_item);
-        spinner.setAdapter(adapter); // TODO: allow user to not select anything
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.majors_with_any, android.R.layout.simple_spinner_item);
+        spinner.setAdapter(adapter);
 
         Button filter = rootView.findViewById(R.id.filter_button);
-        filter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // get remaining inputs
-                buildingName = buildingNameField.getText().toString().trim();
-                studentId = studentIdField.getText().toString().trim();
-                if (!studentId.isEmpty() && !Validator.validateID(studentId)) {
-                    // invalid student id
-                    Toast.makeText(getContext(), "Please enter a valid USC id or leave the field blank", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                major = spinner.getSelectedItem().toString();
-                // inputs are allowed to be empty
-
-                // open filter results (replace this fragment)
-                final FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.filter_tab_content,
-                    FilterResultsFragment.newInstance(
-                        startYear, startMonth, startDay, startHour, startMin,
-                        endYear, endMonth, endDay, endHour, endMin,
-                        buildingName, studentId, major));
-                ft.commit();
-                ft.addToBackStack("filter");
+        filter.setOnClickListener(view -> {
+            // get remaining inputs (may be empty)
+            buildingName = buildingNameField.getText().toString().trim();
+            studentId = studentIdField.getText().toString().trim();
+            if (!studentId.isEmpty() && !Validator.validateID(studentId)) {
+                // invalid student id
+                Toast.makeText(getContext(), "Please enter a valid USC id or leave the field blank", Toast.LENGTH_LONG).show();
+                return;
             }
+            if (spinner.getSelectedItemPosition() == 0) {
+                major = "";
+            } else {
+                major = spinner.getSelectedItem().toString();
+            }
+
+            // open filter results (replace this fragment)
+            final FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.filter_tab_content,
+                FilterResultsFragment.newInstance(
+                    startYear, startMonth, startDay, startHour, startMin,
+                    endYear, endMonth, endDay, endHour, endMin,
+                    buildingName, studentId, major));
+            ft.commit();
+            ft.addToBackStack("filter");
         });
 
         return rootView;
