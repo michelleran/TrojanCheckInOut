@@ -34,7 +34,9 @@ public class StartPage extends AppCompatActivity {
 
             @Override
             public void onFailure(Exception exception) {
-                Log.e("StartPage", exception.getMessage());
+                if (exception != null) {
+                    Log.e("StartPage", exception.getMessage());
+                }
             }
         });
 
