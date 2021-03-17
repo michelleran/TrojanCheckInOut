@@ -25,14 +25,13 @@ import javax.annotation.Nullable;
 
 public class QRCodeHelper {
 
-    public static String process(int requestCode, int resultCode, @Nullable Intent data, StudentActivity studentActivity){
+    public static String process(int requestCode, int resultCode, @Nullable Intent data, StudentActivity studentActivity) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             //if qrcode has nothing in it
             if (result.getContents() == null) {
                 Toast.makeText(studentActivity, "Result Not Found", Toast.LENGTH_LONG).show();
-            }
-            else {
+            } else {
                 //if qr contains data
                 return result.getContents();
 //                //code to process QR code if it return a JSON
@@ -48,8 +47,7 @@ public class QRCodeHelper {
 //                    Toast.makeText(studentActivity, "lel", Toast.LENGTH_LONG).show();
 //                }
             }
-        }
-        else{
+        } else {
             return "Invalid QR Code";
         }
         return "";
@@ -63,5 +61,4 @@ public class QRCodeHelper {
         Path path = FileSystems.getDefault().getPath(filePath);
         MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
     }
-
 }

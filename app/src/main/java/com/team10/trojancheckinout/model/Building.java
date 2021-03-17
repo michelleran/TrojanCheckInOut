@@ -23,6 +23,7 @@ public class Building {
     public String getQrCodeUrl() { return qrCodeUrl; }
     public int getMaxCapacity() { return maxCapacity; }
     public int getCurrentCapacity() { return currentCapacity; }
-    void setMaxCapacity(int capacity){maxCapacity = capacity;}
 
+    void setMaxCapacity(int capacity){maxCapacity = capacity;}
+    void setCurrentCapacity(int capacity) { currentCapacity = capacity; }
 }

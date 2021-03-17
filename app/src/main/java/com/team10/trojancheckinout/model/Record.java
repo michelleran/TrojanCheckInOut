@@ -3,11 +3,12 @@ package com.team10.trojancheckinout.model;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
-public class Record {
+public class Record implements Comparable<Record> {
     private String studentId;
     private String buildingId;
-    private LocalDateTime time;
+    private String buildingName;
     private boolean checkIn;
     private int year;
     private int month;
@@ -17,31 +18,32 @@ public class Record {
     private String major;
 
     private static final ZoneId pst = ZoneId.of("America/Los_Angeles");
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
     public Record() { }
 
-    public Record(String buildingId, String major, boolean checkIn) {
-        this.studentId = Server.getCurrentUserId(); // assumes current user is a student
+    public Record(String studentId, String buildingId, String buildingName, String major, boolean checkIn) {
+        this.studentId = studentId;
         this.buildingId = buildingId;
-        this.time = LocalDateTime.now(pst);
+        this.buildingName = buildingName;
+
+        LocalDateTime time = LocalDateTime.now(pst);
         this.year = time.getYear();
         this.month = time.getMonthValue();
-        this.day = time.getDayOfYear();
+        this.day = time.getDayOfMonth();
         this.hour = time.getHour();
         this.minute = time.getMinute();
+
         this.checkIn = checkIn;
         this.major = major;
     }
 
     public String getStudentId() { return studentId; }
     public String getBuildingId() { return buildingId; }
-    public LocalDateTime getTime() { return time; }
+    public String getBuildingName() { return buildingName; }
     public boolean getCheckIn() { return checkIn; }
     public String getTimeString() {
-        return time.format(formatter);
+        return String.format(Locale.US, "%d/%d/%d %02d:%02d", month, day, year, hour, minute);
     }
-
 
     public int getYear() { return year; }
     public int getMonth() { return month; }
@@ -49,4 +51,21 @@ public class Record {
     public int getHour() { return hour; }
     public int getMinute() { return minute; }
     public String getMajor(){ return major;}
+
+    @Override
+    public int compareTo(Record record) {
+        if (year == record.getYear()) {
+            if (month == record.getMonth()) {
+                if (day == record.getDay()) {
+                    if (hour == record.getHour()) {
+                        return minute - record.getMinute();
+                    }
+                    return hour - record.getHour();
+                }
+                return day - record.getDay();
+            }
+            return month - record.getMonth();
+        }
+        return year - record.getYear();
+    }
 }

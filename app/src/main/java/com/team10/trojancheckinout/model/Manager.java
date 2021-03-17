@@ -1,7 +1,7 @@
 package com.team10.trojancheckinout.model;
 
 public class Manager implements User {
-    private String id;
+    private String uid;
     private String givenName;
     private String surname;
     private String email;
@@ -9,17 +9,9 @@ public class Manager implements User {
 
     public Manager() {}
 
-    public Manager(String id, String givenName, String surname, String email, String photoUrl) {
-        this.id = id;
-        this.givenName = givenName;
-        this.surname = surname;
-        this.email = email;
-        this.photoUrl = photoUrl;
-    }
-
     @Override
-    public String getIdString() {
-        return id;
+    public String getUid() {
+        return uid;
     }
 
     public String getGivenName() {
@@ -38,7 +30,7 @@ public class Manager implements User {
         return photoUrl;
     }
 
-    public void setPhotoUrl(String photoUrl) {
+    void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
 }
