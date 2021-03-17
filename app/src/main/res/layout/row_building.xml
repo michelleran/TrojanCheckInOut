@@ -13,7 +13,29 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:text="Building name"
+            android:textStyle="bold"
+            android:textSize="18dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtCurrentCapacity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Current Capacity"
+            app:layout_constraintStart_toStartOf="@+id/building_name"
+            app:layout_constraintTop_toBottomOf="@+id/building_name" />
+
+        <TextView
+            android:id="@+id/txtMaximumCapacity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Maximum Capacity"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/txtCurrentCapacity"
+            app:layout_constraintTop_toBottomOf="@+id/txtCurrentCapacity" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

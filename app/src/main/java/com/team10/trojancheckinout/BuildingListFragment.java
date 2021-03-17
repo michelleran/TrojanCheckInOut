@@ -83,8 +83,12 @@ class BuildingAdapter
             onUpdate(item);
             return;
         }
+        Building building = new Building("2", "KAP", "blah", 12);
+
         buildingNames.add(item.getName());
+        buildingNames.add(building.getName());
         nameToBuilding.put(item.getName(), item);
+        nameToBuilding.put(building.getName(), building);
         // sort alphabetically
         Collections.sort(buildingNames);
         // refresh
