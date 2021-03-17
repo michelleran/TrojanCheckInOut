@@ -670,13 +670,13 @@ public class Server {
         if (startYear != -1) {
             // startMonth . . . startMin must be valid too
             ZonedDateTime start = ZonedDateTime.of(startYear, startMonth, startDay, startHour, startMin, 0, 0, Record.pst);
-            query = query.startAt(start.toEpochSecond());
+            query = query.endAt(start.toEpochSecond()); // b/c query direction is descending, we "end" at the start date
         }
 
         if (endYear != -1) {
             // endMonth . . . endMin must be valid too
             ZonedDateTime end = ZonedDateTime.of(endYear, endMonth, endDay, endHour, endMin, 0, 0, Record.pst);
-            query = query.endAt(end.toEpochSecond());
+            query = query.startAt(end.toEpochSecond()); // b/c query direction is descending, we "start" at the end date
         }
 
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
