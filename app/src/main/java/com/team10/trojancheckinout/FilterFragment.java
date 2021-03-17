@@ -4,18 +4,12 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -25,22 +19,16 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.team10.trojancheckinout.model.Callback;
-import com.team10.trojancheckinout.model.Record;
-import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.utils.Validator;
 
 import java.util.Calendar;
 import java.util.Locale;
 
 public class FilterFragment extends Fragment {
-    private TextView startDate;
-    private TextView startTime;
-    private TextView endDate;
-    private TextView endTime;
+    private TextView start;
+    private TextView end;
 
-    private final String DATE_FORMAT = "%02d/%02d/%d";
-    private final String TIME_FORMAT = "%02d:%02d";
+    private final String DATE_TIME_FORMAT = "%02d/%02d/%04d %02d:%02d";
 
     private int startYear = -1;
     private int startMonth = -1;
@@ -65,84 +53,49 @@ public class FilterFragment extends Fragment {
             R.layout.fragment_filter, container, false);
 
         // get fields
-        startDate = rootView.findViewById(R.id.start_date);
-        startDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // show date picker dialog
-                final Calendar cal = Calendar.getInstance();
-                DatePickerDialog picker = new DatePickerDialog(rootView.getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                        // save values
-                        startYear = year;
-                        startMonth = month;
-                        startDay = day;
-                        // update field
-                        startDate.setText(String.format(Locale.US, DATE_FORMAT, year, month, day));
-                    }
-                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_WEEK));
-                picker.show();
-            }
-        });
+        start = rootView.findViewById(R.id.start_date);
+        start.setOnClickListener(view -> {
+            // show date picker dialog
+            final Calendar cal = Calendar.getInstance();
+            DatePickerDialog picker = new DatePickerDialog(rootView.getContext(), (datePicker, year, month, day) -> {
+                // save values
+                startYear = year;
+                startMonth = month + 1; // month is 0-indexed
+                startDay = day;
 
-        startTime = rootView.findViewById(R.id.start_time);
-        startTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Calendar cal = Calendar.getInstance();
-                TimePickerDialog picker = new TimePickerDialog(rootView.getContext(), new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int hour, int min) {
-                        // save values
-                        startHour = hour;
-                        startMin = min;
-                        // update field
-                        startTime.setText(String.format(Locale.US, TIME_FORMAT, hour, min));
-                    }
+                // pick time
+                TimePickerDialog timePicker = new TimePickerDialog(rootView.getContext(), (tp, hour, min) -> {
+                    // save values
+                    startHour = hour;
+                    startMin = min;
+                    // update field
+                    start.setText(String.format(Locale.US, DATE_TIME_FORMAT, startMonth, startDay, startYear, startHour, startMin));
                 }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false);
-                picker.show();
-            }
+                timePicker.show();
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+            picker.show();
         });
 
-        endDate = rootView.findViewById(R.id.end_date);
-        endDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // show date picker dialog
-                final Calendar cal = Calendar.getInstance();
-                DatePickerDialog picker = new DatePickerDialog(rootView.getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                        // save values
-                        endYear = year;
-                        endMonth = month;
-                        endDay = day;
-                        // update field
-                        endDate.setText(String.format(Locale.US, DATE_FORMAT, year, month, day));
-                    }
-                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_WEEK));
-                picker.show();
-            }
-        });
-
-        endTime = rootView.findViewById(R.id.end_time);
-        endTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Calendar cal = Calendar.getInstance();
-                TimePickerDialog picker = new TimePickerDialog(rootView.getContext(), new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int hour, int min) {
-                        // save values
-                        endHour = hour;
-                        endMin = min;
-                        // update field
-                        endTime.setText(String.format(Locale.US, TIME_FORMAT, hour, min));
-                    }
+        end = rootView.findViewById(R.id.end_date);
+        end.setOnClickListener(view -> {
+            // show date picker dialog
+            final Calendar cal = Calendar.getInstance();
+            DatePickerDialog picker = new DatePickerDialog(rootView.getContext(), (datePicker, year, month, day) -> {
+                // save values
+                endYear = year;
+                endMonth = month + 1; // month is 0-indexed
+                endDay = day;
+                // pick time
+                TimePickerDialog timePicker = new TimePickerDialog(rootView.getContext(), (tp, hour, min) -> {
+                    // save values
+                    endHour = hour;
+                    endMin = min;
+                    // update field
+                    end.setText(String.format(Locale.US, DATE_TIME_FORMAT, endMonth, endDay, endYear, endHour, endMin));
                 }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false);
-                picker.show();
-            }
+                timePicker.show();
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_WEEK));
+            picker.show();
         });
 
         EditText buildingNameField = rootView.findViewById(R.id.filter_building_field);
