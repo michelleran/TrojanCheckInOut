@@ -36,6 +36,7 @@ public class ManagerProfileFragment extends Fragment {
     private Button btnEdit;
     private Button btnChangePicture;
     private Button btnLogout;
+    private Button btnDeleteProfile;
     private EditText edtNewPassword;
     private EditText edtConfirmPassword;
     private ImageView imgPhoto;
@@ -59,6 +60,7 @@ public class ManagerProfileFragment extends Fragment {
         btnEdit = (Button) rootView.findViewById(R.id.btnEdit);
         btnChangePicture = (Button) rootView.findViewById(R.id.btnChangePicture);
         btnLogout = (Button) rootView.findViewById(R.id.btnLogout);
+        btnDeleteProfile = (Button) rootView.findViewById(R.id.btnDeleteProfile);
         edtNewPassword = (EditText) rootView.findViewById(R.id.edtNewPassword);
         edtConfirmPassword = (EditText) rootView.findViewById(R.id.edtConfirmPassword);
         imgPhoto = (ImageView) rootView.findViewById(R.id.imgPhoto);
@@ -93,6 +95,13 @@ public class ManagerProfileFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         handleLogout();
+                    }
+                });
+
+                btnDeleteProfile.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        handleDeleteProfile();
                     }
                 });
             }
@@ -219,6 +228,25 @@ public class ManagerProfileFragment extends Fragment {
     public void triggerPhotoRefresh(String url) {
         Glide.with(this).load(url).override(400, 400).centerCrop().into(imgPhoto);
         viewState = 0;
+    }
+
+    public void handleDeleteProfile() {
+        Log.d("Manager Profile Fragment", "Triggered Delete Account");
+        Server.deleteManager(new Callback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Log.d("Manager Profile Fragment", "Account Deleted");
+                Toast.makeText(getActivity(), "Account Successfully Deleted", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), StartPage.class);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e("Manager Profile Fragment", "Manager Account Delete Error", exception);
+                Toast.makeText(getActivity(), "Error: Unable to Delete Account", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public static int validatePassword(String newPassword, String confirmPassword) {
