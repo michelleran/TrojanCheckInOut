@@ -29,7 +29,7 @@ public class FilterFragment extends Fragment {
     private TextView start;
     private TextView end;
 
-    private final String DATE_TIME_FORMAT = "%02d/%02d/%04d %02d:%02d";
+    private final String DATE_TIME_FORMAT = "%02d/%02d/%04d %02d:%02d PDT";
 
     private int startYear = -1;
     private int startMonth = -1;
