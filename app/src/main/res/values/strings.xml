@@ -21,7 +21,7 @@
 
     <string name="student_id">Student id</string>
     <string name="student_major">Major</string>
-    
+
     <string-array name="majors">
         <item>AME</item>
         <item>ASTE</item>
@@ -37,22 +37,6 @@
         <item>ISE</item>
     </string-array>
 
-    <string-array name="majors_with_any">
-        <item>Any</item>
-        <item>AME</item>
-        <item>ASTE</item>
-        <item>BME</item>
-        <item>CE</item>
-        <item>CECS</item>
-        <item>CHE</item>
-        <item>CS Games</item>
-        <item>CSBA</item>
-        <item>CSCI</item>
-        <item>EE</item>
-        <item>ENE</item>
-        <item>ISE</item>
-    </string-array>
-    
     <string name="title_activity_test">test</string>
     <string name="firstname"><u>First Name:</u></string>
     <string name="lastname"><u>Last Name:</u></string>
@@ -76,4 +60,6 @@
     <string name="check_out">Check Out</string>
     <string name="sign_out">Sign Out</string>
     <string name="scan_qr_code">Scan QR Code</string>
+    <string name="title_activity_student_history_fragment">StudentHistoryFragment</string>
+    <string name="title_activity_student_history">StudentHistory</string>
 </resources>
