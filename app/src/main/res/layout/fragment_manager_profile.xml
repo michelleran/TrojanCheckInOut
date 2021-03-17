@@ -53,8 +53,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text="Change Photo"
-        app:layout_constraintBottom_toTopOf="@+id/btnLogout"
-        app:layout_constraintEnd_toEndOf="@+id/btnLogout" />
+        app:layout_constraintBottom_toTopOf="@+id/btnDeleteProfile"
+        app:layout_constraintEnd_toEndOf="@+id/btnDeleteProfile" />
 
     <TextView
         android:id="@+id/txtSurname"
@@ -95,12 +95,22 @@
 
     <Button
         android:id="@+id/btnLogout"
-        android:layout_width="350dp"
+        android:layout_width="165dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
         android:layout_marginTop="500dp"
         android:text="Logout"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnDeleteProfile"
+        android:layout_width="165dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="500dp"
+        android:layout_marginEnd="25dp"
+        android:text="Delete Profile"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

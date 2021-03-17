@@ -732,13 +732,5 @@ public class Server {
             });*/
     }
 
-    // Based upon https://github.com/michelleran/TrojanCheckInOut/pull/27
-    public static void logOutUser() {}
-    public static void changePassword(String newPassword) {}
-    public static void changePhotoUrl(Uri file, Callback<String> callback){
-        //TODO: remove this (for testing purposes)
-        callback.onSuccess("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Glazed-Donut.jpg/1200px-Glazed-Donut.jpg");
-    }
-
 
 }
