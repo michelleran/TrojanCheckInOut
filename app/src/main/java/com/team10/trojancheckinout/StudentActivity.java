@@ -212,7 +212,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (result != null && result.getContents() != null) {
                 String buildingId = result.getContents();
-                // TODO: below doesn't work if called right after checking in b/c local student obj is not updated
                 if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
                     Server.checkOut(new Callback<Building>() {
                         @Override

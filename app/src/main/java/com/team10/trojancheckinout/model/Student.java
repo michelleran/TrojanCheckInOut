@@ -51,8 +51,6 @@ public class Student implements User {
         this.currentBuilding = currentBuilding;
     }
 
-    /** This does NOT update the database! */
-    public void setPhotoUrl(String url) { this.photoUrl = url; }
-
+    void setPhotoUrl(String url) { this.photoUrl = url; }
     void setDeleted(boolean deleted) { this.deleted = deleted; }
 }
