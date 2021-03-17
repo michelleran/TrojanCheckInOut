@@ -19,6 +19,7 @@ import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Listener;
 import com.team10.trojancheckinout.model.Server;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,11 +62,15 @@ class BuildingAdapter
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView name;
+        public final TextView buildingCurrentCapacity;
+        public final TextView buildingMaximumCapacity;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.building_name);
             // TODO
+            buildingCurrentCapacity = itemView.findViewById(R.id.txtBuildingCurrentCapacity);
+            buildingMaximumCapacity = itemView.findViewById(R.id.txtBuildingMaximumCapacity);
         }
     }
 
@@ -83,12 +88,16 @@ class BuildingAdapter
             onUpdate(item);
             return;
         }
+        //TODO: remove these lines (for testing purposes)
         Building building = new Building("2", "KAP", "blah", 12);
+        building.setMaxCapacity(12);
 
         buildingNames.add(item.getName());
-        buildingNames.add(building.getName());
         nameToBuilding.put(item.getName(), item);
+
+        buildingNames.add(building.getName());
         nameToBuilding.put(building.getName(), building);
+
         // sort alphabetically
         Collections.sort(buildingNames);
         // refresh
@@ -134,7 +143,10 @@ class BuildingAdapter
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Building building = nameToBuilding.get(buildingNames.get(position));
         holder.name.setText(building.getName());
+
         // TODO
+        holder.buildingCurrentCapacity.setText("Current Capacity: " + String.valueOf(building.getCurrentCapacity()));
+        holder.buildingMaximumCapacity.setText("Maximum Capacity: " + String.valueOf(building.getMaxCapacity()));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

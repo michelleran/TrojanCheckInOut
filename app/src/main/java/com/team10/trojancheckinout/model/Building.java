@@ -24,6 +24,8 @@ public class Building {
     public int getMaxCapacity() { return maxCapacity; }
     public int getCurrentCapacity() { return currentCapacity; }
 
-    void setMaxCapacity(int capacity){maxCapacity = capacity;}
+    //TODO: remove `public` to make this package private (for testing purposes)
+    public void setMaxCapacity(int capacity){maxCapacity = capacity;}
+
     void setCurrentCapacity(int capacity) { currentCapacity = capacity; }
 }
