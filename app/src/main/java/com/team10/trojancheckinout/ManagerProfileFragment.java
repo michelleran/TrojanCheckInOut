@@ -1,5 +1,7 @@
 package com.team10.trojancheckinout;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -232,21 +234,31 @@ public class ManagerProfileFragment extends Fragment {
 
     public void handleDeleteProfile() {
         Log.d("Manager Profile Fragment", "Triggered Delete Account");
-        Server.deleteManager(new Callback<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-                Log.d("Manager Profile Fragment", "Account Deleted");
-                Toast.makeText(getActivity(), "Account Successfully Deleted", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity(), StartPage.class);
-                startActivity(intent);
-            }
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Delete Account")
+                .setMessage("Are you sure you want to delete your account?\nNOTE: This action is permanent")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Server.deleteManager(new Callback<Void>() {
+                            @Override
+                            public void onSuccess(Void result) {
+                                Log.d("Manager Profile Fragment", "Account Deleted");
+                                Toast.makeText(getActivity(), "Account Successfully Deleted", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getActivity(), StartPage.class);
+                                startActivity(intent);
+                            }
 
-            @Override
-            public void onFailure(Exception exception) {
-                Log.e("Manager Profile Fragment", "Manager Account Delete Error", exception);
-                Toast.makeText(getActivity(), "Error: Unable to Delete Account", Toast.LENGTH_SHORT).show();
-            }
-        });
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.e("Manager Profile Fragment", "Manager Account Delete Error", exception);
+                                Toast.makeText(getActivity(), "Error: Unable to Delete Account", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null)
+                .show();
     }
 
     public static int validatePassword(String newPassword, String confirmPassword) {
