@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class Record implements Comparable<Record> {
+public class Record {
     private String studentUid;
     private String studentId;
     private String major;
@@ -47,12 +47,4 @@ public class Record implements Comparable<Record> {
     public String getTime() { return time; }
     public long getEpochTime() { return epochTime; }
     public String getMajor(){ return major;}
-
-    @Override
-    public int compareTo(Record record) {
-        long diff = epochTime - record.getEpochTime();
-        if (diff < 0) return -1;
-        if (diff > 0) return 1;
-        return 0;
-    }
 }

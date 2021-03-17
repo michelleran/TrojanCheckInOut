@@ -611,8 +611,7 @@ public class Server {
         });
     }
 
-
-    public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
+    /*public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
         db.collection(USER_COLLECTION)
                 .whereEqualTo("currentBuilding", buildingId)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -643,7 +642,7 @@ public class Server {
 
                     }
                 });
-    }
+    }*/
 
     public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
