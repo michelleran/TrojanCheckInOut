@@ -104,11 +104,10 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void viewHistory(View view){
-//        final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        transaction.add(R.id.student_history_list, StudentHistoryFragment.newInstance(Long.parseLong(usc_id)));
-//        transaction.addToBackStack(null);
-//        transaction.commit();
         Intent i = new Intent(StudentActivity.this, StudentHistory.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("usc_id", student.getId());
+        i.putExtras(bundle);
         startActivity(i);
     }
 

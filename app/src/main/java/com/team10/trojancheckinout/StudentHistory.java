@@ -2,7 +2,12 @@ package com.team10.trojancheckinout;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,29 +19,17 @@ import com.team10.trojancheckinout.model.Student;
 import com.team10.trojancheckinout.model.User;
 
 public class StudentHistory extends AppCompatActivity {
-
     private static final String TAG = "Student History";
     private RecordAdapter adapter;
-    Student student;
-    Long usc_id;
+    String usc_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_history);
-        Server.getCurrentUser(new Callback<User>() {
-            @Override
-            public void onSuccess(User result) {
-                student = (Student) result;
-                usc_id = Long.parseLong(student.getId());
-            }
 
-            @Override
-            public void onFailure(Exception exception) {
-                // TODO: handle
-            }
-        });
-
+        Bundle bundle = getIntent().getExtras();
+        usc_id = bundle.getString("usc_id");
 
         RecyclerView resultsList = findViewById(R.id.student_history_list);
 
