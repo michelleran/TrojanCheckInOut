@@ -16,9 +16,13 @@ import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
+import com.google.zxing.WriterException;
+import com.team10.trojancheckinout.utils.QRCodeHelper;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -452,6 +456,61 @@ public class Server {
                     callback.onFailure(task.getException());
                     Log.d(TAG, "get failed with ", task.getException());
                 }
+            }
+        });
+    }
+
+    public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) throws IOException, WriterException {
+        initialize();
+        DocumentReference newBuildingRef = db.collection("buildings").document();
+        String buildingID = newBuildingRef.getId();
+        QRCodeHelper.generateQRCodeImage(buildingID,350,350,"/document/raw:/storage/emulated/0/Download/");
+        Uri file = Uri.fromFile(new File("/document/raw:/storage/emulated/0/Download/" + buildingID));
+
+        StorageReference fileRef = storageRef.child("qrcodes/" + buildingID + "/document/raw:/storage/emulated/0/Download/");
+        UploadTask uploadTask = fileRef.putFile(file);
+        uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
+            @Override
+            public void onProgress(@NotNull UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                Log.d("Building Uri", "Upload is " + progress + "% done");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Log.d("Building Uri", "could not handle Uri");
+                callback.onFailure(exception);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
+            @Override
+            public void onSuccess(TaskSnapshot taskSnapshot) {
+                taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Building building = new Building( newBuildingRef.getId(), name, uri.toString(),maxCapacity);
+                        db.collection("buildings").document(buildingID).set(building)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("add building", "DocumentSnapshot added with ID: ");
+                                    callback.onSuccess(building);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("add building", "Error adding document", e);
+                                    callback.onFailure(e);
+                                }
+                            });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
             }
         });
     }
