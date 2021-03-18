@@ -53,11 +53,13 @@ public class BuildingListFragment extends Fragment {
         // get extant buildings, then listen for add/remove/update
         Server.listenForBuildings(adapter);
 
+        btnAddBuilding.setVisibility(View.VISIBLE);
+
         btnAddBuilding.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                ft.replace(R.id.building_tab_content, BuildingChanges.newInstance("parameter1", "parameter2"));
+                ft.replace(R.id.building_tab_content, BuildingChanges.newInstance(true, null));
                 ft.commit();
                 ft.addToBackStack(null);
 
