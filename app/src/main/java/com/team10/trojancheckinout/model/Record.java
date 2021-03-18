@@ -46,21 +46,4 @@ public class Record {
     public String getTime() { return time; }
     public long getEpochTime() { return epochTime; }
     public String getMajor(){ return major;}
-
-    @Override
-    public int compareTo(Record record) {
-        if (year == record.getYear()) {
-            if (month == record.getMonth()) {
-                if (day == record.getDay()) {
-                    if (hour == record.getHour()) {
-                        return minute - record.getMinute();
-                    }
-                    return hour - record.getHour();
-                }
-                return day - record.getDay();
-            }
-            return month - record.getMonth();
-        }
-        return year - record.getYear();
-    }
 }
