@@ -36,7 +36,6 @@
         <item>ENE</item>
         <item>ISE</item>
     </string-array>
-
     <string-array name="majors_with_any">
         <item>Any</item>
         <item>AME</item>
