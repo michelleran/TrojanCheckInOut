@@ -56,11 +56,8 @@ public class BuildingListFragment extends Fragment {
         btnAddBuilding.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("oinker", "oink ");
-                Building build = new Building("12", "ka", "sd", 12);
                 FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                ft.replace(R.id.building_tab_content,
-                       new ManagerProfileFragment());
+                ft.replace(R.id.building_tab_content, BuildingChanges.newInstance("parameter1", "parameter2"));
                 ft.commit();
                 ft.addToBackStack(null);
 
