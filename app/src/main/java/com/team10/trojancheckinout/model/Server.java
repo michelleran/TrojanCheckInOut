@@ -419,9 +419,10 @@ public class Server {
             }
         });
     }
-
-    public static void addBuilding() {
-        // TODO
+    //TODO: Remove with actual implementation
+    public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) {
+        callback.onSuccess(new Building("200", name, "some code", maxCapacity));
+//        callback.onFailure(new Exception("UNABLE TO ADD"));
     }
 
     public static void removeBuilding(String id, Callback<Void> callback){

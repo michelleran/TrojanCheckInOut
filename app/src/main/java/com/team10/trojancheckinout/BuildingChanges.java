@@ -8,16 +8,22 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.team10.trojancheckinout.model.Building;
+import com.team10.trojancheckinout.model.Callback;
+import com.team10.trojancheckinout.model.Server;
 
 import org.w3c.dom.Text;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -106,7 +112,49 @@ public class BuildingChanges extends Fragment {
                 }
             }
         });
-        
+
+        btnBcConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (edtBCname.getText().toString().trim().equals("") || edtBcMaxCap.getText().toString().trim().equals("")) {
+                    Toast.makeText(getContext(), "Please fill out all of the following fields", Toast.LENGTH_SHORT).show();
+                }
+                else if (Integer.parseInt(edtBcMaxCap.getText().toString().trim()) < 0) {
+                    Toast.makeText(getContext(), "Maximum Capacity cannot be negative", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    String buildingName = edtBCname.getText().toString().trim();
+                    int maxCapacity = Integer.parseInt(edtBcMaxCap.getText().toString().trim());
+                    if (isAdd) {
+                        Server.addBuilding(buildingName, maxCapacity, new Callback<Building>() {
+                            @Override
+                            public void onSuccess(Building result) {
+                                if (result != null) {
+                                    Log.d(TAG, "onSuccess: Building with ID " + result.getId() + " added");
+                                } else {
+                                    Log.d(TAG, "onSuccess: Building is null");
+                                }
+                                Toast.makeText(getContext(), "Building " + result.getName() + " successfully added", Toast.LENGTH_SHORT).show();
+                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                fm.popBackStack();
+                            }
+
+                            @Override
+                            public void onFailure(Exception exception) {
+                                if (exception != null) {
+                                    Log.e(TAG, "onFailure: Building add error", exception);
+                                } else {
+                                    Log.e(TAG, "onFailure: Building add error");
+                                }
+                                Toast.makeText(getContext(), "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                }
+            }
+        });
+
         return rootView;
     }
 

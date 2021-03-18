@@ -195,7 +195,6 @@ class BuildingAdapter
             @Override
             public void onClick(View view) {
                 // open building details (replace this fragment)
-                Log.d(TAG, "onClick: CLICKED ON ITEM");
                 final FragmentTransaction ft = fragmentManager.beginTransaction();
                 ft.replace(R.id.building_tab_content,
                             BuildingDetailsFragment.newInstance(building));
