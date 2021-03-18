@@ -32,7 +32,7 @@ import static android.content.ContentValues.TAG;
  */
 public class BuildingChanges extends Fragment {
 
-    private static final String ARG_PARAM1 = "isAdd";
+    private static final String ARG_IS_ADD = "isAdd";
 //    private static final String ARG_PARAM2 = "param2";
 
     private boolean isAdd;
@@ -55,7 +55,7 @@ public class BuildingChanges extends Fragment {
     public static BuildingChanges newInstance(boolean isAdd, Building building) {
         BuildingChanges fragment = new BuildingChanges();
         Bundle args = new Bundle();
-        args.putBoolean(ARG_PARAM1, isAdd);
+        args.putBoolean(ARG_IS_ADD, isAdd);
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,7 +64,7 @@ public class BuildingChanges extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            isAdd = getArguments().getBoolean(ARG_PARAM1);
+            isAdd = getArguments().getBoolean(ARG_IS_ADD);
         }
     }
 

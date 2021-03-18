@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.team10.trojancheckinout.model.Building;
@@ -82,6 +84,7 @@ class BuildingAdapter
         public final TextView name;
         public final TextView buildingCurrentCapacity;
         public final TextView buildingMaximumCapacity;
+        public final TextView btnBuildingEdit;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -89,6 +92,7 @@ class BuildingAdapter
             // TODO
             buildingCurrentCapacity = itemView.findViewById(R.id.txtBuildingCurrentCapacity);
             buildingMaximumCapacity = itemView.findViewById(R.id.txtBuildingMaximumCapacity);
+            btnBuildingEdit = itemView.findViewById(R.id.btnBuildingEdit);
         }
     }
 
@@ -201,6 +205,34 @@ class BuildingAdapter
 
                 ft.commit();
                 ft.addToBackStack(building.getId());
+            }
+        });
+        
+        holder.btnBuildingEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: 3 DOT BUTTON");
+                PopupMenu popup = new PopupMenu(holder.name.getContext(), holder.btnBuildingEdit);
+                popup.inflate(R.menu.options_menu);
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.menuEdit:
+                                Log.d(TAG, "onMenuItemClick: EDIT");
+                                return true;
+                            case R.id.menuViewQR:
+                                Log.d(TAG, "onMenuItemClick: VIEW QR");
+                                return true;
+                            case R.id.menuDelete:
+                                Log.d(TAG, "onMenuItemClick: DELETE");
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                popup.show();
             }
         });
     }
