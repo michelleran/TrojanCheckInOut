@@ -3,10 +3,14 @@ package com.team10.trojancheckinout;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.team10.trojancheckinout.model.Building;
@@ -26,7 +30,10 @@ public class BuildingChanges extends Fragment {
     private boolean isAdd;
 //    private String mParam2;
 
-    private TextView txtBCparam1;
+    private EditText edtBCname;
+    private EditText edtBcMaxCap;
+    private Button btnBcConfirm;
+    private Button btnBcCancel;
 
     public BuildingChanges() {
         // Required empty public constructor
@@ -58,8 +65,20 @@ public class BuildingChanges extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_building_changes, container, false);
-//        txtBCparam1 = (TextView) rootView.findViewById(R.id.txtBCparam1);
-//        txtBCparam1.setText(String.valueOf(isAdd));
+
+        edtBCname = (EditText) rootView.findViewById(R.id.edtBcName);
+        edtBcMaxCap = (EditText) rootView.findViewById(R.id.edtBcMaxCap);
+        btnBcConfirm = (Button) rootView.findViewById(R.id.btnBcConfirm);
+        btnBcCancel = (Button) rootView.findViewById(R.id.btnBcCancel);
+
+        btnBcCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                fm.popBackStack();
+            }
+        });
+
 
         return rootView;
     }

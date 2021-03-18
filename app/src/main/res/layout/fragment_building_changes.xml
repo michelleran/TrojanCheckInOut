@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:windowBackground"
+    android:clickable="true"
     tools:context=".BuildingChanges">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -12,7 +13,7 @@
         android:layout_height="match_parent">
 
         <EditText
-            android:id="@+id/edtBCname"
+            android:id="@+id/edtBcName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="64dp"
@@ -24,7 +25,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/edtBCMaxCap"
+            android:id="@+id/edtBcMaxCap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -33,10 +34,10 @@
             android:inputType="number"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtBCname" />
+            app:layout_constraintTop_toBottomOf="@+id/edtBcName" />
 
         <Button
-            android:id="@+id/btnBCConfirm"
+            android:id="@+id/btnBcConfirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="48dp"
@@ -46,7 +47,7 @@
             app:layout_constraintStart_toStartOf="@+id/guideline3" />
 
         <Button
-            android:id="@+id/btnBCCancel"
+            android:id="@+id/btnBcCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="48dp"
