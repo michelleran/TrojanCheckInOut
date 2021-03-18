@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/building_tab_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -12,7 +12,20 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/building_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginBottom="50dp"/>
 
-    </RelativeLayout>
+        <Button
+            android:id="@+id/btnAddBuilding"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#000000"
+            android:backgroundTint="#FFFFFF"
+            android:text="Add Building"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

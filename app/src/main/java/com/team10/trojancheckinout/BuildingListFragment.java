@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,10 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Listener;
+import com.team10.trojancheckinout.model.Manager;
 import com.team10.trojancheckinout.model.Server;
 
 import java.lang.reflect.Array;
@@ -26,6 +29,7 @@ import java.util.HashMap;
 
 public class BuildingListFragment extends Fragment {
     private BuildingAdapter adapter;
+    private Button btnAddBuilding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,21 +37,44 @@ public class BuildingListFragment extends Fragment {
         View rootView = inflater.inflate(
             R.layout.fragment_building_list, container, false);
 
+
+
         // set up RecyclerView
         RecyclerView buildingList = rootView.findViewById(R.id.building_list);
+        btnAddBuilding = rootView.findViewById(R.id.btnAddBuilding);
 
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         buildingList.setLayoutManager(llm);
 
-        adapter = new BuildingAdapter(getFragmentManager());
+        adapter = new BuildingAdapter(getParentFragmentManager());
         buildingList.setAdapter(adapter);
 
         // get extant buildings, then listen for add/remove/update
         Server.listenForBuildings(adapter);
 
+        btnAddBuilding.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("oinker", "oink ");
+                Building build = new Building("12", "ka", "sd", 12);
+                FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                ft.replace(R.id.building_tab_content,
+                       new ManagerProfileFragment());
+                ft.commit();
+                ft.addToBackStack(null);
+
+//                ManagerProfileFragment nextFrag= new ManagerProfileFragment();
+//                getActivity().getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.building_tab_content, nextFrag, "findThisFragment")
+//                        .addToBackStack(null)
+//                        .commit();
+            }
+        });
+
         return rootView;
     }
+
 }
 
 class BuildingAdapter
@@ -64,6 +91,7 @@ class BuildingAdapter
         public final TextView name;
         public final TextView buildingCurrentCapacity;
         public final TextView buildingMaximumCapacity;
+//        public final Button btnAddBuilding;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -71,6 +99,14 @@ class BuildingAdapter
             // TODO
             buildingCurrentCapacity = itemView.findViewById(R.id.txtBuildingCurrentCapacity);
             buildingMaximumCapacity = itemView.findViewById(R.id.txtBuildingMaximumCapacity);
+//            btnAddBuilding = itemView.findViewById(R.id.btnAddBuilding);
+
+//            btnAddBuilding.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    Log.d("Hey", "onClick: things");
+//                }
+//            });
         }
     }
 
@@ -97,6 +133,31 @@ class BuildingAdapter
 
         buildingNames.add(building.getName());
         nameToBuilding.put(building.getName(), building);
+
+        Building building2 = new Building("2", "KAP", "blah", 12);
+        building2.setMaxCapacity(12);
+        buildingNames.add(building2.getName());
+        nameToBuilding.put(building2.getName(), building2);
+
+        Building building3 = new Building("2", "KAP", "blah", 12);
+        building3.setMaxCapacity(12);
+        buildingNames.add(building3.getName());
+        nameToBuilding.put(building3.getName(), building3);
+
+        Building building4 = new Building("2", "KAP", "blah", 12);
+        building4.setMaxCapacity(12);
+        buildingNames.add(building4.getName());
+        nameToBuilding.put(building4.getName(), building4);
+
+        Building building5 = new Building("2", "KAP", "blah", 12);
+        building5.setMaxCapacity(12);
+        buildingNames.add(building5.getName());
+        nameToBuilding.put(building5.getName(), building5);
+
+        Building building6 = new Building("2", "KAP", "blah", 12);
+        building6.setMaxCapacity(12);
+        buildingNames.add(building6.getName());
+        nameToBuilding.put(building6.getName(), building6);
 
         // sort alphabetically
         Collections.sort(buildingNames);
@@ -155,6 +216,7 @@ class BuildingAdapter
                 final FragmentTransaction ft = fragmentManager.beginTransaction();
                 ft.replace(R.id.building_tab_content,
                             BuildingDetailsFragment.newInstance(building));
+
                 ft.commit();
                 ft.addToBackStack(building.getId());
             }
