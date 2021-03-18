@@ -1,25 +1,14 @@
 package com.team10.trojancheckinout.utils;
 
 import android.content.Intent;
-import android.view.View;
 import android.widget.Toast;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.team10.trojancheckinout.R;
 import com.team10.trojancheckinout.StudentActivity;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
+import net.glxn.qrgen.android.QRCode;
+import net.glxn.qrgen.core.image.ImageType;
 
 import javax.annotation.Nullable;
 
@@ -53,12 +42,7 @@ public class QRCodeHelper {
         return "";
     }
 
-    public static void generateQRCodeImage(String text, int width, int height, String filePath)
-            throws WriterException, IOException {
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
-
-        Path path = FileSystems.getDefault().getPath(filePath);
-        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
+    public static byte[] generateQRCodeImage(String buildingID, int width, int height) {
+        return QRCode.from(buildingID).to(ImageType.JPG).withSize(250, 250).stream().toByteArray();
     }
 }

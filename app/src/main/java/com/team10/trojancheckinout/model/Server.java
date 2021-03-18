@@ -1,5 +1,7 @@
 package com.team10.trojancheckinout.model;
 
+import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,11 +21,16 @@ import com.google.firebase.storage.UploadTask.TaskSnapshot;
 import com.google.zxing.WriterException;
 import com.team10.trojancheckinout.utils.QRCodeHelper;
 
+import net.glxn.qrgen.android.QRCode;
+import net.glxn.qrgen.core.image.ImageType;
+
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -203,7 +210,7 @@ public class Server {
                             callback.onSuccess(document.toObject(Manager.class));
                         }
                     } else {
-                       Log.d("getUSer", "No such document");
+                       Log.d("getUser", "No such document");
                        callback.onFailure(task.getException());
                     }
                 } else {
@@ -427,24 +434,31 @@ public class Server {
 
     public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) throws IOException, WriterException {
         initialize();
+        //QRCodeHelper.generateQRCodeImage(buildingID,250,250,"/document/raw:/storage/emulated/0/Download/");
+        //Uri file = Uri.fromFile(new File("/document/raw:/storage/emulated/0/Download/" + buildingID));
         DocumentReference newBuildingRef = db.collection("buildings").document();
         String buildingID = newBuildingRef.getId();
-        QRCodeHelper.generateQRCodeImage(buildingID,350,350,"/document/raw:/storage/emulated/0/Download/");
-        Uri file = Uri.fromFile(new File("/document/raw:/storage/emulated/0/Download/" + buildingID));
 
-        StorageReference fileRef = storage.child("qrcodes/" + buildingID + "/document/raw:/storage/emulated/0/Download/");
-        UploadTask uploadTask = fileRef.putFile(file);
+        //File file = QRCode.from(buildingID).to(ImageType.JPG).withSize(250, 250).file();
+        //Log.d(TAG, "" + file.toString());
+        //Uri uri = Uri.fromFile(file);
+        byte[] qr = QRCodeHelper.generateQRCodeImage(buildingID, 250 , 250);
+        StorageReference fileRef = storage.child("qrcodes/" + buildingID);
+        UploadTask uploadTask = fileRef.putBytes(qr);
+
+        // StorageReference fileRef = storage.child("qrcodes/" + buildingID);
+        //UploadTask uploadTask = fileRef.putFile(uri);
         uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
             @Override
             public void onProgress(@NotNull UploadTask.TaskSnapshot taskSnapshot) {
                 double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                Log.d("Building Uri", "Upload is " + progress + "% done");
+                Log.d(TAG, "Upload is " + progress + "% done");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle unsuccessful uploads
-                Log.d("Building Uri", "could not handle Uri");
+                Log.d(TAG, "could not handle Uri");
                 callback.onFailure(exception);
                 
             }
@@ -459,14 +473,14 @@ public class Server {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Log.d("add building", "DocumentSnapshot added with ID: ");
+                                    Log.d(TAG, "DocumentSnapshot added with ID: ");
                                     callback.onSuccess(building);
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Log.w("add building", "Error adding document", e);
+                                    Log.w(TAG, "Error adding document", e);
                                     callback.onFailure(e);
                                 }
                             });
@@ -480,7 +494,7 @@ public class Server {
             }
         });
     }
-    
+
     public static void removeBuilding(String id, Callback<Void> callback){
         db.collection(BUILDING_COLLECTION).document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
