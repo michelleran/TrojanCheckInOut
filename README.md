@@ -6,7 +6,7 @@ CSCI 310 Team 10
 * [Setup](#setup)
 
 ## General info
-Trojan Check In/Check Out is a building capacity management and contact tracing Android application built in response to COVID-19 for CSCI 310. Students can create accounts and scan QR codes to check in and out of buildings. Designated "managers" can modify building capacities and view students' visit histories.
+Trojan Check In/Out is a building capacity management and contact tracing Android application built in response to COVID-19 for CSCI 310. Students can create accounts and scan QR codes to check in and out of buildings. Designated "managers" can modify building capacities and view students' visit histories.
 
 ## Technologies
 Project is created with:
