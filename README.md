@@ -19,3 +19,6 @@ To run this project:
 * Clone repository into your IDE (Android Studio)
 * Click "Make Project"
 * Run on emulator by clicking "Run" button
+
+## Extra Features
+* Filter records by start date/time, end date/time, building name, student id, and/or major
