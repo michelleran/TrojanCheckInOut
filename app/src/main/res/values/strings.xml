@@ -21,7 +21,7 @@
 
     <string name="student_id">Student id</string>
     <string name="student_major">Major</string>
-    
+
     <string-array name="majors">
         <item>AME</item>
         <item>ASTE</item>
@@ -36,6 +36,7 @@
         <item>ENE</item>
         <item>ISE</item>
     </string-array>
+
     <string-array name="majors_with_any">
         <item>Any</item>
         <item>AME</item>
@@ -75,4 +76,6 @@
     <string name="check_out">Check Out</string>
     <string name="sign_out">Sign Out</string>
     <string name="scan_qr_code">Scan QR Code</string>
+    <string name="title_activity_student_history_fragment">StudentHistoryFragment</string>
+    <string name="title_activity_student_history">StudentHistory</string>
 </resources>

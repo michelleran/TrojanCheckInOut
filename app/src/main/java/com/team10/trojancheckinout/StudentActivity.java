@@ -2,6 +2,9 @@ package com.team10.trojancheckinout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -100,6 +103,14 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         scanBtn.setOnClickListener(this);
     }
 
+    public void viewHistory(View view){
+        Intent i = new Intent(StudentActivity.this, StudentHistory.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("usc_id", student.getId());
+        i.putExtras(bundle);
+        startActivity(i);
+    }
+
     public void deleteAccount(View view){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.delete_dialog_message)
@@ -136,16 +147,21 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         //Set up buttons
         builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
             newPass = input.getText().toString();
-            Server.changePassword(newPass, new Callback<Void>() {
-                @Override
-                public void onSuccess(Void result) {
-                    Toast.makeText(StudentActivity.this, "Password changed!", Toast.LENGTH_SHORT).show();
-                }
-                @Override
-                public void onFailure(Exception exception) {
-                    Log.e(TAG, "onFailure: changePassword failure");
-                }
-            });
+            if(newPass.isEmpty())
+                Toast.makeText(StudentActivity.this, "Please type a password", Toast.LENGTH_LONG).show();
+            else {
+                Server.changePassword(newPass, new Callback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Toast.makeText(StudentActivity.this, "Password changed!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Log.e(TAG, "onFailure: changePassword failure");
+                    }
+                });
+            }
         });
         builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
         builder.show();
