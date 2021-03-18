@@ -2,13 +2,13 @@ package com.team10.trojancheckinout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -29,16 +29,14 @@ import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.Student;
 import com.team10.trojancheckinout.model.User;
-import com.team10.trojancheckinout.utils.QRCodeHelper;
 
 public class StudentActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "StudentActivity";
     private static final int PICK_PHOTO_REQUEST = 1000;
 
-    TextView givenName_tv, surname_tv, id_tv, major_tv, currentBuilding_tv;
-    ImageView photoUrl;
-    Button scanQRCode_btn;
-    String fName, lName, usc_id, photo_url, major_, currBuilding;
+    TextView givenName, surname, id, major, currentBuilding;
+    ImageView photo;
+    Button scanBtn;
     Student student;
     private IntentIntegrator qrScan;
     private String newPass;
@@ -49,53 +47,45 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student);
 
-        givenName_tv = findViewById(R.id.givenName);
-        surname_tv = findViewById(R.id.surname);
-        id_tv = findViewById(R.id.id);
-        major_tv = findViewById(R.id.major);
-        currentBuilding_tv = findViewById(R.id.currentBuilding);
-        photoUrl = findViewById(R.id.student_photo);
+        givenName = findViewById(R.id.givenName);
+        surname = findViewById(R.id.surname);
+        id = findViewById(R.id.id);
+        major = findViewById(R.id.major);
+        currentBuilding = findViewById(R.id.currentBuilding);
+        photo = findViewById(R.id.student_photo);
 
         //assume current user is student, gets student data
         Server.getCurrentUser(new Callback<User>() {
             @Override
             public void onSuccess(User result) {
                 student = (Student) result;
-                fName = student.getGivenName();
-                lName = student.getSurname();
-                usc_id = student.getId();
-                major_ = student.getMajor();
 
                 //gets building name through Server.getBuilding()
                 if (student.getCurrentBuilding() != null) {
                     Server.getBuilding(student.getCurrentBuilding(), new Callback<Building>() {
                         @Override
                         public void onSuccess(Building result) {
-                            currBuilding = result.getName();
-                            currentBuilding_tv.setText(currBuilding);
+                            currentBuilding.setText(result.getName());
                         }
                         @Override
                         public void onFailure(Exception exception) {
-                            currBuilding = null;
                             Log.e(TAG, "onFailure: getBuildingName failure");
                         }
                     });
                 } else {
-                    currentBuilding_tv.setText(R.string.none);
+                    currentBuilding.setText(R.string.none);
                 }
 
-                photo_url = student.getPhotoUrl();
-
                 //set student data into TextView
-                givenName_tv.setText(fName);
-                surname_tv.setText(lName);
-                id_tv.setText(usc_id);
-                major_tv.setText(major_);
+                givenName.setText(student.getGivenName());
+                surname.setText(student.getSurname());
+                id.setText(student.getId());
+                major.setText(student.getMajor());
 
-                Glide.with(getApplicationContext()).load(photo_url)
+                Glide.with(getApplicationContext()).load(student.getPhotoUrl())
                     .placeholder(R.drawable.default_profile_picture)
                     .override(400, 400).centerCrop()
-                    .into(photoUrl);
+                    .into(photo);
             }
 
             @Override
@@ -104,13 +94,21 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-        scanQRCode_btn = (Button) findViewById(R.id.scanQRCode);
+        scanBtn = (Button) findViewById(R.id.scanQRCode);
 
         //initializing scan object
         qrScan = new IntentIntegrator(this);
 
         //attach onclick listener
-        scanQRCode_btn.setOnClickListener(this);
+        scanBtn.setOnClickListener(this);
+    }
+
+    public void viewHistory(View view){
+        Intent i = new Intent(StudentActivity.this, StudentHistory.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("usc_id", student.getId());
+        i.putExtras(bundle);
+        startActivity(i);
     }
 
     public void deleteAccount(View view){
@@ -149,22 +147,26 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         //Set up buttons
         builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
             newPass = input.getText().toString();
-            Server.changePassword(newPass, new Callback<Void>() {
-                @Override
-                public void onSuccess(Void result) {
-                    Toast.makeText(StudentActivity.this, "Password changed!", Toast.LENGTH_SHORT).show();
-                }
-                @Override
-                public void onFailure(Exception exception) {
-                    Log.e(TAG, "onFailure: changePassword failure");
-                }
-            });
+            if(newPass.isEmpty())
+                Toast.makeText(StudentActivity.this, "Please type a password", Toast.LENGTH_LONG).show();
+            else {
+                Server.changePassword(newPass, new Callback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Toast.makeText(StudentActivity.this, "Password changed!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Log.e(TAG, "onFailure: changePassword failure");
+                    }
+                });
+            }
         });
         builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
-    //TODO: replace editImage() and uploadImagetoFirebase() with function calls from Register
     //upload and change profile image from gallery on click
     public void editImage(View view){
         Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -180,14 +182,13 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     //manually check out of building
     public void checkOut(View view){
         //show Toast if user not checked into a building
-        if(currBuilding == null || currBuilding.equals("None")){
+        if(student.getCurrentBuilding() == null) {
             Toast.makeText(getApplicationContext(), "Not currently checked into a building", Toast.LENGTH_LONG)
                     .show();
             return;
         }
         //set Current Building to None and Server.checkOut()
-        currBuilding = "None";
-        currentBuilding_tv.setText(R.string.none);
+        currentBuilding.setText(R.string.none);
         Server.checkOut(new Callback<Building>() {
             @Override
             public void onSuccess(Building building) {
@@ -211,11 +212,10 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                     public void onSuccess(String result) {
                         Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
                         // replace photo
-                        photo_url = result;
-                        Glide.with(getApplicationContext()).load(photo_url)
+                        Glide.with(getApplicationContext()).load(result)
                             .placeholder(R.drawable.default_profile_picture)
                             .override(400, 400).centerCrop()
-                            .into(photoUrl);
+                            .into(photo);
                     }
                     @Override
                     public void onFailure(Exception exception) {
@@ -228,13 +228,12 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (result != null && result.getContents() != null) {
                 String buildingId = result.getContents();
-                // TODO: below doesn't work if called right after checking in b/c local student obj is not updated
                 if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
                     Server.checkOut(new Callback<Building>() {
                         @Override
                         public void onSuccess(Building building) {
-                            currBuilding = "None";
-                            currentBuilding_tv.setText(R.string.none);
+                            student.setBuilding(null);
+                            currentBuilding.setText(R.string.none);
                             Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
                         }
                         @Override
@@ -246,8 +245,8 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                     Server.checkIn(buildingId, new Callback<Building>() {
                         @Override
                         public void onSuccess(Building building) {
-                            currBuilding = building.getName();
-                            currentBuilding_tv.setText(currBuilding);
+                            student.setBuilding(buildingId);
+                            currentBuilding.setText(building.getName());
                             Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
                         }
                         @Override

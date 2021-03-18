@@ -3,9 +3,10 @@
     package="com.team10.trojancheckinout">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".MyApplication"
@@ -16,26 +17,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TrojanCheckInOut">
 
+        <activity
+            android:name=".StudentHistory"/>
         <activity android:name=".StudentBasicActivity" />
         <activity android:name=".StudentActivity" />
-
         <activity
             android:name=".ManagerActivity"
             android:label="@string/title_activity_manager"
             android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
-
-        <activity android:name=".StartPage"
+        <activity
+            android:name=".StartPage"
             android:theme="@style/Theme.TrojanCheckInOut.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".LoginActivity" />
-
         <activity android:name=".StudentRegisterActivity" />
         <activity android:name=".ManagerRegisterActivity" />
-
     </application>
+
 </manifest>
