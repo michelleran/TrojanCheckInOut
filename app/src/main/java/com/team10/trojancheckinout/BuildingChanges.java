@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +82,32 @@ public class BuildingChanges extends Fragment {
         });
 
 
+        edtBCname.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(!b) {
+                    if (edtBCname.getText().toString().trim().equals("")){
+                        edtBCname.setError("Building name cannot be empty");
+                    }
+                }
+            }
+        });
+
+        edtBcMaxCap.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(!b) {
+                    if (edtBcMaxCap.getText().toString().trim().equals("")){
+                        edtBcMaxCap.setError("Maximum Capacity cannot be empty");
+                    }
+                    else if (Integer.parseInt(edtBcMaxCap.getText().toString().trim()) < 0) {
+                        edtBcMaxCap.setError("Maximum Capacity cannot be negative");
+                    }
+                }
+            }
+        });
+        
         return rootView;
     }
+
 }
