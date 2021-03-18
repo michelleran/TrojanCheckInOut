@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    android:id="@+id/building_list_frame"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+     android:layout_width="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/building_tab_content"
@@ -24,8 +28,6 @@
             android:text="Add Building"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</layout>
+</FrameLayout>

@@ -53,21 +53,13 @@ public class BuildingListFragment extends Fragment {
         // get extant buildings, then listen for add/remove/update
         Server.listenForBuildings(adapter);
 
-        btnAddBuilding.setVisibility(View.VISIBLE);
-
         btnAddBuilding.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                ft.replace(R.id.building_tab_content, BuildingChanges.newInstance(true, null));
+                ft.replace(R.id.building_list_frame, BuildingChanges.newInstance(true, null));
                 ft.commit();
                 ft.addToBackStack(null);
-
-//                ManagerProfileFragment nextFrag= new ManagerProfileFragment();
-//                getActivity().getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.building_tab_content, nextFrag, "findThisFragment")
-//                        .addToBackStack(null)
-//                        .commit();
             }
         });
 
@@ -90,7 +82,6 @@ class BuildingAdapter
         public final TextView name;
         public final TextView buildingCurrentCapacity;
         public final TextView buildingMaximumCapacity;
-//        public final Button btnAddBuilding;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -98,14 +89,6 @@ class BuildingAdapter
             // TODO
             buildingCurrentCapacity = itemView.findViewById(R.id.txtBuildingCurrentCapacity);
             buildingMaximumCapacity = itemView.findViewById(R.id.txtBuildingMaximumCapacity);
-//            btnAddBuilding = itemView.findViewById(R.id.btnAddBuilding);
-
-//            btnAddBuilding.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    Log.d("Hey", "onClick: things");
-//                }
-//            });
         }
     }
 

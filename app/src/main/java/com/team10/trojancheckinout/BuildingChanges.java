@@ -58,8 +58,8 @@ public class BuildingChanges extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_building_changes, container, false);
-        txtBCparam1 = (TextView) rootView.findViewById(R.id.txtBCparam1);
-        txtBCparam1.setText(String.valueOf(isAdd));
+//        txtBCparam1 = (TextView) rootView.findViewById(R.id.txtBCparam1);
+//        txtBCparam1.setText(String.valueOf(isAdd));
 
         return rootView;
     }

@@ -22,7 +22,9 @@
         <activity
             android:name=".ManagerActivity"
             android:label="@string/title_activity_manager"
-            android:theme="@style/Theme.TrojanCheckInOut.NoActionBar" />
+            android:theme="@style/Theme.TrojanCheckInOut.NoActionBar"
+            android:windowSoftInputMode="adjustPan|adjustResize"
+            />
 
         <activity android:name=".StartPage"
             android:theme="@style/Theme.TrojanCheckInOut.NoActionBar">
