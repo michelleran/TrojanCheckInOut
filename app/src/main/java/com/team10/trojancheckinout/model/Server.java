@@ -432,22 +432,15 @@ public class Server {
         });
     }
 
-    public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) throws IOException, WriterException {
-        initialize();
-        //QRCodeHelper.generateQRCodeImage(buildingID,250,250,"/document/raw:/storage/emulated/0/Download/");
-        //Uri file = Uri.fromFile(new File("/document/raw:/storage/emulated/0/Download/" + buildingID));
-        DocumentReference newBuildingRef = db.collection("buildings").document();
+    public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) {
+        DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document();
         String buildingID = newBuildingRef.getId();
 
-        //File file = QRCode.from(buildingID).to(ImageType.JPG).withSize(250, 250).file();
-        //Log.d(TAG, "" + file.toString());
-        //Uri uri = Uri.fromFile(file);
         byte[] qr = QRCodeHelper.generateQRCodeImage(buildingID, 250 , 250);
         StorageReference fileRef = storage.child("qrcodes/" + buildingID);
-        UploadTask uploadTask = fileRef.putBytes(qr);
+        StorageMetadata metadata = new StorageMetadata.Builder().setCustomMetadata("contentType", "image/jpeg").build();
+        UploadTask uploadTask = fileRef.putBytes(qr, metadata);
 
-        // StorageReference fileRef = storage.child("qrcodes/" + buildingID);
-        //UploadTask uploadTask = fileRef.putFile(uri);
         uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
             @Override
             public void onProgress(@NotNull UploadTask.TaskSnapshot taskSnapshot) {
@@ -469,7 +462,7 @@ public class Server {
                     @Override
                     public void onSuccess(Uri uri) {
                         Building building = new Building( newBuildingRef.getId(), name, uri.toString(),maxCapacity);
-                        db.collection("buildings").document(buildingID).set(building)
+                        db.collection(BUILDING_COLLECTION).document(buildingID).set(building)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {

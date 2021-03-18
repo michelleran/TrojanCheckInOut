@@ -15,24 +15,5 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Server.initialize();
-        try {
-            Server.addBuilding("film", 25, new Callback<Building>() {
-                @Override
-                public void onSuccess(Building result) {
-                    Log.d("server", "Hi");
-
-                }
-
-                @Override
-                public void onFailure(Exception exception) {
-                    exception.printStackTrace();
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (WriterException e) {
-            e.printStackTrace();
-        }
-
     }
 }
