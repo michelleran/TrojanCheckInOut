@@ -29,12 +29,9 @@ Project is created with:
 * After some students check in and check out, mangers should be able to see the changes in the building simultaneously
 ### Additional Features
 * Password can be changed
-	
+* Filter records by start date/time, end date/time, building name, student id, and/or major
 ## Setup
 To run this project:
 * Clone repository into your IDE (Android Studio)
 * Click "Make Project"
 * Run on emulator by clicking "Run" button
-
-## Extra Features
-* Filter records by start date/time, end date/time, building name, student id, and/or major
