@@ -12,7 +12,7 @@ Trojan Check In/Out is a building capacity management and contact tracing Androi
 Project is created with:
 * **Android Framework** - implemented backend in Java and UI in XML
 * **Google Firebase** - used for database storage and authentication
-* 'zxing'(https://github.com/zxing/zxing) "Zebra Crossing" - barcode image processing library
+* [`zxing`](https://github.com/zxing/zxing) "Zebra Crossing" - barcode image processing library
 	
 ## Setup
 To run this project:
