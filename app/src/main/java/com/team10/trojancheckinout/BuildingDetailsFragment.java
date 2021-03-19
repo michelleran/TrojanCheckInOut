@@ -84,7 +84,6 @@ public class BuildingDetailsFragment extends Fragment {
 
         // set building current/max capacity
         TextView capacity = rootView.findViewById(R.id.building_details_capacity);
-        capacity.setText(String.format(Locale.US, capacityFormat, 0, maxCapacity));
 
         // set up RecyclerView
         RecyclerView studentList = rootView.findViewById(R.id.building_details_students);
@@ -95,7 +94,29 @@ public class BuildingDetailsFragment extends Fragment {
 
         adapter = new CheckedInStudentAdapter();
         studentList.setAdapter(adapter);
-        Server.listenForCheckedInStudents(buildingId, adapter);
+        Server.listenForCheckedInStudents(buildingId, new Listener<Student>() {
+            @Override
+            public void onAdd(Student item) {
+                adapter.onAdd(item);
+                capacity.setText(String.format(Locale.US, capacityFormat, adapter.getItemCount(), maxCapacity));
+            }
+
+            @Override
+            public void onRemove(Student item) {
+                adapter.onRemove(item);
+                capacity.setText(String.format(Locale.US, capacityFormat, adapter.getItemCount(), maxCapacity));
+            }
+
+            @Override
+            public void onUpdate(Student item) {
+                // nothing
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e(TAG, exception.getMessage());
+            }
+        });
 
         return rootView;
     }
@@ -127,15 +148,9 @@ class CheckedInStudentAdapter
     }
 
     @Override
-    public void onUpdate(Student item) {
-        // TODO: don't need to do anything?
-    }
-
+    public void onUpdate(Student item) { }
     @Override
-    public void onFailure(Exception exception) {
-        Log.e(TAG, exception.getMessage());
-        // don't need to do anything
-    }
+    public void onFailure(Exception exception) { }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView studentPhoto;
