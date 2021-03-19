@@ -46,11 +46,11 @@ public class Student implements User {
         return deleted;
     }
 
-    void setPhotoUrl(String url) { this.photoUrl = url; }
-    void setBuilding(String currentBuilding) {
+    /** This does NOT update the database! */
+    public void setBuilding(String currentBuilding) {
         this.currentBuilding = currentBuilding;
     }
-    void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
+
+    void setPhotoUrl(String url) { this.photoUrl = url; }
+    void setDeleted(boolean deleted) { this.deleted = deleted; }
 }

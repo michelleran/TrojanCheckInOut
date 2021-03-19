@@ -51,8 +51,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     public void addRecord(Record record) {
         records.add(record);
-        // sort by time (listeners may not be fired in the order data is written)
-        Collections.sort(records);
         notifyDataSetChanged();
     }
 
@@ -69,19 +67,19 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
     public void onBindViewHolder(@NonNull RecordAdapter.ViewHolder holder, int position) {
         Record record = records.get(position);
         holder.recordType.setText(record.getCheckIn() ? R.string.checked_into : R.string.checked_out_of);
-        holder.time.setText(record.getTimeString());
+        holder.time.setText(record.getTime());
 
         holder.studentPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // open profile of student
                 Intent intent = new Intent(holder.itemView.getContext(), StudentBasicActivity.class);
-                intent.putExtra("studentId", record.getStudentId());
+                intent.putExtra("studentId", record.getStudentUid());
                 holder.itemView.getContext().startActivity(intent);
             }
         });
 
-        Server.getStudent(record.getStudentId(), new Callback<Student>() {
+        Server.getStudent(record.getStudentUid(), new Callback<Student>() {
             @Override
             public void onSuccess(Student result) {
                 // set student photo
