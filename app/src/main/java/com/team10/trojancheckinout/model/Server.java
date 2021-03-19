@@ -1,5 +1,7 @@
 package com.team10.trojancheckinout.model;
 
+import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -16,6 +18,11 @@ import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
+import com.google.zxing.WriterException;
+import com.team10.trojancheckinout.utils.QRCodeHelper;
+
+import net.glxn.qrgen.android.QRCode;
+import net.glxn.qrgen.core.image.ImageType;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -199,7 +206,7 @@ public class Server {
                             callback.onSuccess(document.toObject(Manager.class));
                         }
                     } else {
-                       Log.d("getUSer", "No such document");
+                       Log.d("getUser", "No such document");
                        callback.onFailure(task.getException());
                     }
                 } else {
@@ -421,8 +428,60 @@ public class Server {
         });
     }
 
-    public static void addBuilding() {
-        // TODO
+    public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) {
+        DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document();
+        String buildingID = newBuildingRef.getId();
+
+        byte[] qr = QRCodeHelper.generateQRCodeImage(buildingID, 250 , 250);
+        StorageReference fileRef = storage.child("qrcodes/" + buildingID);
+        StorageMetadata metadata = new StorageMetadata.Builder().setCustomMetadata("contentType", "image/jpeg").build();
+        UploadTask uploadTask = fileRef.putBytes(qr, metadata);
+
+        uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
+            @Override
+            public void onProgress(@NotNull UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                Log.d(TAG, "Upload is " + progress + "% done");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Log.d(TAG, "could not handle Uri");
+                callback.onFailure(exception);
+                
+            }
+        }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
+            @Override
+            public void onSuccess(TaskSnapshot taskSnapshot) {
+                taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Building building = new Building( newBuildingRef.getId(), name, uri.toString(),maxCapacity);
+                        db.collection(BUILDING_COLLECTION).document(buildingID).set(building)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "DocumentSnapshot added with ID: ");
+                                    callback.onSuccess(building);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error adding document", e);
+                                    callback.onFailure(e);
+                                }
+                            });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
+            }
+        });
     }
 
     public static void removeBuilding(String id, Callback<Void> callback){

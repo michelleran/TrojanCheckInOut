@@ -21,7 +21,6 @@
 
     <string name="student_id">Student id</string>
     <string name="student_major">Major</string>
-
     <string-array name="majors">
         <item>AME</item>
         <item>ASTE</item>

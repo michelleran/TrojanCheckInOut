@@ -13,7 +13,6 @@ public class Record {
 
     private String buildingId;
     private String buildingName;
-
     private boolean checkIn;
 
     private String time;
