@@ -110,40 +110,8 @@ class BuildingAdapter
             onUpdate(item);
             return;
         }
-        //TODO: remove these lines (for testing purposes)
-        Building building = new Building("2", "KAP", "blah", 12);
-        building.setMaxCapacity(12);
-
         buildingNames.add(item.getName());
         nameToBuilding.put(item.getName(), item);
-
-        buildingNames.add(building.getName());
-        nameToBuilding.put(building.getName(), building);
-
-        Building building2 = new Building("2", "KAP", "blah", 12);
-        building2.setMaxCapacity(12);
-        buildingNames.add(building2.getName());
-        nameToBuilding.put(building2.getName(), building2);
-
-        Building building3 = new Building("2", "KAP", "blah", 12);
-        building3.setMaxCapacity(12);
-        buildingNames.add(building3.getName());
-        nameToBuilding.put(building3.getName(), building3);
-
-        Building building4 = new Building("2", "KAP", "blah", 12);
-        building4.setMaxCapacity(12);
-        buildingNames.add(building4.getName());
-        nameToBuilding.put(building4.getName(), building4);
-
-        Building building5 = new Building("2", "KAP", "blah", 12);
-        building5.setMaxCapacity(12);
-        buildingNames.add(building5.getName());
-        nameToBuilding.put(building5.getName(), building5);
-
-        Building building6 = new Building("2", "KAP", "blah", 12);
-        building6.setMaxCapacity(12);
-        buildingNames.add(building6.getName());
-        nameToBuilding.put(building6.getName(), building6);
 
         // sort alphabetically
         Collections.sort(buildingNames);
@@ -221,7 +189,7 @@ class BuildingAdapter
                             case R.id.menuEdit:
                                 Log.d(TAG, "onMenuItemClick: EDIT");
                                 FragmentTransaction ft = fragmentManager.beginTransaction();
-                                ft.replace(R.id.building_list_frame, BuildingChanges.newInstance("EDIT", building));
+                                ft.replace(R.id.building_list_frame, BuildingChanges.newInstance("EDIT", building), "EDIT");
                                 ft.commit();
                                 ft.addToBackStack(building.getId());
                                 return true;
