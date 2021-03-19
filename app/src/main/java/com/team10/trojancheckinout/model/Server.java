@@ -529,6 +529,10 @@ public class Server {
                 });
     }
 
+//    public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
+//        callback.onSuccess(new Building(id, "BUIL", "thingss", maxCapacity));
+//    }
+
     public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
         final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
         db.runTransaction(new Transaction.Function<Building>() {
