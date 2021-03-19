@@ -14,6 +14,6 @@ import javax.annotation.Nullable;
 
 public class QRCodeHelper {
     public static byte[] generateQRCodeImage(String buildingID, int width, int height) {
-        return QRCode.from(buildingID).to(ImageType.JPG).withSize(250, 250).stream().toByteArray();
+        return QRCode.from(buildingID).to(ImageType.JPG).withSize(width, height).stream().toByteArray();
     }
 }
