@@ -167,10 +167,10 @@ public class BuildingChanges extends Fragment {
                         public void onSuccess(Building result) {
                             if (result != null) {
                                 Log.d(TAG, "onSuccess: Maximum Capacity of Building " + result.getName() + " set to " + result.getMaxCapacity());
+                                Toast.makeText(getContext(), "Maximum Capacity of Building " + result.getName() + " set to " +  result.getMaxCapacity(), Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.d(TAG, "onSuccess: Building is null");
                             }
-                            Toast.makeText(getContext(), "Maximum Capacity of Building " + result.getName() + " set to " +  result.getMaxCapacity(), Toast.LENGTH_SHORT).show();
                             FragmentManager fm = getActivity().getSupportFragmentManager();
                             fm.popBackStack();
                         }
@@ -178,11 +178,11 @@ public class BuildingChanges extends Fragment {
                         @Override
                         public void onFailure(Exception exception) {
                             if (exception != null) {
-                                Log.e(TAG, "onFailure: Building add error", exception);
+                                Log.e(TAG, "onFailure: Building edit error", exception);
                             } else {
-                                Log.e(TAG, "onFailure: Building add error");
+                                Log.e(TAG, "onFailure: Building edit error");
                             }
-                            Toast.makeText(getContext(), "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Maximum Capacity cannot be set. Please try again", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
