@@ -471,36 +471,40 @@ public class Server {
     }
 
     public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
-        final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
-        db.runTransaction(new Transaction.Function<Building>() {
-            @Override
-            public Building apply(Transaction transaction) throws FirebaseFirestoreException {
-                Building building = transaction.get(buildingDocRef).toObject(Building.class);
-                // If new max capacity is smaller than old max capacity
-                if(building.getMaxCapacity() > maxCapacity){
-                    throw new FirebaseFirestoreException("New capacity is smaller than old capacity",
-                        FirebaseFirestoreException.Code.ABORTED);
-                }else{
-                    transaction.update(buildingDocRef, "maxCapacity", maxCapacity);
-                    building.setMaxCapacity(maxCapacity);
-                }
-                // Success
-                return building;
-            }
-        }).addOnSuccessListener(new OnSuccessListener<Building>() {
-            @Override
-            public void onSuccess(Building building) {
-                callback.onSuccess(building);
-                Log.d(TAG, "Transaction success!");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                callback.onFailure(e);
-                Log.w(TAG, "Transaction failure.", e);
-            }
-        });
+        callback.onSuccess(new Building(id, "BUIL", "thingss", maxCapacity));
     }
+
+//    public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
+//        final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
+//        db.runTransaction(new Transaction.Function<Building>() {
+//            @Override
+//            public Building apply(Transaction transaction) throws FirebaseFirestoreException {
+//                Building building = transaction.get(buildingDocRef).toObject(Building.class);
+//                // If new max capacity is smaller than old max capacity
+//                if(building.getMaxCapacity() > maxCapacity){
+//                    throw new FirebaseFirestoreException("New capacity is smaller than old capacity",
+//                        FirebaseFirestoreException.Code.ABORTED);
+//                }else{
+//                    transaction.update(buildingDocRef, "maxCapacity", maxCapacity);
+//                    building.setMaxCapacity(maxCapacity);
+//                }
+//                // Success
+//                return building;
+//            }
+//        }).addOnSuccessListener(new OnSuccessListener<Building>() {
+//            @Override
+//            public void onSuccess(Building building) {
+//                callback.onSuccess(building);
+//                Log.d(TAG, "Transaction success!");
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                callback.onFailure(e);
+//                Log.w(TAG, "Transaction failure.", e);
+//            }
+//        });
+//    }
 
     public static void checkIn(String id, Callback<Building> callback){ // TODO: may not need to call back w/ the building
         // Get building and student document references

@@ -59,7 +59,7 @@ public class BuildingListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                ft.replace(R.id.building_list_frame, BuildingChanges.newInstance(true, null));
+                ft.replace(R.id.building_list_frame, BuildingChanges.newInstance("ADD", null));
                 ft.commit();
                 ft.addToBackStack(null);
             }
@@ -220,6 +220,10 @@ class BuildingAdapter
                         switch (menuItem.getItemId()) {
                             case R.id.menuEdit:
                                 Log.d(TAG, "onMenuItemClick: EDIT");
+                                FragmentTransaction ft = fragmentManager.beginTransaction();
+                                ft.replace(R.id.building_list_frame, BuildingChanges.newInstance("EDIT", building));
+                                ft.commit();
+                                ft.addToBackStack(building.getId());
                                 return true;
                             case R.id.menuViewQR:
                                 Log.d(TAG, "onMenuItemClick: VIEW QR");
