@@ -192,6 +192,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         Server.checkOut(new Callback<Building>() {
             @Override
             public void onSuccess(Building building) {
+                student.setBuilding(null);
                 Toast.makeText(getApplicationContext(), "Successfully checked out!", Toast.LENGTH_LONG).show();
             }
             @Override

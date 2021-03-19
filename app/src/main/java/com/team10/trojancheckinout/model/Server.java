@@ -529,10 +529,6 @@ public class Server {
                 });
     }
 
-//    public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
-//        callback.onSuccess(new Building(id, "BUIL", "thingss", maxCapacity));
-//    }
-
     public static void setBuildingMaxCapacity(String id, int maxCapacity, Callback<Building> callback){
         final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(id);
         db.runTransaction(new Transaction.Function<Building>() {
@@ -561,6 +557,35 @@ public class Server {
             public void onFailure(@NonNull Exception e) {
                 callback.onFailure(e);
                 Log.w(TAG, "Transaction failure.", e);
+            }
+        });
+    }
+
+    public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
+        db.collection(USER_COLLECTION).whereEqualTo("currentBuilding", buildingId)
+            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, error.getMessage());
+                    return;
+                }
+                for (DocumentChange dc : value.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            listener.onAdd(dc.getDocument().toObject(Student.class));
+                            Log.d(TAG, "Add: " + dc.getDocument().getData());
+                            break;
+                        case MODIFIED:
+                            listener.onUpdate(dc.getDocument().toObject(Student.class));
+                            Log.d(TAG, "Update: " + dc.getDocument().getData());
+                            break;
+                        case REMOVED:
+                            listener.onRemove(dc.getDocument().toObject(Student.class));
+                            Log.d(TAG, "Remove: " + dc.getDocument().getData());
+                            break;
+                    }
+                }
             }
         });
     }

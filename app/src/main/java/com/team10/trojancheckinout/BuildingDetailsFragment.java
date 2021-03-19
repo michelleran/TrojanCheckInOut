@@ -1,7 +1,9 @@
 package com.team10.trojancheckinout;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,13 +12,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
+import com.team10.trojancheckinout.model.Listener;
 import com.team10.trojancheckinout.model.Record;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.model.Student;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -80,52 +87,104 @@ public class BuildingDetailsFragment extends Fragment {
         capacity.setText(String.format(Locale.US, capacityFormat, 0, maxCapacity));
 
         // set up RecyclerView
-        RecyclerView recordList = rootView.findViewById(R.id.building_details_students);
+        RecyclerView studentList = rootView.findViewById(R.id.building_details_students);
 
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
-        recordList.setLayoutManager(llm);
+        studentList.setLayoutManager(llm);
 
         adapter = new CheckedInStudentAdapter();
-        recordList.setAdapter(adapter);
-
-        Server.filterRecords(
-            -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1,
-            buildingName, "", "", new Callback<Record>() {
-            @Override
-            public void onSuccess(Record result) {
-                adapter.addRecord(result);
-                // update current capacity
-                capacity.setText(String.format(Locale.US, capacityFormat, adapter.getItemCount(), maxCapacity));
-            }
-
-            @Override
-            public void onFailure(Exception exception) {
-                Log.e(TAG, exception.getMessage());
-                // TODO: handle
-            }
-        });
+        studentList.setAdapter(adapter);
+        Server.listenForCheckedInStudents(buildingId, adapter);
 
         return rootView;
     }
 }
 
-class CheckedInStudentAdapter extends RecordAdapter {
+class CheckedInStudentAdapter
+    extends RecyclerView.Adapter<CheckedInStudentAdapter.ViewHolder>
+    implements Listener<Student>
+{
+    protected ArrayList<Student> students;
+
+    private final String TAG = "CheckedInStudentAdapter";
+
     @Override
-    public void addRecord(Record record) {
-        if (record.getCheckIn()) {
-            super.addRecord(record);
-            return;
-        }
-        // a student checked out
-        for (int i = 0; i < records.size(); i++) {
-            if (records.get(i).getStudentUid().equals(record.getStudentUid())) {
-                // remove corresponding check-in record
-                records.remove(i);
+    public void onAdd(Student item) {
+        students.add(item);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void onRemove(Student item) {
+        for (int i = 0; i < students.size(); i++) {
+            if (students.get(i).getUid().equals(item.getUid())) {
+                students.remove(i);
                 break;
             }
         }
         notifyDataSetChanged();
     }
+
+    @Override
+    public void onUpdate(Student item) {
+        // TODO: don't need to do anything?
+    }
+
+    @Override
+    public void onFailure(Exception exception) {
+        Log.e(TAG, exception.getMessage());
+        // don't need to do anything
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public final ImageView studentPhoto;
+        public final TextView studentName;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            // get refs to views
+            studentPhoto = itemView.findViewById(R.id.record_student_photo);
+            studentName = itemView.findViewById(R.id.record_student_name);
+        }
+    }
+
+    public CheckedInStudentAdapter() {
+        students = new ArrayList<>();
+    }
+
+    @NonNull
+    @Override
+    public CheckedInStudentAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // create a new view, which defines the UI of the list item
+        View view = LayoutInflater.from(parent.getContext())
+            .inflate(R.layout.row_student, parent, false);
+        return new CheckedInStudentAdapter.ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull CheckedInStudentAdapter.ViewHolder holder, int position) {
+        Student student = students.get(position);
+        // set student photo
+        Glide.with(holder.itemView)
+            .load(student.getPhotoUrl())
+            .override(400, 400).centerCrop()
+            .into(holder.studentPhoto);
+        // set student name
+        holder.studentName.setText(
+            String.format("%s, %s", student.getSurname(), student.getGivenName()));
+
+        holder.studentPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // open profile of student
+                Intent intent = new Intent(holder.itemView.getContext(), StudentBasicActivity.class);
+                intent.putExtra("studentId", student.getUid());
+                holder.itemView.getContext().startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() { return students.size(); }
 }
