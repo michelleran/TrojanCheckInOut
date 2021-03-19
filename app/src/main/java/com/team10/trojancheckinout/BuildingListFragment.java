@@ -189,12 +189,16 @@ class BuildingAdapter
                             case R.id.menuEdit:
                                 Log.d(TAG, "onMenuItemClick: EDIT");
                                 FragmentTransaction ft = fragmentManager.beginTransaction();
-                                ft.replace(R.id.building_list_frame, BuildingChanges.newInstance("EDIT", building), "EDIT");
+                                ft.replace(R.id.building_list_frame, BuildingChanges.newInstance("EDIT", building));
                                 ft.commit();
                                 ft.addToBackStack(building.getId());
                                 return true;
                             case R.id.menuViewQR:
                                 Log.d(TAG, "onMenuItemClick: VIEW QR");
+                                FragmentTransaction ft1 = fragmentManager.beginTransaction();
+                                ft1.replace(R.id.building_list_frame, BuildingChanges.newInstance("QR", building));
+                                ft1.commit();
+                                ft1.addToBackStack(building.getId());
                                 return true;
                             case R.id.menuDelete:
                                 Log.d(TAG, "onMenuItemClick: DELETE");

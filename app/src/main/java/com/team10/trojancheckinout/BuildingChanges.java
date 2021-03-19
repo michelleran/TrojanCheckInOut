@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
@@ -111,6 +112,7 @@ public class BuildingChanges extends Fragment {
         btnBcCancel = (Button) rootView.findViewById(R.id.btnBcCancel);
         txtBcName = (TextView) rootView.findViewById(R.id.txtBcName);
         pbBcLoading = (ProgressBar) rootView.findViewById(R.id.pbBcLoading);
+        imgBcQR = (ImageView) rootView.findViewById(R.id.imgBcQR);
 
         pbBcLoading.setVisibility(View.INVISIBLE);
 
@@ -138,16 +140,25 @@ public class BuildingChanges extends Fragment {
 
     public void setViewQR() {
         edtBCname.setVisibility(View.INVISIBLE);
-        txtBcName.setVisibility(View.INVISIBLE);
+        edtBcMaxCap.setVisibility(View.INVISIBLE);
+        txtBcName.setVisibility(View.VISIBLE);
         imgBcQR.setVisibility(View.VISIBLE);
-        btnBcCancel.setText("CANCEL");
+
+        btnBcConfirm.setText("Download");
+
+        if (buildingName != null) {
+            txtBcName.setText("Building: " + buildingName);
+        }
+
+        Glide.with(getActivity()).load(buildingQR).override(400, 400).centerCrop().into(imgBcQR);
+
     }
 
     public void setViewEdit() {
         edtBCname.setVisibility(View.INVISIBLE);
         imgBcQR.setVisibility(View.INVISIBLE);
         txtBcName.setVisibility(View.VISIBLE);
-        btnBcCancel.setText("CANCEL");
+        edtBcMaxCap.setVisibility(View.VISIBLE);
 
         if (buildingName != null) {
             txtBcName.setText("Building: " + buildingName);
@@ -232,7 +243,7 @@ public class BuildingChanges extends Fragment {
         txtBcName.setVisibility(View.INVISIBLE);
         imgBcQR.setVisibility(View.INVISIBLE);
         edtBCname.setVisibility(View.VISIBLE);
-        btnBcCancel.setText("CANCEL");
+        edtBcMaxCap.setVisibility(View.VISIBLE);
 
         edtBCname.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
