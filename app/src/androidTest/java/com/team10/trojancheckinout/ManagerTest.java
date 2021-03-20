@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.material.tabs.TabLayout;
@@ -50,8 +51,6 @@ public class ManagerTest {
     public ActivityTestRule<ManagerActivity> activityRule =
         new ActivityTestRule<>(ManagerActivity.class);
 
-    // TODO: tests seem to fail if run together?
-
     @Test
     public void listBuildings_openDetails() {
         final String BUILDING = "Mudd Hall";
@@ -67,12 +66,15 @@ public class ManagerTest {
 
         // TODO: assert that current capacity, max capacity match (how to get values?)
 
-        // open profile of a checked-in student
-        /*onView(withRecyclerView(R.id.building_details_students) // TODO: error if recyclerview is empty
-            .atPositionOnView(0, R.id.record_student_photo))
-            .perform(click());
-        // assert that current building matches
-        onView(withId(R.id.currentBuilding)).check(matches(withText(BUILDING)));*/
+        RecyclerView list = activityRule.getActivity().findViewById(R.id.building_details_students);
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // open profile of checked-in student
+            onView(withRecyclerView(R.id.building_details_students)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert that current building matches
+            onView(withId(R.id.currentBuilding)).check(matches(withText(BUILDING)));
+        }
     }
 
     @Test
@@ -121,10 +123,13 @@ public class ManagerTest {
             e.printStackTrace();
         }
 
-        // TODO: how to do this for all items?
-        onView(withRecyclerView(R.id.results_list)
-            .atPositionOnView(0, R.id.record_building_name))
-            .check(matches(withText(BUILDING)));
+        RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list);
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // check that record is for the right building
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_building_name))
+                .check(matches(withText(BUILDING)));
+        }
     }
 
     @Test
