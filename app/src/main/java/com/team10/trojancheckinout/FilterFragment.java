@@ -113,7 +113,7 @@ public class FilterFragment extends Fragment {
             studentId = studentIdField.getText().toString().trim();
             if (!studentId.isEmpty() && !Validator.validateID(studentId)) {
                 // invalid student id
-                Toast.makeText(getContext(), "Please enter a valid USC id or leave the field blank", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.filter_invalid_usc_id, Toast.LENGTH_LONG).show();
                 return;
             }
             if (spinner.getSelectedItemPosition() == 0) {
@@ -123,7 +123,7 @@ public class FilterFragment extends Fragment {
             }
 
             // open filter results (replace this fragment)
-            final FragmentTransaction ft = getFragmentManager().beginTransaction();
+            final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
             ft.replace(R.id.filter_tab_content,
                 FilterResultsFragment.newInstance(
                     startYear, startMonth, startDay, startHour, startMin,

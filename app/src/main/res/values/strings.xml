@@ -65,6 +65,8 @@
     <string name="none">None</string>
     <string name="new_password">Input New Password</string>
 
+    <string name="filter_invalid_usc_id">Please enter a valid USC id or leave the field blank</string>
+
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
