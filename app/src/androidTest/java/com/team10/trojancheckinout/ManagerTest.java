@@ -133,7 +133,22 @@ public class ManagerTest {
     }
 
     @Test
+    public void filterBy_id() {
+        // TODO
+    }
+
+    @Test
     public void filterBy_major() {
+        // TODO
+    }
+
+    @Test
+    public void filterBy_buildingId() {
+        // TODO
+    }
+
+    @Test
+    public void filterBy_buildingMajor() {
         // TODO
     }
 
