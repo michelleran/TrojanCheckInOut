@@ -38,6 +38,7 @@ import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.instanceOf;
 
 import static com.team10.trojancheckinout.RecyclerViewMatcher.*;
 import static com.team10.trojancheckinout.TestUtils.*;
@@ -81,12 +82,7 @@ public class ManagerTest {
     public void filterBy_invalidId() {
         // navigate to filter tab
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-
-        try {
-            Thread.sleep(WAIT_UI);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(WAIT_UI);
 
         // input too short USC id
         onView(withId(R.id.filter_student_id_field)).perform(typeText("12345"));
@@ -102,14 +98,10 @@ public class ManagerTest {
     @Test
     public void filterBy_building() {
         final String BUILDING = "Mudd Hall";
+
         // navigate to filter tab
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-
-        try {
-            Thread.sleep(WAIT_UI);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(WAIT_UI);
 
         // input building name
         onView(withId(R.id.filter_building_field)).perform(typeText(BUILDING));
@@ -117,15 +109,11 @@ public class ManagerTest {
         onView(withId(R.id.filter_button)).perform(click());
 
         // wait for results to load
-        try {
-            Thread.sleep(WAIT_DATA);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(WAIT_DATA);
 
         RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list);
         for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
-            // check that record is for the right building
+            // assert that building name matches
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_building_name))
                 .check(matches(withText(BUILDING)));
@@ -134,25 +122,108 @@ public class ManagerTest {
 
     @Test
     public void filterBy_id() {
-        // TODO
+        final String ID = "0123456789";
+
+        // navigate to filter tab
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
+        sleep(WAIT_UI);
+
+        // input student id
+        onView(withId(R.id.filter_student_id_field)).perform(typeText(ID));
+        onView(withId(R.id.filter_student_id_field)).perform(ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // wait for results to load
+        sleep(WAIT_DATA);
+
+        RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list); // TODO: fails to find the recyclerview?
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // open profile of student
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert that id matches
+            onView(withId(R.id.id)).check(matches(withText(ID)));
+        }
     }
 
     @Test
     public void filterBy_major() {
-        // TODO
+        final String MAJOR = "CSCI";
+
+        // navigate to filter tab
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
+        sleep(WAIT_UI);
+
+        // select major
+        onView(withId(R.id.filter_major_spinner)).perform(click());
+        onData(allOf(is(instanceOf(String.class)), is(MAJOR))).perform(click());
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // wait for results to load
+        sleep(WAIT_DATA);
+
+        RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list); // TODO: ''
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // open profile of student
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert that major matches
+            onView(withId(R.id.major)).check(matches(withText(MAJOR)));
+        }
     }
 
     @Test
     public void filterBy_buildingId() {
-        // TODO
+        final String BUILDING = "Mudd Hall";
+        final String ID = "0123456789";
+
+        // navigate to filter tab
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
+        sleep(WAIT_UI);
+
+        // input building name
+        onView(withId(R.id.filter_building_field)).perform(typeText(BUILDING));
+        onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
+
+        // input student id
+        onView(withId(R.id.filter_student_id_field)).perform(typeText(ID));
+        onView(withId(R.id.filter_student_id_field)).perform(ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // wait for results to load
+        sleep(WAIT_DATA);
+
+        RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list); // TODO: ''
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // assert that building name matches
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_building_name))
+                .check(matches(withText(BUILDING)));
+            // open profile of student
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert that id matches
+            onView(withId(R.id.id)).check(matches(withText(ID)));
+        }
     }
 
-    @Test
+    /*@Test
     public void filterBy_buildingMajor() {
         // TODO
-    }
+    }*/
 
     // TODO: Espresso can't test date/time picker?
+
+    private void sleep(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     @NonNull
     private static ViewAction selectTabAtPosition(final int position) {
