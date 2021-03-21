@@ -1,13 +1,17 @@
 package com.team10.trojancheckinout;
 
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,8 +27,6 @@ import com.bumptech.glide.Glide;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
-
-import org.w3c.dom.Text;
 
 import static android.content.ContentValues.TAG;
 
@@ -48,6 +50,7 @@ public class BuildingChanges extends Fragment {
     private String buildingName;
     private int buildingMaxCapacity;
     private String buildingQR;
+    private long lastDownload;
 //    private String mParam2;
 
     private EditText edtBCname;
@@ -57,6 +60,7 @@ public class BuildingChanges extends Fragment {
     private TextView txtBcName;
     private ProgressBar pbBcLoading;
     private ImageView imgBcQR;
+    private DownloadManager mgr=null;
 
     public BuildingChanges() {
         // Required empty public constructor
@@ -114,6 +118,9 @@ public class BuildingChanges extends Fragment {
         pbBcLoading = (ProgressBar) rootView.findViewById(R.id.pbBcLoading);
         imgBcQR = (ImageView) rootView.findViewById(R.id.imgBcQR);
 
+        mgr = (DownloadManager)getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+
+
         pbBcLoading.setVisibility(View.INVISIBLE);
 
         btnBcCancel.setOnClickListener(new View.OnClickListener() {
@@ -152,6 +159,31 @@ public class BuildingChanges extends Fragment {
 
         Glide.with(getActivity()).load(buildingQR).override(400, 400).centerCrop().into(imgBcQR);
 
+
+        BroadcastReceiver onDownloadComplete=new BroadcastReceiver() {
+            public void onReceive(Context ctxt, Intent intent) {
+                Toast.makeText(ctxt, "Download Finished", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        btnBcConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Uri uri = Uri.parse(buildingQR);
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        .mkdirs();
+                DownloadManager.Request req = new DownloadManager.Request(uri);
+                req.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
+                        | DownloadManager.Request.NETWORK_MOBILE)
+                        .setDescription("Downloading QR Code")
+                        .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                                "qr_code_" + buildingName + ".jpg");
+                lastDownload = mgr.enqueue(req);
+
+                getContext().registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+            }
+        });
+
     }
 
     public void setViewEdit() {
@@ -159,6 +191,9 @@ public class BuildingChanges extends Fragment {
         imgBcQR.setVisibility(View.INVISIBLE);
         txtBcName.setVisibility(View.VISIBLE);
         edtBcMaxCap.setVisibility(View.VISIBLE);
+
+        btnBcConfirm.setText("Confirm");
+
 
         if (buildingName != null) {
             txtBcName.setText("Building: " + buildingName);
@@ -244,6 +279,9 @@ public class BuildingChanges extends Fragment {
         imgBcQR.setVisibility(View.INVISIBLE);
         edtBCname.setVisibility(View.VISIBLE);
         edtBcMaxCap.setVisibility(View.VISIBLE);
+
+        btnBcConfirm.setText("Confirm");
+
 
         edtBCname.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

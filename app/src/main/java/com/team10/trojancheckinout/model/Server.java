@@ -21,9 +21,6 @@ import com.google.firebase.storage.UploadTask.TaskSnapshot;
 import com.google.zxing.WriterException;
 import com.team10.trojancheckinout.utils.QRCodeHelper;
 
-import net.glxn.qrgen.android.QRCode;
-import net.glxn.qrgen.core.image.ImageType;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZonedDateTime;
