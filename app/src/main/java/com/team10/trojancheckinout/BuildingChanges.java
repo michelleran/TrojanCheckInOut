@@ -5,17 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Environment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,8 +27,6 @@ import com.bumptech.glide.Glide;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
-
-import org.w3c.dom.Text;
 
 import static android.content.ContentValues.TAG;
 
@@ -183,11 +177,10 @@ public class BuildingChanges extends Fragment {
                         | DownloadManager.Request.NETWORK_MOBILE)
                         .setDescription("Downloading QR Code")
                         .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-                                "qr_code_" + buildingName);
+                                "qr_code_" + buildingName + ".jpg");
                 lastDownload = mgr.enqueue(req);
 
                 getContext().registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
             }
         });
 
