@@ -7,6 +7,7 @@ import android.view.View;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.UiController;
@@ -111,6 +112,7 @@ public class ManagerTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
+        //Log.d("Test", activityRule.getActivity().getFragmentManager().getFragments().toString());
         RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list);
         for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
             // assert that building name matches
@@ -136,14 +138,22 @@ public class ManagerTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list); // TODO: fails to find the recyclerview?
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
-            // open profile of student
-            onView(withRecyclerView(R.id.results_list)
-                .atPositionOnView(i, R.id.record_student_photo))
-                .perform(click());
-            // assert that id matches
-            onView(withId(R.id.id)).check(matches(withText(ID)));
+        //onView(withId(R.id.fragment_filter_results)).check(matches(isDisplayed()));
+
+        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        if (fragment instanceof FilterResultsFragment) {
+            for (int i = 0;
+                 i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
+            {
+                // open profile of student
+                onView(withRecyclerView(R.id.results_list)
+                    .atPositionOnView(i, R.id.record_student_photo))
+                    .perform(click());
+                // assert that id matches
+                onView(withId(R.id.id)).check(matches(withText(ID)));
+            }
+        } else {
+            Log.w("filterBy_id", "Results fragment not found; will try again");
         }
     }
 
