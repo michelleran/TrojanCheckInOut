@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -55,6 +56,7 @@ public class BuildingChanges extends Fragment {
     private String buildingName;
     private int buildingMaxCapacity;
     private String buildingQR;
+    private long lastDownload;
 //    private String mParam2;
 
     private EditText edtBCname;
@@ -166,7 +168,7 @@ public class BuildingChanges extends Fragment {
 
         BroadcastReceiver onDownloadComplete=new BroadcastReceiver() {
             public void onReceive(Context ctxt, Intent intent) {
-                Toast.makeText(getContext(), "Download Done", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctxt, "Download Finished", Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -182,10 +184,9 @@ public class BuildingChanges extends Fragment {
                         .setDescription("Downloading QR Code")
                         .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
                                 "qr_code_" + buildingName);
-                mgr.enqueue(req);
+                lastDownload = mgr.enqueue(req);
 
                 getContext().registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
 
             }
         });
@@ -197,6 +198,9 @@ public class BuildingChanges extends Fragment {
         imgBcQR.setVisibility(View.INVISIBLE);
         txtBcName.setVisibility(View.VISIBLE);
         edtBcMaxCap.setVisibility(View.VISIBLE);
+
+        btnBcConfirm.setText("Confirm");
+
 
         if (buildingName != null) {
             txtBcName.setText("Building: " + buildingName);
@@ -282,6 +286,9 @@ public class BuildingChanges extends Fragment {
         imgBcQR.setVisibility(View.INVISIBLE);
         edtBCname.setVisibility(View.VISIBLE);
         edtBcMaxCap.setVisibility(View.VISIBLE);
+
+        btnBcConfirm.setText("Confirm");
+
 
         edtBCname.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

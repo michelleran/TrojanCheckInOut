@@ -1,5 +1,9 @@
 package com.team10.trojancheckinout;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,8 +22,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.team10.trojancheckinout.model.Building;
+import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Listener;
 import com.team10.trojancheckinout.model.Manager;
 import com.team10.trojancheckinout.model.Server;
@@ -85,6 +91,7 @@ class BuildingAdapter
         public final TextView buildingCurrentCapacity;
         public final TextView buildingMaximumCapacity;
         public final TextView btnBuildingEdit;
+        public final TextView menuDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -93,6 +100,7 @@ class BuildingAdapter
             buildingCurrentCapacity = itemView.findViewById(R.id.txtBuildingCurrentCapacity);
             buildingMaximumCapacity = itemView.findViewById(R.id.txtBuildingMaximumCapacity);
             btnBuildingEdit = itemView.findViewById(R.id.btnBuildingEdit);
+            menuDelete = (TextView) itemView.findViewById(R.id.menuDelete);
         }
     }
 
@@ -202,6 +210,29 @@ class BuildingAdapter
                                 return true;
                             case R.id.menuDelete:
                                 Log.d(TAG, "onMenuItemClick: DELETE");
+                                new AlertDialog.Builder(holder.name.getContext())
+                                        .setTitle("Delete Building")
+                                        .setMessage("Are you sure you want to delete this building?\nNOTE: This action is permanent")
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                Server.removeBuilding(building.getId(), new Callback<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void result) {
+                                                        Log.d(TAG, "Successfully Removed Building!");
+                                                        Toast.makeText(holder.name.getContext(), "Building " + building.getName() + " Successfully Deleted", Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Exception exception) {
+                                                        Log.e(TAG, "Building Delete Error", exception);
+                                                        Toast.makeText(holder.name.getContext(), "Error: Unable to Delete Building", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.no, null)
+                                        .show();
                                 return true;
                             default:
                                 return false;
