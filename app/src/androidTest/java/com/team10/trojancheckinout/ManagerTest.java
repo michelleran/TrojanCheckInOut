@@ -28,12 +28,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Locale;
+
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.*;
 import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
 import static androidx.test.espresso.assertion.ViewAssertions.*;
 import static androidx.test.espresso.action.ViewActions.*;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
 
 import static org.hamcrest.Matchers.allOf;
@@ -44,6 +47,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static com.team10.trojancheckinout.RecyclerViewMatcher.*;
 import static com.team10.trojancheckinout.TestUtils.*;
 
+/** Must be logged in as a manager. */
 @RunWith(AndroidJUnit4.class)
 public class ManagerTest {
     private final int WAIT_DATA = 3000;
@@ -54,7 +58,7 @@ public class ManagerTest {
         new ActivityTestRule<>(ManagerActivity.class);
 
     @Test
-    public void listBuildings_openDetails() {
+    public void listBuildings_openDetails() { // TODO: only works when run alone?
         final String BUILDING = "Mudd Hall";
         // navigate to buildings tab
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
@@ -62,14 +66,23 @@ public class ManagerTest {
         onView(withId(R.id.building_list))
             .perform(RecyclerViewActions.actionOnItem(
                 hasDescendant(withText(BUILDING)), click()));
+
+        sleep(WAIT_UI);
+
         // check building name
         onView(withId(R.id.building_details_name))
-            .check(matches(withText(BUILDING)));
-
-        // TODO: assert that current capacity, max capacity match (how to get values?)
+            .check(matches(allOf(withText(BUILDING), isDisplayed())));
 
         RecyclerView list = activityRule.getActivity().findViewById(R.id.building_details_students);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+        int count = list.getAdapter().getItemCount();
+
+        // assert that current capacity = length of list
+        onView(withId(R.id.building_details_capacity))
+            .check(matches(
+                withText(startsWith(String.format(Locale.US, "Capacity: %d/", count)))
+            ));
+
+        for (int i = 0; i < count; i++) {
             // open profile of checked-in student
             onView(withRecyclerView(R.id.building_details_students)
                 .atPositionOnView(i, R.id.record_student_photo))
@@ -138,8 +151,6 @@ public class ManagerTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        //onView(withId(R.id.fragment_filter_results)).check(matches(isDisplayed()));
-
         Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
         if (fragment instanceof FilterResultsFragment) {
             for (int i = 0;
@@ -174,6 +185,7 @@ public class ManagerTest {
         sleep(WAIT_DATA);
 
         Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        // TODO: not sure why both blocks fire
         if (fragment instanceof FilterResultsFragment) {
             for (int i = 0;
                  i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
@@ -232,10 +244,47 @@ public class ManagerTest {
         }
     }
 
-    /*@Test
+    @Test
     public void filterBy_buildingMajor() {
-        // TODO
-    }*/
+        final String BUILDING = "Mudd Hall";
+        final String MAJOR = "CSCI";
+
+        // navigate to filter tab
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
+        sleep(WAIT_UI);
+
+        // input building name
+        onView(withId(R.id.filter_building_field)).perform(typeText(BUILDING));
+        onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
+
+        // select major
+        onView(withId(R.id.filter_major_spinner)).perform(click());
+        onData(allOf(is(instanceOf(String.class)), is(MAJOR))).perform(click());
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // wait for results to load
+        sleep(WAIT_DATA);
+
+        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        if (fragment instanceof FilterResultsFragment) {
+            for (int i = 0;
+                 i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
+            {
+                // assert that building name matches
+                onView(withRecyclerView(R.id.results_list)
+                    .atPositionOnView(i, R.id.record_building_name))
+                    .check(matches(withText(BUILDING)));
+                // open profile of student
+                onView(withRecyclerView(R.id.results_list)
+                    .atPositionOnView(i, R.id.record_student_photo))
+                    .perform(click());
+                // assert that major matches
+                onView(withId(R.id.major)).check(matches(withText(MAJOR)));
+            }
+        } else {
+            Log.w("filterBy_buildingMajor", "Results fragment not found; will try again");
+        }
+    }
 
     // TODO: Espresso can't test date/time picker?
 
