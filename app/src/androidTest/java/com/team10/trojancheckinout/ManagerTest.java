@@ -173,14 +173,20 @@ public class ManagerTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list); // TODO: ''
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
-            // open profile of student
-            onView(withRecyclerView(R.id.results_list)
-                .atPositionOnView(i, R.id.record_student_photo))
-                .perform(click());
-            // assert that major matches
-            onView(withId(R.id.major)).check(matches(withText(MAJOR)));
+        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        if (fragment instanceof FilterResultsFragment) {
+            for (int i = 0;
+                 i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
+            {
+                // open profile of student
+                onView(withRecyclerView(R.id.results_list)
+                    .atPositionOnView(i, R.id.record_student_photo))
+                    .perform(click());
+                // assert that major matches
+                onView(withId(R.id.major)).check(matches(withText(MAJOR)));
+            }
+        } else {
+            Log.w("filterBy_major", "Results fragment not found; will try again");
         }
     }
 
@@ -205,18 +211,24 @@ public class ManagerTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list); // TODO: ''
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
-            // assert that building name matches
-            onView(withRecyclerView(R.id.results_list)
-                .atPositionOnView(i, R.id.record_building_name))
-                .check(matches(withText(BUILDING)));
-            // open profile of student
-            onView(withRecyclerView(R.id.results_list)
-                .atPositionOnView(i, R.id.record_student_photo))
-                .perform(click());
-            // assert that id matches
-            onView(withId(R.id.id)).check(matches(withText(ID)));
+        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        if (fragment instanceof FilterResultsFragment) {
+            for (int i = 0;
+                 i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
+            {
+                // assert that building name matches
+                onView(withRecyclerView(R.id.results_list)
+                    .atPositionOnView(i, R.id.record_building_name))
+                    .check(matches(withText(BUILDING)));
+                // open profile of student
+                onView(withRecyclerView(R.id.results_list)
+                    .atPositionOnView(i, R.id.record_student_photo))
+                    .perform(click());
+                // assert that id matches
+                onView(withId(R.id.id)).check(matches(withText(ID)));
+            }
+        } else {
+            Log.w("filterBy_buildingId", "Results fragment not found; will try again");
         }
     }
 
