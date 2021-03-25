@@ -307,12 +307,55 @@ public class FilterTest {
         }
     }
 
-    /*@Test
+    @Test
     public void filterBy_startEndDate() {
+        // navigate to filter tab
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
+        sleep(WAIT_UI);
 
+        // select start date field
+        onView(withId(R.id.start_date)).perform(click());
+
+        // select March 20, 2021 09:00 PDT
+        Calendar cal = new Calendar.Builder()
+            .setDate(2021, 3, 20)
+            .setTimeOfDay(9, 0, 0)
+            .setTimeZone(TimeZone.getTimeZone(Record.pst))
+            .build();
+        long startEpochTime = cal.toInstant().getEpochSecond();
+        selectDateTime(cal);
+
+        // select end date field
+        onView(withId(R.id.end_date)).perform(click());
+
+        // select March 24, 2021 09:00 PDT
+        cal = new Calendar.Builder()
+            .setDate(2021, 3, 24)
+            .setTimeOfDay(9, 0, 0)
+            .setTimeZone(TimeZone.getTimeZone(Record.pst))
+            .build();
+        long endEpochTime = cal.toInstant().getEpochSecond();
+        selectDateTime(cal);
+
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // wait for results to load
+        sleep(WAIT_DATA);
+
+        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        if (fragment instanceof FilterResultsFragment) {
+            RecordAdapter adapter = (RecordAdapter) ((FilterResultsFragment)fragment).resultsList.getAdapter();
+            for (int i = 0; i < adapter.getItemCount(); i++) {
+                // assert that time is between start and end date
+                long time = adapter.getEpochTimeOfRecord(i);
+                assert startEpochTime <= time && time <= endEpochTime;
+            }
+        } else {
+            Log.w("filterBy_startEndDate", "Results fragment not found; will try again");
+        }
     }
 
-    @Test
+    /*@Test
     public void filterBy_startDateAfterEndDate() {
 
     }*/
