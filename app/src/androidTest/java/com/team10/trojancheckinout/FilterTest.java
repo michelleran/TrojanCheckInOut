@@ -245,7 +245,7 @@ public class FilterTest {
         onView(withId(R.id.start_date)).perform(click());
 
         Calendar cal = new Calendar.Builder()
-            .setDate(2021, Calendar.MARCH, 22)
+            .setDate(2021, 3, 22)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
@@ -286,7 +286,51 @@ public class FilterTest {
 
     @Test
     public void filterBy_endDate() {
+        // navigate to filter tab
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
+        sleep(WAIT_UI);
 
+        // select end date field
+        onView(withId(R.id.end_date)).perform(click());
+
+        Calendar cal = new Calendar.Builder()
+            .setDate(2021, 3, 22)
+            .setTimeOfDay(9, 0, 0)
+            .setTimeZone(TimeZone.getTimeZone(Record.pst))
+            .build();
+        long endEpochTime = cal.toInstant().getEpochSecond();
+
+        // select March 22, 2021
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
+            .perform(PickerActions.setDate(
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)));
+        onView(withId(android.R.id.button1)).perform(click());
+
+        // select 09:00 PDT
+        onView(withClassName(Matchers.equalTo(TimePicker.class.getName())))
+            .perform(PickerActions.setTime(
+                cal.get(Calendar.HOUR_OF_DAY),
+                cal.get(Calendar.MINUTE)));
+        onView(withId(android.R.id.button1)).perform(click());
+
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // wait for results to load
+        sleep(WAIT_DATA);
+
+        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        if (fragment instanceof FilterResultsFragment) {
+            RecordAdapter adapter = (RecordAdapter) ((FilterResultsFragment)fragment).resultsList.getAdapter();
+            for (int i = 0; i < adapter.getItemCount(); i++) {
+                // assert that time is before or at end date
+                long time = adapter.getEpochTimeOfRecord(i);
+                assert time <= endEpochTime;
+            }
+        } else {
+            Log.w("filterBy_endDate", "Results fragment not found; will try again");
+        }
     }
 
     @Test
