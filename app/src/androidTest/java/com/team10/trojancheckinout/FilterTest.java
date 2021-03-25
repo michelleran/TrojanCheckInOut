@@ -244,6 +244,7 @@ public class FilterTest {
         // select start date field
         onView(withId(R.id.start_date)).perform(click());
 
+        // select March 22, 2021 09:00 PDT
         Calendar cal = new Calendar.Builder()
             .setDate(2021, 3, 22)
             .setTimeOfDay(9, 0, 0)
@@ -251,21 +252,7 @@ public class FilterTest {
             .build();
         long startEpochTime = cal.toInstant().getEpochSecond();
 
-        // select March 22, 2021
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
-            .perform(PickerActions.setDate(
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH)));
-        onView(withId(android.R.id.button1)).perform(click());
-
-        // select 09:00 PDT
-        onView(withClassName(Matchers.equalTo(TimePicker.class.getName())))
-            .perform(PickerActions.setTime(
-                cal.get(Calendar.HOUR_OF_DAY),
-                cal.get(Calendar.MINUTE)));
-        onView(withId(android.R.id.button1)).perform(click());
-
+        selectDateTime(cal);
         onView(withId(R.id.filter_button)).perform(click());
 
         // wait for results to load
@@ -293,6 +280,7 @@ public class FilterTest {
         // select end date field
         onView(withId(R.id.end_date)).perform(click());
 
+        // select March 22, 2021 09:00 PDT
         Calendar cal = new Calendar.Builder()
             .setDate(2021, 3, 22)
             .setTimeOfDay(9, 0, 0)
@@ -300,21 +288,7 @@ public class FilterTest {
             .build();
         long endEpochTime = cal.toInstant().getEpochSecond();
 
-        // select March 22, 2021
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
-            .perform(PickerActions.setDate(
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH)));
-        onView(withId(android.R.id.button1)).perform(click());
-
-        // select 09:00 PDT
-        onView(withClassName(Matchers.equalTo(TimePicker.class.getName())))
-            .perform(PickerActions.setTime(
-                cal.get(Calendar.HOUR_OF_DAY),
-                cal.get(Calendar.MINUTE)));
-        onView(withId(android.R.id.button1)).perform(click());
-
+        selectDateTime(cal);
         onView(withId(R.id.filter_button)).perform(click());
 
         // wait for results to load
@@ -333,7 +307,7 @@ public class FilterTest {
         }
     }
 
-    @Test
+    /*@Test
     public void filterBy_startEndDate() {
 
     }
@@ -341,5 +315,24 @@ public class FilterTest {
     @Test
     public void filterBy_startDateAfterEndDate() {
 
+    }*/
+
+    private void selectDateTime(Calendar cal) {
+        // select date
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
+            .perform(PickerActions.setDate(
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)));
+        // select ok
+        onView(withId(android.R.id.button1)).perform(click());
+
+        // select time
+        onView(withClassName(Matchers.equalTo(TimePicker.class.getName())))
+            .perform(PickerActions.setTime(
+                cal.get(Calendar.HOUR_OF_DAY),
+                cal.get(Calendar.MINUTE)));
+        // select ok
+        onView(withId(android.R.id.button1)).perform(click());
     }
 }
