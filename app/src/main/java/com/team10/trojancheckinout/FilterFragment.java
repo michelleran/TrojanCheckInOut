@@ -122,6 +122,8 @@ public class FilterFragment extends Fragment {
                 major = spinner.getSelectedItem().toString();
             }
 
+            // TODO: validate start/end date
+
             // open filter results (replace this fragment)
             final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
             ft.replace(R.id.filter_tab_content,

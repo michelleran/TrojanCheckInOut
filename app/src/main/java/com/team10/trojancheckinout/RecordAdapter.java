@@ -117,4 +117,9 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     @Override
     public int getItemCount() { return records.size(); }
+
+    @VisibleForTesting
+    long getEpochTimeOfRecord(int position) {
+        return records.get(position).getEpochTime();
+    }
 }
