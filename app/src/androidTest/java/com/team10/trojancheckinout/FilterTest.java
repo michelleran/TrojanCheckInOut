@@ -13,6 +13,7 @@ import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
+import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,9 +37,6 @@ import static com.team10.trojancheckinout.TestUtils.*;
 /** Must be logged in as a manager. */
 @RunWith(AndroidJUnit4.class)
 public class FilterTest {
-    private final int WAIT_DATA = 3000;
-    private final int WAIT_UI = 1000;
-
     @Rule
     public ActivityTestRule<ManagerActivity> activityRule =
         new ActivityTestRule<>(ManagerActivity.class);
@@ -253,14 +251,21 @@ public class FilterTest {
             .build();
         long startEpochTime = cal.toInstant().getEpochSecond();
 
-        // select March 22, 2021 09:00 PDT
-        onView(isAssignableFrom(DatePicker.class))
+        // select March 22, 2021
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
             .perform(PickerActions.setDate(
                 cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH),
                 cal.get(Calendar.DAY_OF_MONTH)));
-        onView(isAssignableFrom(TimePicker.class))
-            .perform(PickerActions.setTime(cal.get(Calendar.HOUR_OF_DAY), Calendar.MINUTE));
+        onView(withId(android.R.id.button1)).perform(click());
+
+        // select 09:00 PDT
+        onView(withClassName(Matchers.equalTo(TimePicker.class.getName())))
+            .perform(PickerActions.setTime(
+                cal.get(Calendar.HOUR_OF_DAY),
+                cal.get(Calendar.MINUTE)));
+        onView(withId(android.R.id.button1)).perform(click());
+
         onView(withId(R.id.filter_button)).perform(click());
 
         // wait for results to load
