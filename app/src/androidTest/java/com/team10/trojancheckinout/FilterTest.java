@@ -355,10 +355,43 @@ public class FilterTest {
         }
     }
 
-    /*@Test
+    @Test
     public void filterBy_startDateAfterEndDate() {
+        // navigate to filter tab
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
+        sleep(WAIT_UI);
 
-    }*/
+        // select start date field
+        onView(withId(R.id.start_date)).perform(click());
+
+        // select March 24, 2021 09:00 PDT
+        Calendar cal = new Calendar.Builder()
+            .setDate(2021, 3, 24)
+            .setTimeOfDay(9, 0, 0)
+            .setTimeZone(TimeZone.getTimeZone(Record.pst))
+            .build();
+        long startEpochTime = cal.toInstant().getEpochSecond();
+        selectDateTime(cal);
+
+        // select end date field
+        onView(withId(R.id.end_date)).perform(click());
+
+        // select March 20, 2021 09:00 PDT
+        cal = new Calendar.Builder()
+            .setDate(2021, 3, 20)
+            .setTimeOfDay(9, 0, 0)
+            .setTimeZone(TimeZone.getTimeZone(Record.pst))
+            .build();
+        long endEpochTime = cal.toInstant().getEpochSecond();
+        selectDateTime(cal);
+
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // assert that toast was shown
+        onView(withText(R.string.filter_invalid_dates))
+            .inRoot(withDecorView(not(is(activityRule.getActivity().getWindow().getDecorView()))))
+            .check(matches(isDisplayed()));
+    }
 
     private void selectDateTime(Calendar cal) {
         // select date

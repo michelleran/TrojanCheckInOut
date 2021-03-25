@@ -116,13 +116,24 @@ public class FilterFragment extends Fragment {
                 Toast.makeText(getContext(), R.string.filter_invalid_usc_id, Toast.LENGTH_LONG).show();
                 return;
             }
+
+            // validate that start <= end date
+            if (startYear != -1 && endYear != -1 &&
+                (startYear > endYear ||
+                (startYear == endYear && startMonth > endMonth) ||
+                (startYear == endYear && startMonth == endMonth && startDay > endDay) ||
+                (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour > endHour) ||
+                (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour == endHour && startMin > endMin)))
+            {
+                Toast.makeText(getContext(), R.string.filter_invalid_dates, Toast.LENGTH_LONG).show();
+                return;
+            }
+
             if (spinner.getSelectedItemPosition() == 0) {
                 major = "";
             } else {
                 major = spinner.getSelectedItem().toString();
             }
-
-            // TODO: validate start/end date
 
             // open filter results (replace this fragment)
             final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
