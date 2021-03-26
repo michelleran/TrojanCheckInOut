@@ -1,10 +1,14 @@
 package com.team10.trojancheckinout;
 
 import android.view.View;
+
+import com.google.android.material.tabs.TabLayout;
+
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.PerformException;
 import androidx.test.espresso.UiController;
@@ -12,9 +16,12 @@ import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.espresso.util.HumanReadables;
 
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static org.hamcrest.Matchers.allOf;
+
 /**
- * Created by dannyroa on 5/9/15.
- * https://github.com/dannyroa/espresso-samples
+ * Modified from https://github.com/dannyroa/espresso-samples
  */
 public class TestUtils {
 
@@ -108,4 +115,41 @@ public class TestUtils {
         return new RecyclerViewMatcher(recyclerViewId);
     }
 
+    public static final int WAIT_DATA = 3000;
+    public static final int WAIT_UI = 1000;
+
+    public static void sleep(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @NonNull
+    public static ViewAction selectTabAtPosition(final int position) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return allOf(isDisplayed(), isAssignableFrom(TabLayout.class));
+            }
+
+            @Override
+            public String getDescription() {
+                return "with tab at index" + String.valueOf(position);
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                if (view instanceof TabLayout) {
+                    TabLayout tabLayout = (TabLayout) view;
+                    TabLayout.Tab tab = tabLayout.getTabAt(position);
+
+                    if (tab != null) {
+                        tab.select();
+                    }
+                }
+            }
+        };
+    }
 }
