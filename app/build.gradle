@@ -58,7 +58,9 @@ dependencies {
 
     implementation 'com.opencsv:opencsv:5.3'
 
+
     testImplementation 'junit:junit:4.+'
+    testImplementation group: 'com.tngtech.junit.dataprovider', name: 'junit4-dataprovider', version: '2.6'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'

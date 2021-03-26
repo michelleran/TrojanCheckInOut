@@ -1,51 +1,44 @@
 package com.team10.trojancheckinout;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.View;
-
-import com.google.android.material.tabs.TabLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
-import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
-import org.hamcrest.Description;
+import com.google.android.material.tabs.TabLayout;
+
 import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.jetbrains.annotations.TestOnly;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Locale;
 
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
-import static androidx.test.espresso.Espresso.*;
+import static androidx.test.espresso.Espresso.onData;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
-import static androidx.test.espresso.matcher.ViewMatchers.*;
-import static androidx.test.espresso.assertion.ViewAssertions.*;
-import static androidx.test.espresso.action.ViewActions.*;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.*;
-
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static com.team10.trojancheckinout.TestUtils.withRecyclerView;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.instanceOf;
-
-import static com.team10.trojancheckinout.RecyclerViewMatcher.*;
-import static com.team10.trojancheckinout.TestUtils.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 
 /** Must be logged in as a manager. */
 @RunWith(AndroidJUnit4.class)
