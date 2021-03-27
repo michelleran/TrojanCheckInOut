@@ -12,6 +12,7 @@ import com.team10.trojancheckinout.model.Server;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,6 +51,9 @@ public class FilterResultsFragment extends Fragment {
     private String buildingName;
     private String studentId;
     private String major;
+
+    @VisibleForTesting
+    RecyclerView resultsList;
 
     private RecordAdapter adapter;
 
@@ -115,7 +119,7 @@ public class FilterResultsFragment extends Fragment {
             R.layout.fragment_filter_results, container, false);
 
         // set up RecyclerView
-        RecyclerView resultsList = rootView.findViewById(R.id.results_list);
+        resultsList = rootView.findViewById(R.id.results_list);
 
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);

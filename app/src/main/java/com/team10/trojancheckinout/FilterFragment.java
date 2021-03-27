@@ -113,9 +113,22 @@ public class FilterFragment extends Fragment {
             studentId = studentIdField.getText().toString().trim();
             if (!studentId.isEmpty() && !Validator.validateID(studentId)) {
                 // invalid student id
-                Toast.makeText(getContext(), "Please enter a valid USC id or leave the field blank", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.filter_invalid_usc_id, Toast.LENGTH_LONG).show();
                 return;
             }
+
+            // validate that start <= end date
+            if (startYear != -1 && endYear != -1 &&
+                (startYear > endYear ||
+                (startYear == endYear && startMonth > endMonth) ||
+                (startYear == endYear && startMonth == endMonth && startDay > endDay) ||
+                (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour > endHour) ||
+                (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour == endHour && startMin > endMin)))
+            {
+                Toast.makeText(getContext(), R.string.filter_invalid_dates, Toast.LENGTH_LONG).show();
+                return;
+            }
+
             if (spinner.getSelectedItemPosition() == 0) {
                 major = "";
             } else {
@@ -123,7 +136,7 @@ public class FilterFragment extends Fragment {
             }
 
             // open filter results (replace this fragment)
-            final FragmentTransaction ft = getFragmentManager().beginTransaction();
+            final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
             ft.replace(R.id.filter_tab_content,
                 FilterResultsFragment.newInstance(
                     startYear, startMonth, startDay, startHour, startMin,
