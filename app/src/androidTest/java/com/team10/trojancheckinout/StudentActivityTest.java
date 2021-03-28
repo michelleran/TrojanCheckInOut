@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
@@ -41,8 +42,14 @@ import static com.team10.trojancheckinout.TestUtils.WAIT_LONG_OP;
 import static com.team10.trojancheckinout.TestUtils.WAIT_UI;
 import static com.team10.trojancheckinout.TestUtils.getCurrentActivity;
 import static com.team10.trojancheckinout.TestUtils.sleep;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 
 public class StudentActivityTest {
+    private final String EMAIL = "student@usc.edu";
+    private final String PASSWORD = "12345678";
+
     @Rule
     public ActivityScenarioRule<LoginActivity> activityRule =
         new ActivityScenarioRule<>(LoginActivity.class);
@@ -50,8 +57,8 @@ public class StudentActivityTest {
     @Before
     public void login() {
         // login
-        onView(withId(R.id.etEmail)).perform(typeText("student@usc.edu"));
-        onView(withId(R.id.etPassword)).perform(typeText("12345678"));
+        onView(withId(R.id.etEmail)).perform(typeText(EMAIL));
+        onView(withId(R.id.etPassword)).perform(typeText(PASSWORD));
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.btnLogin)).perform(click());
         sleep(WAIT_DATA);
@@ -133,9 +140,8 @@ public class StudentActivityTest {
         onView(withText(R.string.cancel)).perform(click());
     }
 
-    // TODO: how to make this separate from everything else? or register as a part of it...?
-    /*@Test
-    public void deleteAccount_confirmPopUp() {
+    @Test
+    public void deleteAccount_confirmPopUp_reregister() {
         sleep(WAIT_UI);
         onView(withId(R.id.floatingActionButton2)).perform(click());
         sleep(WAIT_UI);
@@ -144,7 +150,35 @@ public class StudentActivityTest {
         //confirm delete
         onView(withText(R.string.confirm)).perform(click());
         sleep(WAIT_UI);
-        //check if returned to start page
-        onView(withId(R.id.studentRegisterBtn)).check(matches(isDisplayed()));
-    }*/
+
+        // re-register
+        onView(withId(R.id.studentRegisterBtn)).perform(click());
+        onView(withId(R.id.etSFname)).perform(typeText("Student"));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etSLname)).perform(typeText("Testing"));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etSEmail)).perform(typeText(EMAIL));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etSPassword)).perform(typeText(PASSWORD));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etUSCid)).perform(typeText("6998590265"));
+        Espresso.closeSoftKeyboard();
+
+        // select major
+        onView(withId(R.id.sMajors)).perform(click());
+        onData(allOf(is(instanceOf(String.class)), is("CSCI"))).perform(click());
+
+        // add photo
+        Matcher<Intent> expectedIntent = IntentMatchers.hasAction(Intent.ACTION_GET_CONTENT);
+        Intents.init();
+        Intents.intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, getGalleryIntent()));
+        sleep(WAIT_UI);
+        onView(withId(R.id.sAddPhoto)).perform(click());
+        sleep(WAIT_UI);
+        Intents.intended(expectedIntent);
+        Intents.release();
+
+        onView(withId(R.id.sRegBtn)).perform(click());
+        sleep(WAIT_LONG_OP);
+    }
 }
