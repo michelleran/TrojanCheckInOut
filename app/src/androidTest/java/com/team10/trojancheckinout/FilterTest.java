@@ -393,13 +393,4 @@ public class FilterTest {
         // select ok
         onView(withId(android.R.id.button1)).perform(click());
     }
-
-    private AppCompatActivity getCurrentActivity() {
-        final AppCompatActivity[] activity = new AppCompatActivity[1];
-        onView(isRoot()).check((view, noViewFoundException) -> {
-            //activity[0] = (AppCompatActivity) view.getContext();
-            activity[0] = (AppCompatActivity) view.findViewById(android.R.id.content).getContext();
-        });
-        return activity[0];
-    }
 }
