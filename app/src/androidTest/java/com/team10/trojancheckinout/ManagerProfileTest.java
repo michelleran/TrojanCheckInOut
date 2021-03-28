@@ -24,6 +24,7 @@ import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.espresso.intent.Intents;
+import androidx.test.espresso.intent.matcher.IntentMatchers;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -34,11 +35,14 @@ import androidx.test.espresso.intent.rule.IntentsTestRule;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.hamcrest.core.AllOf;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -63,6 +67,7 @@ import static org.hamcrest.core.StringContains.containsString;
 
 import static com.team10.trojancheckinout.TestUtils.*;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4.class)
 public class ManagerProfileTest {
 
@@ -72,10 +77,6 @@ public class ManagerProfileTest {
     public final String userSurname = "Manager1";
     public final String userEmail = "tester1@usc.edu";
     public final String userPassword = "password";
-
-    @Rule
-    public IntentsTestRule intentsTestRule = new IntentsTestRule(ManagerActivity.class);
-
 
     @Before
     public void setUp() {
@@ -110,30 +111,29 @@ public class ManagerProfileTest {
     @Test
     public void test_validateGalleryIntent() {
 
-        Matcher<Intent> expectedIntent = allOf(hasAction(Intent.ACTION_PICK));
-        Intents.release();
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
+        sleep(WAIT_UI);
+
+
+        Matcher<Intent> expectedIntent = AllOf.allOf(IntentMatchers.hasAction(Intent.ACTION_PICK),
+                IntentMatchers.hasData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
         Intents.init();
-
-        Intents.intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, createGallery()));
-
-        sleep(WAIT_DATA);
-
+        Intents.intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, getGalleryIntent()));
+        sleep(WAIT_UI);
+        onView(withId(R.id.btnChangePicture)).perform(click());
+        sleep(WAIT_UI);
         Intents.intended(expectedIntent);
         Intents.release();
-
     }
 
-    public Intent createGallery() {
-
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setData(Uri.parse("content://com.android.providers.media.documents/document/image%3A31"));
-
+    private Intent getGalleryIntent() {
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setData(Uri.parse("android.resource://com.team10.trojancheckinout/" + R.drawable.default_profile_picture));
         return intent;
-
     }
 
 
-    //Check if we can click the logout button and then get routed back to the start page
+//    Check if we can click the logout button and then get routed back to the start page
     @After
     public void logout() {
         onView(withId(R.id.btnLogout)).perform(click());
