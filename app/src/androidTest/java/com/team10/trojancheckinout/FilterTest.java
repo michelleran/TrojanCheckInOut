@@ -11,10 +11,12 @@ import com.team10.trojancheckinout.model.Record;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.PickerActions;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
@@ -42,7 +44,6 @@ import static org.hamcrest.Matchers.instanceOf;
 
 import static com.team10.trojancheckinout.TestUtils.*;
 
-/** Must be logged in as a manager. */
 @RunWith(AndroidJUnit4.class)
 public class FilterTest {
     @Rule
@@ -50,7 +51,7 @@ public class FilterTest {
         new ActivityScenarioRule<LoginActivity>(LoginActivity.class);
 
     @Before
-    public void login_NavigateToFilterTab() {
+    public void login_navigateToFilterTab() {
         // login
         onView(withId(R.id.etEmail)).perform(typeText("ranmiche@usc.edu"));
         onView(withId(R.id.etPassword)).perform(typeText("12345678"));
@@ -117,20 +118,18 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
-        if (fragment instanceof FilterResultsFragment) {
-            for (int i = 0;
-                 i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
-            {
-                // open profile of student
-                onView(withRecyclerView(R.id.results_list)
-                    .atPositionOnView(i, R.id.record_student_photo))
-                    .perform(click());
-                // assert that id matches
-                onView(withId(R.id.id)).check(matches(withText(ID)));
-            }
-        } else {
-            Log.w("filterBy_id", "Results fragment not found; will try again");
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // scroll to student
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            // open profile
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert that id matches
+            onView(withId(R.id.id)).check(matches(withText(ID)));
+            Espresso.pressBack();
         }
     }
 
@@ -145,21 +144,18 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
-        // TODO: not sure why both blocks fire
-        if (fragment instanceof FilterResultsFragment) {
-            for (int i = 0;
-                 i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
-            {
-                // open profile of student
-                onView(withRecyclerView(R.id.results_list)
-                    .atPositionOnView(i, R.id.record_student_photo))
-                    .perform(click());
-                // assert that major matches
-                onView(withId(R.id.major)).check(matches(withText(MAJOR)));
-            }
-        } else {
-            Log.w("filterBy_major", "Results fragment not found; will try again");
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // scroll to student
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            // open profile
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert that major matches
+            onView(withId(R.id.major)).check(matches(withText(MAJOR)));
+            Espresso.pressBack();
         }
     }
 
@@ -179,24 +175,22 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
-        if (fragment instanceof FilterResultsFragment) {
-            for (int i = 0;
-                 i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
-            {
-                // assert that building name matches
-                onView(withRecyclerView(R.id.results_list)
-                    .atPositionOnView(i, R.id.record_building_name))
-                    .check(matches(withText(BUILDING)));
-                // open profile of student
-                onView(withRecyclerView(R.id.results_list)
-                    .atPositionOnView(i, R.id.record_student_photo))
-                    .perform(click());
-                // assert that id matches
-                onView(withId(R.id.id)).check(matches(withText(ID)));
-            }
-        } else {
-            Log.w("filterBy_buildingId", "Results fragment not found; will try again");
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // assert that building name matches
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_building_name))
+                .check(matches(withText(BUILDING)));
+            // scroll to student
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            // open profile
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert that id matches
+            onView(withId(R.id.id)).check(matches(withText(ID)));
+            Espresso.pressBack();
         }
     }
 
@@ -216,24 +210,22 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
-        if (fragment instanceof FilterResultsFragment) {
-            for (int i = 0;
-                 i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
-            {
-                // assert that building name matches
-                onView(withRecyclerView(R.id.results_list)
-                    .atPositionOnView(i, R.id.record_building_name))
-                    .check(matches(withText(BUILDING)));
-                // open profile of student
-                onView(withRecyclerView(R.id.results_list)
-                    .atPositionOnView(i, R.id.record_student_photo))
-                    .perform(click());
-                // assert that major matches
-                onView(withId(R.id.major)).check(matches(withText(MAJOR)));
-            }
-        } else {
-            Log.w("filterBy_buildingMajor", "Results fragment not found; will try again");
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // assert that building name matches
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_building_name))
+                .check(matches(withText(BUILDING)));
+            // scroll to student
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            // open profile
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert that major matches
+            onView(withId(R.id.major)).check(matches(withText(MAJOR)));
+            Espresso.pressBack();
         }
     }
 
@@ -256,16 +248,12 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
-        if (fragment instanceof FilterResultsFragment) {
-            RecordAdapter adapter = (RecordAdapter) ((FilterResultsFragment)fragment).resultsList.getAdapter();
-            for (int i = 0; i < adapter.getItemCount(); i++) {
-                // assert that time is at or after start date
-                long time = adapter.getEpochTimeOfRecord(i);
-                assert time >= startEpochTime;
-            }
-        } else {
-            Log.w("filterBy_startDate", "Results fragment not found; will try again");
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        RecordAdapter adapter = (RecordAdapter) list.getAdapter();
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            // assert that time is at or after start date
+            long time = adapter.getEpochTimeOfRecord(i);
+            assert time >= startEpochTime;
         }
     }
 
@@ -288,16 +276,12 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
-        if (fragment instanceof FilterResultsFragment) {
-            RecordAdapter adapter = (RecordAdapter) ((FilterResultsFragment)fragment).resultsList.getAdapter();
-            for (int i = 0; i < adapter.getItemCount(); i++) {
-                // assert that time is before or at end date
-                long time = adapter.getEpochTimeOfRecord(i);
-                assert time <= endEpochTime;
-            }
-        } else {
-            Log.w("filterBy_endDate", "Results fragment not found; will try again");
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        RecordAdapter adapter = (RecordAdapter) list.getAdapter();
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            // assert that time is before or at end date
+            long time = adapter.getEpochTimeOfRecord(i);
+            assert time <= endEpochTime;
         }
     }
 
@@ -332,16 +316,12 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
-        if (fragment instanceof FilterResultsFragment) {
-            RecordAdapter adapter = (RecordAdapter) ((FilterResultsFragment)fragment).resultsList.getAdapter();
-            for (int i = 0; i < adapter.getItemCount(); i++) {
-                // assert that time is between start and end date
-                long time = adapter.getEpochTimeOfRecord(i);
-                assert startEpochTime <= time && time <= endEpochTime;
-            }
-        } else {
-            Log.w("filterBy_startEndDate", "Results fragment not found; will try again");
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        RecordAdapter adapter = (RecordAdapter) list.getAdapter();
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            // assert that time is between start and end date
+            long time = adapter.getEpochTimeOfRecord(i);
+            assert startEpochTime <= time && time <= endEpochTime;
         }
     }
 
