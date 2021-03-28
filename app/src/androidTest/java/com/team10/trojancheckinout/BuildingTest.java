@@ -84,6 +84,7 @@ public class BuildingTest {
    // Check if the building fragments are being displayed
     @Test
     public void verifyView() {
+        onView(withId(R.id.building_tab_content)).check(matches(isDisplayed()));
         onView(withId(R.id.building_list)).check(matches(isDisplayed()));
         onView(withId(R.id.btnAddBuilding)).check(matches(isDisplayed()));
         sleep(WAIT_UI);
@@ -154,6 +155,23 @@ public class BuildingTest {
         onView(withId(R.id.edtBcMaxCap)).check(matches(withHint("Maximum Capacity")));
         onView(withId(R.id.btnBcCancel)).check(matches(withText("Cancel")));
         onView(withId(R.id.btnBcConfirm)).check(matches(withText("Confirm")));
+    }
+
+    @Test
+    public void verifyCancelFunctionality() {
+        sleep(WAIT_UI);
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
+
+        onView(withId(R.id.btnAddBuilding)).perform(click());
+        sleep(WAIT_UI);
+
+        onView(withId(R.id.btnBcCancel)).perform(click());
+        sleep(WAIT_UI);
+
+        // Check if we have come back to original screen
+        onView(withId(R.id.building_tab_content)).check(matches(isDisplayed()));
+        onView(withId(R.id.building_list)).check(matches(isDisplayed()));
+        onView(withId(R.id.btnAddBuilding)).check(matches(isDisplayed()));
     }
 
 
