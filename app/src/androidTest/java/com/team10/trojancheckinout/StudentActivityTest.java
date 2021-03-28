@@ -10,6 +10,7 @@ import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.intent.matcher.IntentMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 
 import org.hamcrest.Matcher;
@@ -22,6 +23,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -33,13 +35,14 @@ import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+
 import static com.team10.trojancheckinout.TestUtils.WAIT_DATA;
+import static com.team10.trojancheckinout.TestUtils.WAIT_LONG_OP;
 import static com.team10.trojancheckinout.TestUtils.WAIT_UI;
+import static com.team10.trojancheckinout.TestUtils.getCurrentActivity;
 import static com.team10.trojancheckinout.TestUtils.sleep;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StudentActivityTest {
-
     @Rule
     public ActivityScenarioRule<LoginActivity> activityRule =
         new ActivityScenarioRule<>(LoginActivity.class);
@@ -60,7 +63,7 @@ public class StudentActivityTest {
     }
 
     @Test
-    public void t1_OpenStudentHistory() {
+    public void openStudentHistory() {
         Intents.init();
         sleep(WAIT_UI);
         onView(withId(R.id.viewHistorybtn)).perform(click());
@@ -73,7 +76,7 @@ public class StudentActivityTest {
     }
 
     @Test
-    public void t2_EditProfileImage() {
+    public void editProfileImage() {
         Matcher<Intent> expectedIntent = AllOf.allOf(IntentMatchers.hasAction(Intent.ACTION_PICK),
                 IntentMatchers.hasData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
         Intents.init();
@@ -83,6 +86,8 @@ public class StudentActivityTest {
         sleep(WAIT_UI);
         Intents.intended(expectedIntent);
         Intents.release();
+        // wait for upload to complete
+        sleep(WAIT_LONG_OP);
     }
 
     private Intent getGalleryIntent() {
@@ -92,16 +97,34 @@ public class StudentActivityTest {
     }
 
     @Test
-    public void t3_CheckOut() {
-        sleep(WAIT_UI);
-        onView(withId(R.id.checkOutbtn)).perform(click());
-        sleep(WAIT_UI);
+    public void mockScanQR_checkInThenOut() {
+        final String BUILDING = "yiFJ8xf2VT4ge6aWXxCJ";
+        StudentActivity activity = (StudentActivity) getCurrentActivity();
+        // mock scan to check in
+        activity.didScanQR(BUILDING);
+        sleep(WAIT_LONG_OP);
+        onView(withId(R.id.currentBuilding)).check(matches(withText("Mudd Hall")));
+        // mock scan to check out
+        activity.didScanQR(BUILDING);
+        sleep(WAIT_LONG_OP);
         onView(withId(R.id.currentBuilding)).check(matches(withText(R.string.none)));
     }
 
     @Test
-    public void t4_CancelDeleteAccountPopUp(){
-        sleep(3000);
+    public void mockScanQR_checkIn_checkOutViaButton() {
+        StudentActivity activity = (StudentActivity) getCurrentActivity();
+        // mock scan to check in
+        activity.didScanQR("yiFJ8xf2VT4ge6aWXxCJ");
+        sleep(WAIT_LONG_OP);
+        onView(withId(R.id.currentBuilding)).check(matches(withText("Mudd Hall")));
+        // check out via button
+        onView(withId(R.id.checkOutbtn)).perform(click());
+        sleep(WAIT_LONG_OP);
+        onView(withId(R.id.currentBuilding)).check(matches(withText(R.string.none)));
+    }
+
+    @Test
+    public void deleteAccount_cancelPopUp(){
         onView(withId(R.id.floatingActionButton2)).perform(click());
         sleep(WAIT_UI);
         onView(withText(R.string.delete_dialog_message)).check(matches(isDisplayed()));
@@ -110,8 +133,9 @@ public class StudentActivityTest {
         onView(withText(R.string.cancel)).perform(click());
     }
 
-    @Ignore("Execute this test individually due to its destructive nature. Log in as a student beforehand.")
-    public void t5_ConfirmDeleteAccountPopUp(){
+    // TODO: how to make this separate from everything else? or register as a part of it...?
+    /*@Test
+    public void deleteAccount_confirmPopUp() {
         sleep(WAIT_UI);
         onView(withId(R.id.floatingActionButton2)).perform(click());
         sleep(WAIT_UI);
@@ -122,5 +146,5 @@ public class StudentActivityTest {
         sleep(WAIT_UI);
         //check if returned to start page
         onView(withId(R.id.studentRegisterBtn)).check(matches(isDisplayed()));
-    }
+    }*/
 }
