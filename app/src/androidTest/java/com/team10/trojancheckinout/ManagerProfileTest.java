@@ -10,7 +10,9 @@ import com.team10.trojancheckinout.model.Server;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.Espresso;
+import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -46,31 +48,44 @@ public class ManagerProfileTest {
 
     private String TAG = "ManagerProfileTest";
 
-    @Rule
-    public ActivityTestRule<ManagerActivity> activityRule =
-            new ActivityTestRule<>(ManagerActivity.class);
+    public final String userGivenName = "Tester1";
+    public final String userSurname = "Manager1";
+    public final String userEmail = "tester1@usc.edu";
+    public final String userPassword = "password";
 
     @Before
     public void setUp() {
+        ActivityScenario activityScenario = ActivityScenario.launch(StartPage.class);
+        onView(withId(R.id.startLoginbtn)).perform(click());
+
+        sleep(WAIT_UI);
+
+        onView(withId(R.id.etEmail)).perform(typeText(userEmail));
+        onView(withId(R.id.etPassword)).perform(typeText(userPassword));
+        onView(withId(R.id.btnLogin)).perform(click());
+
+        sleep(WAIT_UI);
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
         sleep(WAIT_UI);
+
     }
 
     @Test
     public void checkProfileInformation() {
-        onView(withId(R.id.txtGivenName)).check(matches(isDisplayed()));
-        onView(withId(R.id.txtSurname)).check(matches(isDisplayed()));
-        onView(withId(R.id.txtEmail)).check(matches(isDisplayed()));
-
+        String matchGivenName = "First Name: " + userGivenName;
+        String matchSurname = "Surname: " + userSurname;
+        String matchEmail = "Email: " + userEmail;
+        onView(withId(R.id.txtGivenName)).check(matches(withText(matchGivenName)));
+        onView(withId(R.id.txtSurname)).check(matches(withText(matchSurname)));
+        onView(withId(R.id.txtEmail)).check(matches(withText(matchEmail)));
+        onView(withId(R.id.imgPhoto)).check(matches(isDisplayed()));
     }
 
-    @Test
-    public void changePass() {
-
-        onView(withId(R.id.btnEdit)).perform(click());
+    //Check if we can click the logout button and then get routed back to the start page
+    @After
+    public void logout() {
+        onView(withId(R.id.btnLogout)).perform(click());
         sleep(WAIT_UI);
-
-        onView(withId(R.id.edtNewPassword)).check(matches(isDisplayed()));
-
+        onView(withId(R.id.textView)).check(matches(isDisplayed()));
     }
 }
