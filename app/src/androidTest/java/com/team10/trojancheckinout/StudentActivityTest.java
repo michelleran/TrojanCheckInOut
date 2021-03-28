@@ -181,4 +181,83 @@ public class StudentActivityTest {
         onView(withId(R.id.sRegBtn)).perform(click());
         sleep(WAIT_LONG_OP);
     }
+
+    //must be logged into account using EMAIL and PASSWORD
+    @Test
+    public void confirmRegistration(){
+
+        //check contents of accounts matches previous test's registration
+        onView(withId(R.id.givenName)).check(matches(withText("Student")));
+        onView(withId(R.id.surname)).check(matches(withText("Testing")));
+        onView(withId(R.id.id)).check(matches(withText("6998590265")));
+        onView(withId(R.id.major)).check(matches(withText("CSCI")));
+
+        //the below is to doubly make sure all registration fields match
+        /*//logout
+        onView(withId(R.id.signOutbtn)).perform(click());
+
+        //login
+        onView(withId(R.id.etEmail)).perform(typeText(EMAIL));
+        onView(withId(R.id.etPassword)).perform(typeText(PASSWORD));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.btnLogin)).perform(click());
+        sleep(WAIT_DATA);
+
+        //check contents again
+        onView(withId(R.id.givenName)).check(matches(withText("Student")));
+        onView(withId(R.id.surname)).check(matches(withText("Testing")));
+        onView(withId(R.id.id)).check(matches(withText("6998590265")));
+        onView(withId(R.id.major)).check(matches(withText("CSCI")));*/
+
+    }
+
+
+
+    //Tests to put in Rithwik's section
+    /*@Test
+    public void deleteAccount(){
+        onView(withId(R.id.btnDeleteProfile)).perform(click());
+        sleep(WAIT_UI);
+        onView(withText(R.string.delete_dialog_message)).check(matches(isDisplayed()));
+
+        //cancel delete
+        onView(withText(R.string.cancel)).perform(click());
+    }
+
+    @Test
+    public void register_manager(){
+        sleep(WAIT_UI);
+        onView(withId(R.id.btnDeleteProfile)).perform(click());
+        sleep(WAIT_UI);
+        onView(withText(R.string.delete_dialog_message)).check(matches(isDisplayed()));
+
+        //confirm delete
+        onView(withText(R.string.confirm)).perform(click());
+        sleep(WAIT_UI);
+
+        //register the account again
+        onView(withId(R.id.managerRegisterBtn)).perform(click());
+        onView(withId(R.id.etMFname)).perform(typeText(userGivenName));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etMLname)).perform(typeText(userSurname));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etMEmail)).perform(typeText(userEmail));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etMPassword)).perform(typeText(userPassword));
+        Espresso.closeSoftKeyboard();
+
+        // add photo
+        Matcher<Intent> expectedIntent = IntentMatchers.hasAction(Intent.ACTION_GET_CONTENT);
+        Intents.init();
+        Intents.intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, getGalleryIntent()));
+        sleep(WAIT_UI);
+        onView(withId(R.id.sAddPhoto)).perform(click());
+        sleep(WAIT_UI);
+        Intents.intended(expectedIntent);
+        Intents.release();
+
+        //register
+        onView(withId(R.id.sRegBtn)).perform(click());
+        sleep(WAIT_LONG_OP);
+    }*/
 }
