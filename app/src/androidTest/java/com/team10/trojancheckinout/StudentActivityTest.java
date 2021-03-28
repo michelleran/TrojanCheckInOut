@@ -29,6 +29,9 @@ public class StudentActivityTest {
         sleep(WAIT_UI);
         onView(withId(R.id.viewHistorybtn)).perform(click());
         intended(hasComponent(StudentHistory.class.getName()));
+        sleep(WAIT_UI);
+        //check if appropriate recycler view is displayed on following page
+        onView(withId(R.id.student_history_list)).check(matches(isDisplayed()));
         Intents.release();
 
     }
@@ -65,7 +68,7 @@ public class StudentActivityTest {
         sleep(WAIT_UI);
         onView(withText(R.string.delete_dialog_message)).check(matches(isDisplayed()));
 
-        //cancel delete
+        //confirm delete
         onView(withText(R.string.confirm)).perform(click());
         sleep(WAIT_UI);
         onView(withId(R.id.studentRegisterBtn)).check(matches(isDisplayed()));
