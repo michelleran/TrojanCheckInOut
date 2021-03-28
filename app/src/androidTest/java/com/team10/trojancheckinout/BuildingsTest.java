@@ -97,6 +97,7 @@ public class BuildingsTest {
             onView(withId(R.id.currentBuilding)).check(matches(withText(BUILDING)));
             Espresso.pressBack();
         }
+        Espresso.pressBack();
     }
 
     /** Must be run alone to give the transactions time to finish. */
