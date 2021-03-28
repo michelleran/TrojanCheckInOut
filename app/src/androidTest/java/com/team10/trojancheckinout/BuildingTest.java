@@ -46,6 +46,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.*;
 import static androidx.test.espresso.assertion.ViewAssertions.*;
 import static androidx.test.espresso.action.ViewActions.*;
 import static com.team10.trojancheckinout.TestUtils.withRecyclerView;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 public class BuildingTest {
 
@@ -172,6 +174,22 @@ public class BuildingTest {
         onView(withId(R.id.building_tab_content)).check(matches(isDisplayed()));
         onView(withId(R.id.building_list)).check(matches(isDisplayed()));
         onView(withId(R.id.btnAddBuilding)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void verifyConfirmFunctionality() {
+        sleep(WAIT_UI);
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
+
+        onView(withId(R.id.btnAddBuilding)).perform(click());
+        sleep(WAIT_UI);
+
+        onView(withId(R.id.btnBcConfirm)).perform(click());
+        sleep(WAIT_UI);
+
+        onView(withText("Please fill out all of the following fields"))
+                .inRoot(withDecorView(not(is(activityRule.getActivity().getWindow().getDecorView()))))
+                .check(matches(isDisplayed()));
     }
 
 
