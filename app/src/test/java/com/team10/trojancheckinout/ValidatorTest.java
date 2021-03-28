@@ -119,7 +119,21 @@ public class ValidatorTest {
         return new Object[][]{
                 {"overeight"},
                 {"overeigh"},
-                {"passpasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspass"}
+                {"passpasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspass" +
+                        "passpasspasspasspasspasspasspasspasspasspasspasspasspasspasspassp" +
+                        "asspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspa" +
+                        "sspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspa" +
+                        "sspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspassp" +
+                        "asspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspa" +
+                        "sspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspass" +
+                        "passpasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspa" +
+                        "sspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspass"}
         };
     }
     @Test
