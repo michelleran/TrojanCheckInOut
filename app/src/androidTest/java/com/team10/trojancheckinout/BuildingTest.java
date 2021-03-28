@@ -78,7 +78,7 @@ public class BuildingTest {
     }
 
 
-//    Check if the building fragments are being displayed
+   // Check if the building fragments are being displayed
     @Test
     public void verifyView() {
         onView(withId(R.id.building_list)).check(matches(isDisplayed()));
@@ -86,20 +86,23 @@ public class BuildingTest {
         sleep(WAIT_UI);
     }
 
+    // Renders list properly (check for KAP building)
     @Test
-    public void verifyBuildingRowClick() {
+    public void verifyBuildingRowNameMatch() {
         sleep(WAIT_UI);
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
         sleep(WAIT_DATA);
         String buildingToMatch = "KAP";
         RecyclerView list = activityRule.getActivity().findViewById(R.id.building_list);
         int totalBuildingCount = list.getAdapter().getItemCount();
+        int buildingIndex = -1;
         for (int i = 0; i < totalBuildingCount; i++) {
             if (i != totalBuildingCount - 1){
                 try {
                     onView(withRecyclerView(R.id.building_list)
                             .atPositionOnView(i, R.id.building_name))
                             .check(matches(withText(buildingToMatch)));
+                    buildingIndex = i;
                     break;
                 }
                 catch (AssertionFailedError e) {}
@@ -110,6 +113,25 @@ public class BuildingTest {
                         .check(matches(withText(buildingToMatch)));
             }
         }
+
+        onView(withRecyclerView(R.id.building_list).atPositionOnView(buildingIndex, R.id.building_name)).perform(click());
+        sleep(WAIT_DATA);
+    }
+
+    @Test
+    public void verifyBuildingRowClick() {
+        sleep(WAIT_UI);
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
+        sleep(WAIT_UI);
+
+
+        RecyclerView list = activityRule.getActivity().findViewById(R.id.building_list);
+        onView(withRecyclerView(R.id.building_list)
+                .atPositionOnView(0, R.id.building_name)).perform(click());
+        sleep(WAIT_DATA);
+
+        //Check we have went to building details
+        onView(withId(R.id.building_details_name)).check(matches(isDisplayed()));
     }
 
     @After
