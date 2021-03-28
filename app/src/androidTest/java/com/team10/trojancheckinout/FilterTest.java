@@ -91,7 +91,10 @@ public class FilterTest {
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+        for (int i = 0; i < Math.min(3, list.getAdapter().getItemCount()); i++) {
+            // scroll to record
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
             // assert that building name matches
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_building_name))
@@ -111,8 +114,8 @@ public class FilterTest {
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
-            // scroll to student
+        for (int i = 0; i < Math.min(3, list.getAdapter().getItemCount()); i++) {
+            // scroll to record
             onView(withId(R.id.results_list))
                 .perform(RecyclerViewActions.scrollToPosition(i));
             // open profile
@@ -137,8 +140,8 @@ public class FilterTest {
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
-            // scroll to student
+        for (int i = 0; i < Math.min(3, list.getAdapter().getItemCount()); i++) {
+            // scroll to record
             onView(withId(R.id.results_list))
                 .perform(RecyclerViewActions.scrollToPosition(i));
             // open profile
@@ -168,14 +171,14 @@ public class FilterTest {
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+        for (int i = 0; i < Math.min(3, list.getAdapter().getItemCount()); i++) {
+            // scroll to record
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
             // assert that building name matches
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_building_name))
                 .check(matches(withText(BUILDING)));
-            // scroll to student
-            onView(withId(R.id.results_list))
-                .perform(RecyclerViewActions.scrollToPosition(i));
             // open profile
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
@@ -203,14 +206,14 @@ public class FilterTest {
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+        for (int i = 0; i < Math.min(3, list.getAdapter().getItemCount()); i++) {
+            // scroll to record
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
             // assert that building name matches
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_building_name))
                 .check(matches(withText(BUILDING)));
-            // scroll to student
-            onView(withId(R.id.results_list))
-                .perform(RecyclerViewActions.scrollToPosition(i));
             // open profile
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
