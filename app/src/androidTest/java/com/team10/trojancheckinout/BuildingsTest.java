@@ -99,6 +99,7 @@ public class BuildingsTest {
         }
     }
 
+    /** Must be run alone to give the transactions time to finish. */
     @Test
     public void openBuilding_fakeCheckInThenOut() {
         final String BUILDING = "Mudd Hall";
