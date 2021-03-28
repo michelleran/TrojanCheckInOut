@@ -52,9 +52,6 @@ public class FilterResultsFragment extends Fragment {
     private String studentId;
     private String major;
 
-    @VisibleForTesting
-    RecyclerView resultsList;
-
     private RecordAdapter adapter;
 
     public FilterResultsFragment() {
@@ -119,7 +116,7 @@ public class FilterResultsFragment extends Fragment {
             R.layout.fragment_filter_results, container, false);
 
         // set up RecyclerView
-        resultsList = rootView.findViewById(R.id.results_list);
+        RecyclerView resultsList = rootView.findViewById(R.id.results_list);
 
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
