@@ -81,7 +81,6 @@ public class ManagerProfileTest {
     @Before
     public void setUp() {
 
-
         ActivityScenario activityScenario = ActivityScenario.launch(StartPage.class);
         onView(withId(R.id.startLoginbtn)).perform(click());
 
