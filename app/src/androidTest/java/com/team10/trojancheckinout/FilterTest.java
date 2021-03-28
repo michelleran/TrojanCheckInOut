@@ -1,19 +1,27 @@
 package com.team10.trojancheckinout;
 
+import android.app.Activity;
 import android.util.Log;
+import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
 import com.team10.trojancheckinout.model.Record;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.NoMatchingViewException;
+import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.PickerActions;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
 import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,34 +46,47 @@ import static com.team10.trojancheckinout.TestUtils.*;
 @RunWith(AndroidJUnit4.class)
 public class FilterTest {
     @Rule
-    public ActivityTestRule<ManagerActivity> activityRule =
-        new ActivityTestRule<>(ManagerActivity.class);
+    public ActivityScenarioRule<LoginActivity> activityRule =
+        new ActivityScenarioRule<LoginActivity>(LoginActivity.class);
 
-    @Test
-    public void filterBy_invalidId() {
+    @Before
+    public void login_NavigateToFilterTab() {
+        // login
+        onView(withId(R.id.etEmail)).perform(typeText("ranmiche@usc.edu"));
+        onView(withId(R.id.etPassword)).perform(typeText("12345678"));
+        onView(withId(R.id.etPassword)).perform(ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.btnLogin)).perform(click());
+
+        sleep(WAIT_DATA);
+
         // navigate to filter tab
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
         sleep(WAIT_UI);
+    }
 
+    @After
+    public void logout() {
+        // navigate to profile tab
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
+        sleep(WAIT_UI);
+        // log out
+        onView(withId(R.id.btnLogout)).perform(click());
+    }
+
+    @Test
+    public void filterBy_invalidId() {
         // input too short USC id
         onView(withId(R.id.filter_student_id_field)).perform(typeText("12345"));
         onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
         onView(withId(R.id.filter_button)).perform(click());
 
-        // assert that toast was shown
-        onView(withText(R.string.filter_invalid_usc_id))
-            .inRoot(withDecorView(not(is(activityRule.getActivity().getWindow().getDecorView()))))
-            .check(matches(isDisplayed()));
+        // assert that filtering hasn't proceeded
+        onView(withId(R.id.filter_button)).check(matches(isDisplayed()));
     }
 
     @Test
     public void filterBy_building() {
         final String BUILDING = "Mudd Hall";
-
-        // navigate to filter tab
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-        sleep(WAIT_UI);
-
         // input building name
         onView(withId(R.id.filter_building_field)).perform(typeText(BUILDING));
         onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
@@ -74,8 +95,7 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        //Log.d("Test", activityRule.getActivity().getFragmentManager().getFragments().toString());
-        RecyclerView list = activityRule.getActivity().findViewById(R.id.results_list);
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
         for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
             // assert that building name matches
             onView(withRecyclerView(R.id.results_list)
@@ -87,11 +107,6 @@ public class FilterTest {
     @Test
     public void filterBy_id() {
         final String ID = "0123456789";
-
-        // navigate to filter tab
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-        sleep(WAIT_UI);
-
         // input student id
         onView(withId(R.id.filter_student_id_field)).perform(typeText(ID));
         onView(withId(R.id.filter_student_id_field)).perform(ViewActions.closeSoftKeyboard());
@@ -100,7 +115,7 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
         if (fragment instanceof FilterResultsFragment) {
             for (int i = 0;
                  i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
@@ -120,11 +135,6 @@ public class FilterTest {
     @Test
     public void filterBy_major() {
         final String MAJOR = "CSCI";
-
-        // navigate to filter tab
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-        sleep(WAIT_UI);
-
         // select major
         onView(withId(R.id.filter_major_spinner)).perform(click());
         onData(allOf(is(instanceOf(String.class)), is(MAJOR))).perform(click());
@@ -133,7 +143,7 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
         // TODO: not sure why both blocks fire
         if (fragment instanceof FilterResultsFragment) {
             for (int i = 0;
@@ -155,11 +165,6 @@ public class FilterTest {
     public void filterBy_buildingId() {
         final String BUILDING = "Mudd Hall";
         final String ID = "0123456789";
-
-        // navigate to filter tab
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-        sleep(WAIT_UI);
-
         // input building name
         onView(withId(R.id.filter_building_field)).perform(typeText(BUILDING));
         onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
@@ -172,7 +177,7 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
         if (fragment instanceof FilterResultsFragment) {
             for (int i = 0;
                  i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
@@ -197,11 +202,6 @@ public class FilterTest {
     public void filterBy_buildingMajor() {
         final String BUILDING = "Mudd Hall";
         final String MAJOR = "CSCI";
-
-        // navigate to filter tab
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-        sleep(WAIT_UI);
-
         // input building name
         onView(withId(R.id.filter_building_field)).perform(typeText(BUILDING));
         onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
@@ -214,7 +214,7 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
         if (fragment instanceof FilterResultsFragment) {
             for (int i = 0;
                  i < ((FilterResultsFragment)fragment).resultsList.getAdapter().getItemCount(); i++)
@@ -237,10 +237,6 @@ public class FilterTest {
 
     @Test
     public void filterBy_startDate() {
-        // navigate to filter tab
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-        sleep(WAIT_UI);
-
         // select start date field
         onView(withId(R.id.start_date)).perform(click());
 
@@ -258,7 +254,7 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
         if (fragment instanceof FilterResultsFragment) {
             RecordAdapter adapter = (RecordAdapter) ((FilterResultsFragment)fragment).resultsList.getAdapter();
             for (int i = 0; i < adapter.getItemCount(); i++) {
@@ -273,10 +269,6 @@ public class FilterTest {
 
     @Test
     public void filterBy_endDate() {
-        // navigate to filter tab
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-        sleep(WAIT_UI);
-
         // select end date field
         onView(withId(R.id.end_date)).perform(click());
 
@@ -294,7 +286,7 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
         if (fragment instanceof FilterResultsFragment) {
             RecordAdapter adapter = (RecordAdapter) ((FilterResultsFragment)fragment).resultsList.getAdapter();
             for (int i = 0; i < adapter.getItemCount(); i++) {
@@ -309,10 +301,6 @@ public class FilterTest {
 
     @Test
     public void filterBy_startEndDate() {
-        // navigate to filter tab
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-        sleep(WAIT_UI);
-
         // select start date field
         onView(withId(R.id.start_date)).perform(click());
 
@@ -342,7 +330,7 @@ public class FilterTest {
         // wait for results to load
         sleep(WAIT_DATA);
 
-        Fragment fragment = activityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
+        Fragment fragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_filter_results);
         if (fragment instanceof FilterResultsFragment) {
             RecordAdapter adapter = (RecordAdapter) ((FilterResultsFragment)fragment).resultsList.getAdapter();
             for (int i = 0; i < adapter.getItemCount(); i++) {
@@ -357,10 +345,6 @@ public class FilterTest {
 
     @Test
     public void filterBy_startDateAfterEndDate() {
-        // navigate to filter tab
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(2));
-        sleep(WAIT_UI);
-
         // select start date field
         onView(withId(R.id.start_date)).perform(click());
 
@@ -387,10 +371,8 @@ public class FilterTest {
 
         onView(withId(R.id.filter_button)).perform(click());
 
-        // assert that toast was shown
-        onView(withText(R.string.filter_invalid_dates))
-            .inRoot(withDecorView(not(is(activityRule.getActivity().getWindow().getDecorView()))))
-            .check(matches(isDisplayed()));
+        // assert that filtering hasn't proceeded
+        onView(withId(R.id.filter_button)).check(matches(isDisplayed()));
     }
 
     private void selectDateTime(Calendar cal) {
@@ -410,5 +392,14 @@ public class FilterTest {
                 cal.get(Calendar.MINUTE)));
         // select ok
         onView(withId(android.R.id.button1)).perform(click());
+    }
+
+    private AppCompatActivity getCurrentActivity() {
+        final AppCompatActivity[] activity = new AppCompatActivity[1];
+        onView(isRoot()).check((view, noViewFoundException) -> {
+            //activity[0] = (AppCompatActivity) view.getContext();
+            activity[0] = (AppCompatActivity) view.findViewById(android.R.id.content).getContext();
+        });
+        return activity[0];
     }
 }
