@@ -10,7 +10,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
+import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.Student;
 import com.team10.trojancheckinout.model.User;
 
