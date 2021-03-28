@@ -1,5 +1,13 @@
 package com.team10.trojancheckinout;
 
+import android.app.Activity;
+import android.app.Instrumentation;
+import android.app.Instrumentation.ActivityResult;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.DatePicker;
 import android.widget.TextView;
@@ -15,9 +23,16 @@ import androidx.test.espresso.Espresso;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.PickerActions;
+import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
+import androidx.test.espresso.intent.Intents.*;
+import androidx.test.espresso.intent.matcher.IntentMatchers.*;
+import androidx.test.espresso.intent.rule.IntentsTestRule;
+
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
@@ -28,7 +43,12 @@ import org.junit.runner.RunWith;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import static android.app.Activity.RESULT_OK;
 import static androidx.test.espresso.Espresso.*;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
 import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
 import static androidx.test.espresso.assertion.ViewAssertions.*;
@@ -53,8 +73,14 @@ public class ManagerProfileTest {
     public final String userEmail = "tester1@usc.edu";
     public final String userPassword = "password";
 
+    @Rule
+    public IntentsTestRule intentsTestRule = new IntentsTestRule(ManagerActivity.class);
+
+
     @Before
     public void setUp() {
+
+
         ActivityScenario activityScenario = ActivityScenario.launch(StartPage.class);
         onView(withId(R.id.startLoginbtn)).perform(click());
 
@@ -80,6 +106,32 @@ public class ManagerProfileTest {
         onView(withId(R.id.txtEmail)).check(matches(withText(matchEmail)));
         onView(withId(R.id.imgPhoto)).check(matches(isDisplayed()));
     }
+
+    @Test
+    public void test_validateGalleryIntent() {
+
+        Matcher<Intent> expectedIntent = allOf(hasAction(Intent.ACTION_PICK));
+        Intents.release();
+        Intents.init();
+
+        Intents.intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, createGallery()));
+
+        sleep(WAIT_DATA);
+
+        Intents.intended(expectedIntent);
+        Intents.release();
+
+    }
+
+    public Intent createGallery() {
+
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setData(Uri.parse("content://com.android.providers.media.documents/document/image%3A31"));
+
+        return intent;
+
+    }
+
 
     //Check if we can click the logout button and then get routed back to the start page
     @After
