@@ -1,10 +1,15 @@
 package com.team10.trojancheckinout;
 
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.Espresso;
+import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,18 +26,39 @@ import static org.hamcrest.Matchers.allOf;
 
 import static com.team10.trojancheckinout.TestUtils.*;
 
-/** Must be logged in as a manager. */
 @RunWith(AndroidJUnit4.class)
-public class ManagerTest {
+public class BuildingsTest {
     @Rule
-    public ActivityTestRule<ManagerActivity> activityRule =
-        new ActivityTestRule<>(ManagerActivity.class);
+    public ActivityScenarioRule<LoginActivity> activityRule =
+        new ActivityScenarioRule<LoginActivity>(LoginActivity.class);
 
-    @Test
-    public void listBuildings_openDetails() { // TODO: only works when run alone?
-        final String BUILDING = "Mudd Hall";
+    @Before
+    public void login_navigateToBuildingsTab() {
+        // login
+        onView(withId(R.id.etEmail)).perform(typeText("ranmiche@usc.edu"));
+        onView(withId(R.id.etPassword)).perform(typeText("12345678"));
+        onView(withId(R.id.etPassword)).perform(ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.btnLogin)).perform(click());
+
+        sleep(WAIT_DATA);
+
         // navigate to buildings tab
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
+        sleep(WAIT_UI);
+    }
+
+    @After
+    public void logout() {
+        // navigate to profile tab
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
+        sleep(WAIT_UI);
+        // log out
+        onView(withId(R.id.btnLogout)).perform(click());
+    }
+
+    @Test
+    public void listBuildings_openDetails() {
+        final String BUILDING = "Mudd Hall";
         // select a building
         onView(withId(R.id.building_list))
             .perform(RecyclerViewActions.actionOnItem(
@@ -44,7 +70,7 @@ public class ManagerTest {
         onView(withId(R.id.building_details_name))
             .check(matches(allOf(withText(BUILDING), isDisplayed())));
 
-        RecyclerView list = activityRule.getActivity().findViewById(R.id.building_details_students);
+        RecyclerView list = getCurrentActivity().findViewById(R.id.building_details_students);
         int count = list.getAdapter().getItemCount();
 
         // assert that current capacity = length of list
@@ -54,12 +80,16 @@ public class ManagerTest {
             ));
 
         for (int i = 0; i < count; i++) {
-            // open profile of checked-in student
+            // scroll to student
+            onView(withId(R.id.building_details_students))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            // open profile
             onView(withRecyclerView(R.id.building_details_students)
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
             // assert that current building matches
             onView(withId(R.id.currentBuilding)).check(matches(withText(BUILDING)));
+            Espresso.pressBack();
         }
     }
 }
