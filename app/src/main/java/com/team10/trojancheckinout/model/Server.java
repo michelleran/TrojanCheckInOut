@@ -29,6 +29,7 @@ import java.util.Map;
 
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 
 public class Server {
@@ -587,10 +588,15 @@ public class Server {
         });
     }
 
-    public static void checkIn(String buildingId, Callback<Building> callback){
+    public static void checkIn(String buildingId, Callback<Building> callback) {
+        checkInStudent(auth.getUid(), buildingId, callback);
+    }
+
+    @VisibleForTesting
+    public static void checkInStudent(String studentId, String buildingId, Callback<Building> callback) {
         // Get building and student document references
         final DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document(buildingId);
-        final DocumentReference studentRef = db.collection(USER_COLLECTION).document(auth.getUid());
+        final DocumentReference studentRef = db.collection(USER_COLLECTION).document(studentId);
         db.runTransaction(new Transaction.Function<Building>() {
             @Override
             public Building apply(Transaction transaction) throws FirebaseFirestoreException {
@@ -651,7 +657,12 @@ public class Server {
     }
 
     public static void checkOut(Callback<Building> callback) {
-        final DocumentReference studentDocRef = db.collection(USER_COLLECTION).document(auth.getUid());
+        checkOutStudent(auth.getUid(), callback);
+    }
+
+    @VisibleForTesting
+    public static void checkOutStudent(String id, Callback<Building> callback) {
+        final DocumentReference studentDocRef = db.collection(USER_COLLECTION).document(id);
         db.runTransaction(new Transaction.Function<Building>() {
             @Override
             public Building apply(@NotNull Transaction transaction) throws FirebaseFirestoreException {
@@ -695,39 +706,6 @@ public class Server {
             }
         });
     }
-
-    /*public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
-        db.collection(USER_COLLECTION)
-                .whereEqualTo("currentBuilding", buildingId)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "listen:error", e);
-                            return;
-                        }
-
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    listener.onAdd(dc.getDocument().toObject(Student.class));
-                                    Log.d(TAG, "New city: " + dc.getDocument().getData());
-                                    break;
-                                case MODIFIED:
-                                    listener.onUpdate(dc.getDocument().toObject(Student.class));
-                                    Log.d(TAG, "Modified city: " + dc.getDocument().getData());
-                                    break;
-                                case REMOVED:
-                                    listener.onRemove(dc.getDocument().toObject(Student.class));
-                                    Log.d(TAG, "Removed city: " + dc.getDocument().getData());
-                                    break;
-                            }
-                        }
-
-                    }
-                });
-    }*/
 
     public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
