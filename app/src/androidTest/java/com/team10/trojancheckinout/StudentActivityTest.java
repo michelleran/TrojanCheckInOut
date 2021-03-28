@@ -36,6 +36,7 @@ public class StudentActivityTest {
     @Test
     public void editProfileImage() {
 
+
     }
 
     @Test
@@ -55,5 +56,18 @@ public class StudentActivityTest {
 
         //cancel delete
         onView(withText(R.string.cancel)).perform(click());
+    }
+
+    @Test
+    public void confirmDeleteAccountPopUp(){
+        sleep(WAIT_UI);
+        onView(withId(R.id.floatingActionButton2)).perform(click());
+        sleep(WAIT_UI);
+        onView(withText(R.string.delete_dialog_message)).check(matches(isDisplayed()));
+
+        //cancel delete
+        onView(withText(R.string.confirm)).perform(click());
+        sleep(WAIT_UI);
+        onView(withId(R.id.studentRegisterBtn)).check(matches(isDisplayed()));
     }
 }
