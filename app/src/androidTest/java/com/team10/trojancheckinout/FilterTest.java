@@ -80,8 +80,10 @@ public class FilterTest {
         onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
         onView(withId(R.id.filter_button)).perform(click());
 
-        // assert that filtering hasn't proceeded
-        onView(withId(R.id.filter_button)).check(matches(isDisplayed()));
+        // assert that toast was shown
+        onView(withText(R.string.filter_invalid_usc_id))
+            .inRoot(withDecorView(not(is(getCurrentActivity().getWindow().getDecorView()))))
+            .check(matches(isDisplayed()));
     }
 
     @Test
@@ -371,8 +373,10 @@ public class FilterTest {
 
         onView(withId(R.id.filter_button)).perform(click());
 
-        // assert that filtering hasn't proceeded
-        onView(withId(R.id.filter_button)).check(matches(isDisplayed()));
+        // assert that toast was shown
+        onView(withText(R.string.filter_invalid_dates))
+            .inRoot(withDecorView(not(is(getCurrentActivity().getWindow().getDecorView()))))
+            .check(matches(isDisplayed()));
     }
 
     private void selectDateTime(Calendar cal) {
