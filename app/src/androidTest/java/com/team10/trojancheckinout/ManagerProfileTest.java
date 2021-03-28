@@ -113,7 +113,6 @@ public class ManagerProfileTest {
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
         sleep(WAIT_UI);
 
-
         Matcher<Intent> expectedIntent = AllOf.allOf(IntentMatchers.hasAction(Intent.ACTION_GET_CONTENT));
         Intents.init();
         Intents.intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, getGalleryIntent()));

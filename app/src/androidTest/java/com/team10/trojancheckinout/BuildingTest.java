@@ -56,6 +56,9 @@ public class BuildingTest {
     public final String userEmail = "tester1@usc.edu";
     public final String userPassword = "password";
 
+    public final String buildingToAdd = "SampleBuilding";
+    public final int buildingMaxCap = 60;
+
     @Rule
     public ActivityTestRule<ManagerActivity> activityRule = new ActivityTestRule<>(ManagerActivity.class);
 
@@ -133,6 +136,27 @@ public class BuildingTest {
         //Check we have went to building details
         onView(withId(R.id.building_details_name)).check(matches(isDisplayed()));
     }
+
+    @Test
+    public void verifyBuildingChangeFragmentRender() {
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
+        sleep(WAIT_UI);
+
+        onView(withId(R.id.btnAddBuilding)).perform(click());
+        sleep(WAIT_UI);
+
+        onView(withId(R.id.edtBcName)).check(matches(isDisplayed()));
+        onView(withId(R.id.edtBcMaxCap)).check(matches(isDisplayed()));
+        onView(withId(R.id.btnBcConfirm)).check(matches(isDisplayed()));
+        onView(withId(R.id.btnBcCancel)).check(matches(isDisplayed()));
+
+        onView(withId(R.id.edtBcName)).check(matches(withHint("Building Name")));
+        onView(withId(R.id.edtBcMaxCap)).check(matches(withHint("Maximum Capacity")));
+        onView(withId(R.id.btnBcCancel)).check(matches(withText("Cancel")));
+        onView(withId(R.id.btnBcConfirm)).check(matches(withText("Confirm")));
+    }
+
+
 
     @After
     public void logout() {
