@@ -12,21 +12,20 @@ import static org.junit.Assert.*;
 
 
 @RunWith(AndroidJUnit4.class)
-public class RegistrationTest {
-    @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.team10.trojancheckinout", appContext.getPackageName());
-    }
+public class RegistrationLoginTest {
 
     @Test
-    public void verifyNameNotEmpty(){
+    public void registerStudent(){
 
     }
 
     @Test
-    public void verifyEmail(){
+    public void registerManager(){
+
+    }
+
+    @Test
+    public void loginUser(){
 
     }
 }
