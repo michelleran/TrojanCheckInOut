@@ -1,25 +1,17 @@
 package com.team10.trojancheckinout;
 
-import android.app.Activity;
-import android.util.Log;
-import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
 import com.team10.trojancheckinout.model.Record;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.Espresso;
-import androidx.test.espresso.NoMatchingViewException;
-import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.rule.ActivityTestRule;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -28,7 +20,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
