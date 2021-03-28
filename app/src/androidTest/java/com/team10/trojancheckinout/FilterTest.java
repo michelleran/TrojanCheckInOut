@@ -28,6 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -236,7 +237,7 @@ public class FilterTest {
 
         // select March 22, 2021 09:00 PDT
         Calendar cal = new Calendar.Builder()
-            .setDate(2021, 3, 22)
+            .setDate(2021, 2, 22)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
@@ -264,7 +265,7 @@ public class FilterTest {
 
         // select March 22, 2021 09:00 PDT
         Calendar cal = new Calendar.Builder()
-            .setDate(2021, 3, 22)
+            .setDate(2021, 2, 22)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
@@ -292,7 +293,7 @@ public class FilterTest {
 
         // select March 20, 2021 09:00 PDT
         Calendar cal = new Calendar.Builder()
-            .setDate(2021, 3, 20)
+            .setDate(2021, 2, 20)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
@@ -304,7 +305,7 @@ public class FilterTest {
 
         // select March 24, 2021 09:00 PDT
         cal = new Calendar.Builder()
-            .setDate(2021, 3, 24)
+            .setDate(2021, 2, 24)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
@@ -332,7 +333,7 @@ public class FilterTest {
 
         // select March 24, 2021 09:00 PDT
         Calendar cal = new Calendar.Builder()
-            .setDate(2021, 3, 24)
+            .setDate(2021, 2, 24)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
@@ -344,7 +345,7 @@ public class FilterTest {
 
         // select March 20, 2021 09:00 PDT
         cal = new Calendar.Builder()
-            .setDate(2021, 3, 20)
+            .setDate(2021, 2, 20)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
@@ -364,7 +365,7 @@ public class FilterTest {
         onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
             .perform(PickerActions.setDate(
                 cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
+                cal.get(Calendar.MONTH) + 1,
                 cal.get(Calendar.DAY_OF_MONTH)));
         // select ok
         onView(withId(android.R.id.button1)).perform(click());
