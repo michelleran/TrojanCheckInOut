@@ -198,8 +198,6 @@ public class BuildingTest {
     @Test
     public void verifyProperAddBuilding() {
 
-        String confirmMessage = "Building " + buildingToAdd + " successfully added";
-
         sleep(WAIT_UI);
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
 
@@ -213,10 +211,7 @@ public class BuildingTest {
 
         onView(withId(R.id.btnBcConfirm)).perform(click());
 
-        sleep(WAIT_DATA);
-        sleep(WAIT_DATA);
-        sleep(WAIT_DATA);
-        sleep(WAIT_UI);
+        sleep(10000);
 
         onView(withId(R.id.building_tab_content)).check(matches(isDisplayed()));
         onView(withId(R.id.building_list)).check(matches(isDisplayed()));
@@ -228,6 +223,35 @@ public class BuildingTest {
         Log.d(TAG, "verifyProperAddBuilding: " + String.valueOf(totalBuildingCount));
         onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(totalBuildingCount - 1));
         onView(withRecyclerView(R.id.building_list).atPositionOnView(totalBuildingCount - 1, R.id.building_name)).check(matches(withText(buildingToAdd)));
+    }
+
+    @Test
+    public void verifyNoNameAddBuilding() {
+        String newBuilding = "";
+        sleep(WAIT_UI);
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
+
+        onView(withId(R.id.btnAddBuilding)).perform(click());
+        sleep(WAIT_UI);
+
+        onView(withId(R.id.edtBcName)).perform(typeText(newBuilding));
+        sleep(WAIT_UI);
+        onView(withId(R.id.edtBcName)).perform(click());
+        sleep(WAIT_UI);
+        onView(withId(R.id.edtBcMaxCap)).perform(typeText(String.valueOf(buildingMaxCap)));
+        onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
+
+        onView(withId(R.id.edtBcName)).check(matches(hasErrorText("Building name cannot be empty")));
+        onView(withId(R.id.btnBcCancel)).perform(click());
+    }
+
+
+
+
+
+    @Test
+    public void verifyImproperBuilding() {
+
     }
 
 }
