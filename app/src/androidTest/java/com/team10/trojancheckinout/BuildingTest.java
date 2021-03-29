@@ -105,31 +105,6 @@ public class BuildingTest {
         sleep(WAIT_UI);
     }
 
-    // Renders list properly (check for KAP building) // TODO: what calls this?
-    public int matchRowBuilding(String buildingToMatch) {
-        sleep(WAIT_UI);
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
-        sleep(WAIT_DATA);
-        RecyclerView list = getCurrentActivity().findViewById(R.id.building_list);
-        int totalBuildingCount = list.getAdapter().getItemCount();
-        int buildingIndex = -1;
-        for (int i = 0; i < totalBuildingCount; i++) {
-                onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(i));
-                try {
-                    onView(withRecyclerView(R.id.building_list)
-                            .atPositionOnView(i, R.id.building_name))
-                            .check(matches(withText(buildingToMatch)));
-                    buildingIndex = i;
-                    break;
-                }
-                catch (AssertionFailedError e) {}
-        }
-        return buildingIndex;
-
-    }
-
-
-
     @Test
     public void verifyBuildingRowClick() {
         sleep(WAIT_UI);
