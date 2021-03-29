@@ -167,7 +167,7 @@ public class BuildingModificationTest {
         sleep(WAIT_UI);
     }
 
-    @Test
+    /*@Test
     public void verifyProperAddBuilding() {
         addFunction();
     }
@@ -180,7 +180,7 @@ public class BuildingModificationTest {
     @Test
     public void testDeleteBuildingOK() {
        deleteFunction();
-    }
+    }*/
 
     @Test
     public void consolidatedBuildingTest() {
@@ -188,8 +188,6 @@ public class BuildingModificationTest {
         editFunction();
         deleteFunction();
     }
-
-
 
     @After
     public void shutdown(){
