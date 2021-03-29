@@ -1,6 +1,9 @@
 package com.team10.trojancheckinout;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
@@ -290,6 +293,35 @@ public class BuildingTest {
         int currPosition = matchRowBuilding(buildingToDelete);
         Assert.assertEquals(currPosition, -1);
     }*/
+
+    @Test
+    public void verifyUniqueQRCodes() {
+        // select 1st building
+        onView(withRecyclerView(R.id.building_list)
+            .atPositionOnView(0, R.id.btnBuildingEdit)).perform(click());
+        onView(withText("View QR Code")).inRoot(isPlatformPopup()).perform(click());
+
+        sleep(WAIT_DATA);
+        Bitmap qr1 = ((BitmapDrawable) ((ImageView) getCurrentActivity()
+            .findViewById(R.id.imgBcQR))
+            .getDrawable())
+            .getBitmap();
+        Espresso.pressBack();
+
+        // select 2nd building
+        onView(withRecyclerView(R.id.building_list)
+            .atPositionOnView(1, R.id.btnBuildingEdit)).perform(click());
+        onView(withText("View QR Code")).inRoot(isPlatformPopup()).perform(click());
+
+        sleep(WAIT_DATA);
+        Bitmap qr2 = ((BitmapDrawable) ((ImageView) getCurrentActivity()
+            .findViewById(R.id.imgBcQR))
+            .getDrawable())
+            .getBitmap();
+        Espresso.pressBack();
+
+        assert qr1 != qr2;
+    }
 
     @After
     public void logout() {
