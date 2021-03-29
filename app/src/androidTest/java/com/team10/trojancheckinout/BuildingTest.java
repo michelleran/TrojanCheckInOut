@@ -251,12 +251,10 @@ public class BuildingTest {
     }
 
     @Test
-    public void testDeleteBuilding() {
-
+    public void testDeleteBuildingCancel() {
 
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
         RecyclerView list = activityRule.getActivity().findViewById(R.id.building_list);
-        RecyclerView.Adapter buildAdapt = list.getAdapter();
         int initialTotalBuildingCount = list.getAdapter().getItemCount();
 
         onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(initialTotalBuildingCount - 1));
@@ -264,16 +262,34 @@ public class BuildingTest {
 
         onView(withText("Delete Building")).inRoot(isPlatformPopup()).perform(click());
         onView(withText("CANCEL")).inRoot(isDialog()).check(matches(isDisplayed()));
-        onView(withText("CANCEL")).inRoot(isDialog()).check(matches(isDisplayed())).check(matches(isDisplayed()));
+        onView(withText("CANCEL")).inRoot(isDialog()).perform(click());
+        sleep(WAIT_DATA);
 
         int finalTotalBuildingCount = list.getAdapter().getItemCount();
 
         Assert.assertEquals(initialTotalBuildingCount, finalTotalBuildingCount);
     }
 
-
     @Test
-    public void verifyImproperBuilding() {
+    public void testDeleteBuildingOK() {
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
+        RecyclerView list = activityRule.getActivity().findViewById(R.id.building_list);
+        int initialTotalBuildingCount = list.getAdapter().getItemCount();
+
+        onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(initialTotalBuildingCount - 1));
+        onView(withRecyclerView(R.id.building_list).atPositionOnView(initialTotalBuildingCount - 1, R.id.btnBuildingEdit)).perform(click());
+
+        onView(withText("Delete Building")).inRoot(isPlatformPopup()).perform(click());
+        onView(withText("OK")).inRoot(isDialog()).check(matches(isDisplayed()));
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+
+        sleep(WAIT_UI);
+        RecyclerView list2 = activityRule.getActivity().findViewById(R.id.building_list);
+        sleep(WAIT_DATA);
+
+        int finalTotalBuildingCount = list2.getAdapter().getItemCount();
+
+        Assert.assertEquals((initialTotalBuildingCount - 1), finalTotalBuildingCount);
 
     }
 
