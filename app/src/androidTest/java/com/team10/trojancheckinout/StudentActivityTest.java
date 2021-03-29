@@ -181,4 +181,5 @@ public class StudentActivityTest {
         onView(withId(R.id.sRegBtn)).perform(click());
         sleep(WAIT_LONG_OP);
     }
+
 }

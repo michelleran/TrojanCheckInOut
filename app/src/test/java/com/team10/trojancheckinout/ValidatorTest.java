@@ -28,22 +28,29 @@ public class ValidatorTest {
                 {"fname","","","password","ID"},
                 {"fname","lname","","","ID"},
                 {"fname","lname","email","",""},
+
                 {"","","","password","ID"},
                 {"fname","","","","ID"},
                 {"fname","lname","","",""},
+
                 {"","","","","ID"},
                 {"fname","","","",""},
+
                 {"","","","",""},
 
                 {"fname","lname","email",""},
                 {"fname","lname","","password"},
                 {"fname","","email","password"},
                 {"","lname","email","password"},
+
                 {"","","email","password"},
                 {"fname","","","password"},
                 {"fname","lname","",""},
+
+
                 {"fname","","",""},
                 {"","","","password"},
+
                 {"","","",""}
         };
     }
@@ -69,6 +76,8 @@ public class ValidatorTest {
                 {"winstoww@usc.edu"},
                 {"winstoww7@usc.edu"},
                 {"winstoww7w@usc.edu"},
+                {"ww@usc.edu"},
+                {"w1@usc.edu"}
         };
     }
     @Test
@@ -110,6 +119,21 @@ public class ValidatorTest {
         return new Object[][]{
                 {"overeight"},
                 {"overeigh"},
+                {"passpasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspass" +
+                        "passpasspasspasspasspasspasspasspasspasspasspasspasspasspasspassp" +
+                        "asspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspa" +
+                        "sspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspa" +
+                        "sspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspassp" +
+                        "asspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspa" +
+                        "sspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspass" +
+                        "passpasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspa" +
+                        "sspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspasspas" +
+                        "spasspasspasspasspasspasspasspass"}
         };
     }
     @Test
