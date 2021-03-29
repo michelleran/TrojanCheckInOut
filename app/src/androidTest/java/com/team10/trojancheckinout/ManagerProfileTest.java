@@ -92,7 +92,7 @@ public class ManagerProfileTest {
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.btnLogin)).perform(click());
 
-        sleep(WAIT_LONG_OP);
+        sleep(WAIT_DATA);
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
         sleep(WAIT_UI);
 

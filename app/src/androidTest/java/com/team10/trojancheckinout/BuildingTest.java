@@ -88,7 +88,7 @@ public class BuildingTest {
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.btnLogin)).perform(click());
 
-        sleep(WAIT_LONG_OP);
+        sleep(WAIT_DATA);
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
         sleep(WAIT_UI);
     }
@@ -103,17 +103,15 @@ public class BuildingTest {
     }
 
     // Renders list properly (check for KAP building)
-    @Test
-    public void verifyBuildingRowNameMatch() {
+    public int matchRowBuilding(String buildingToMatch) {
         sleep(WAIT_UI);
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
         sleep(WAIT_DATA);
-        String buildingToMatch = "KAP";
         RecyclerView list = getCurrentActivity().findViewById(R.id.building_list);
         int totalBuildingCount = list.getAdapter().getItemCount();
         int buildingIndex = -1;
         for (int i = 0; i < totalBuildingCount; i++) {
-            if (i != totalBuildingCount - 1){
+                onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(i));
                 try {
                     onView(withRecyclerView(R.id.building_list)
                             .atPositionOnView(i, R.id.building_name))
@@ -122,17 +120,12 @@ public class BuildingTest {
                     break;
                 }
                 catch (AssertionFailedError e) {}
-            }
-            else {
-                onView(withRecyclerView(R.id.building_list)
-                        .atPositionOnView(i, R.id.building_name))
-                        .check(matches(withText(buildingToMatch)));
-            }
         }
+        return buildingIndex;
 
-        onView(withRecyclerView(R.id.building_list).atPositionOnView(buildingIndex, R.id.building_name)).perform(click());
-        sleep(WAIT_DATA);
     }
+
+
 
     @Test
     public void verifyBuildingRowClick() {
@@ -225,11 +218,9 @@ public class BuildingTest {
         onView(withId(R.id.building_list)).check(matches(isDisplayed()));
         onView(withId(R.id.btnAddBuilding)).check(matches(isDisplayed()));
 
-        RecyclerView list = getCurrentActivity().findViewById(R.id.building_list);
-        int totalBuildingCount = list.getAdapter().getItemCount();
-        Log.d(TAG, "verifyProperAddBuilding: " + String.valueOf(totalBuildingCount));
-        onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(totalBuildingCount - 1));
-        onView(withRecyclerView(R.id.building_list).atPositionOnView(totalBuildingCount - 1, R.id.building_name)).check(matches(withText(buildingToAdd)));
+        int buildingIndex = matchRowBuilding(buildingToAdd);
+        onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(buildingIndex));
+        onView(withRecyclerView(R.id.building_list).atPositionOnView(buildingIndex, R.id.building_name)).check(matches(withText(buildingToAdd)));
     }*/
 
     @Test
@@ -276,26 +267,28 @@ public class BuildingTest {
 
     /*@Test
     public void testDeleteBuildingOK() {
+        String buildingToDelete = buildingToAdd;
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
         RecyclerView list = getCurrentActivity().findViewById(R.id.building_list);
         int initialTotalBuildingCount = list.getAdapter().getItemCount();
 
-        onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(initialTotalBuildingCount - 1));
+        int buildingPosition = matchRowBuilding(buildingToDelete);
+        Assert.assertNotEquals(buildingPosition, -1);
+
+        onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(buildingPosition - 1));
         Matcher last = withRecyclerView(R.id.building_list).atPositionOnView(initialTotalBuildingCount - 2, R.id.building_name);
-        onView(withRecyclerView(R.id.building_list).atPositionOnView(initialTotalBuildingCount - 1, R.id.btnBuildingEdit)).perform(click());
+
+        onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(buildingPosition));
+        onView(withRecyclerView(R.id.building_list).atPositionOnView(buildingPosition, R.id.btnBuildingEdit)).perform(click());
 
         onView(withText("Delete Building")).inRoot(isPlatformPopup()).perform(click());
         onView(withText("OK")).inRoot(isDialog()).check(matches(isDisplayed()));
         onView(withText("OK")).inRoot(isDialog()).perform(click());
 
-        sleep(WAIT_UI);
         sleep(WAIT_DATA);
 
-        int finalTotalBuildingCount = list.getAdapter().getItemCount();
-
-        Assert.assertEquals((initialTotalBuildingCount - 1), finalTotalBuildingCount);
-        onView(withRecyclerView(R.id.building_list).atPositionOnView(finalTotalBuildingCount - 1, R.id.building_name)).check(matches(last));
-
+        int currPosition = matchRowBuilding(buildingToDelete);
+        Assert.assertEquals(currPosition, -1);
     }*/
 
     @After
