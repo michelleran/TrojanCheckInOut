@@ -51,6 +51,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import static android.app.Activity.RESULT_OK;
@@ -64,8 +65,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.*;
 import static androidx.test.espresso.assertion.ViewAssertions.*;
 import static androidx.test.espresso.action.ViewActions.*;
 import static com.team10.trojancheckinout.TestUtils.withRecyclerView;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 
 public class BuildingTest {
 
@@ -132,18 +135,40 @@ public class BuildingTest {
 
     @Test
     public void verifyBuildingRowClick() {
+        final String BUILDING = "Mudd Hall";
+        // select building
+        onView(withId(R.id.building_list))
+            .perform(RecyclerViewActions.actionOnItem(
+                hasDescendant(withText(BUILDING)), click()));
+
         sleep(WAIT_UI);
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
-        sleep(WAIT_UI);
 
+        // check building name
+        onView(withId(R.id.building_details_name))
+            .check(matches(allOf(withText(BUILDING), isDisplayed())));
 
-        RecyclerView list = getCurrentActivity().findViewById(R.id.building_list);
-        onView(withRecyclerView(R.id.building_list)
-                .atPositionOnView(0, R.id.building_name)).perform(click());
-        sleep(WAIT_DATA);
+        RecyclerView list = getCurrentActivity().findViewById(R.id.building_details_students);
+        int count = list.getAdapter().getItemCount();
 
-        //Check we have went to building details
-        onView(withId(R.id.building_details_name)).check(matches(isDisplayed()));
+        // assert that current capacity = length of list
+        onView(withId(R.id.building_details_capacity))
+            .check(matches(
+                withText(startsWith(String.format(Locale.US, "Capacity: %d/", count)))
+            ));
+
+        for (int i = 0; i < count; i++) {
+            // scroll to student
+            onView(withId(R.id.building_details_students))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            // open profile
+            onView(withRecyclerView(R.id.building_details_students)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert that current building matches
+            onView(withId(R.id.currentBuilding)).check(matches(withText(BUILDING)));
+            Espresso.pressBack();
+        }
+        Espresso.pressBack();
     }
 
     @Test
