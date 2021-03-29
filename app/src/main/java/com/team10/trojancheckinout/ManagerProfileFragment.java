@@ -193,8 +193,9 @@ public class ManagerProfileFragment extends Fragment {
         }
         else if (viewState == 0) {
             viewState = 2;
-            Intent choosePic = new Intent(Intent.ACTION_GET_CONTENT);
+            Intent choosePic = new Intent();
             choosePic.setType("image/*");
+            choosePic.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(choosePic, 1);
         }
     }
