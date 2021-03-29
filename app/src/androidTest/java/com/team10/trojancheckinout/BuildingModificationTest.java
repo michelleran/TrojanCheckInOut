@@ -14,8 +14,10 @@ import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
@@ -37,7 +39,6 @@ import static com.team10.trojancheckinout.TestUtils.sleep;
 import static com.team10.trojancheckinout.TestUtils.withRecyclerView;
 
 public class BuildingModificationTest {
-
 
     private String TAG = "BuildingTest";
 
@@ -71,26 +72,7 @@ public class BuildingModificationTest {
 
     }
 
-    @Rule
-    public ActivityScenarioRule<LoginActivity> activityRule =
-            new ActivityScenarioRule<>(LoginActivity.class);
-
-    @Before
-    public void setUp() {
-        onView(withId(R.id.etEmail)).perform(typeText(userEmail));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.etPassword)).perform(typeText(userPassword));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.btnLogin)).perform(click());
-
-        sleep(WAIT_DATA);
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
-        sleep(WAIT_UI);
-    }
-
-    @Test
-    public void verifyProperAddBuilding() {
-
+    public void addFunction() {
         onView(withId(R.id.btnAddBuilding)).perform(click());
         sleep(WAIT_UI);
 
@@ -111,11 +93,10 @@ public class BuildingModificationTest {
         onView(withRecyclerView(R.id.building_list).atPositionOnView(buildingIndex, R.id.building_name)).check(matches(withText(buildingToAdd)));
     }
 
-    @Test
-    public void testEditBuilding() {
+    public void editFunction() {
         String buildingToEdit = buildingToAdd;
         buildingMaxCap = buildingMaxCap + 1;
-        String newCapacity = String.valueOf(buildingMaxCap + 1);
+        String newCapacity = String.valueOf(buildingMaxCap);
         int buildingPosition = matchRowBuilding(buildingToEdit);
         Assert.assertNotEquals(buildingPosition, -1);
 
@@ -144,8 +125,7 @@ public class BuildingModificationTest {
                 .check(matches(withText("Maximum Capacity: " + newCapacity)));
     }
 
-    @Test
-    public void testDeleteBuildingOK() {
+    public void deleteFunction() {
         String buildingToDelete = buildingToAdd;
         RecyclerView list = getCurrentActivity().findViewById(R.id.building_list);
         int initialTotalBuildingCount = list.getAdapter().getItemCount();
@@ -168,6 +148,47 @@ public class BuildingModificationTest {
         int currPosition = matchRowBuilding(buildingToDelete);
         Assert.assertEquals(currPosition, -1);
     }
+
+
+    @Rule
+    public ActivityScenarioRule<LoginActivity> activityRule =
+            new ActivityScenarioRule<>(LoginActivity.class);
+
+    @Before
+    public void setUp() {
+        onView(withId(R.id.etEmail)).perform(typeText(userEmail));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etPassword)).perform(typeText(userPassword));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.btnLogin)).perform(click());
+
+        sleep(WAIT_DATA);
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
+        sleep(WAIT_UI);
+    }
+
+    @Test
+    public void verifyProperAddBuilding() {
+        addFunction();
+    }
+
+    @Test
+    public void testEditBuilding() {
+        editFunction();
+    }
+
+    @Test
+    public void testDeleteBuildingOK() {
+       deleteFunction();
+    }
+
+    @Test
+    public void consolidatedBuildingTest() {
+        addFunction();
+        editFunction();
+        deleteFunction();
+    }
+
 
 
     @After
