@@ -90,7 +90,7 @@ public class ManagerProfileTest {
         onView(withId(R.id.etPassword)).perform(typeText(userPassword));
         onView(withId(R.id.btnLogin)).perform(click());
 
-        sleep(WAIT_UI);
+        sleep(WAIT_DATA);
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
         sleep(WAIT_UI);
 
