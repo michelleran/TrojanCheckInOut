@@ -87,10 +87,12 @@ public class ManagerProfileTest {
         sleep(WAIT_UI);
 
         onView(withId(R.id.etEmail)).perform(typeText(userEmail));
+        Espresso.closeSoftKeyboard();
         onView(withId(R.id.etPassword)).perform(typeText(userPassword));
+        Espresso.closeSoftKeyboard();
         onView(withId(R.id.btnLogin)).perform(click());
 
-        sleep(WAIT_UI);
+        sleep(WAIT_LONG_OP);
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
         sleep(WAIT_UI);
 
@@ -121,6 +123,9 @@ public class ManagerProfileTest {
         sleep(WAIT_UI);
         Intents.intended(expectedIntent);
         Intents.release();
+
+        // wait for upload to complete
+        sleep(WAIT_LONG_OP);
     }
 
     private Intent getGalleryIntent() {
