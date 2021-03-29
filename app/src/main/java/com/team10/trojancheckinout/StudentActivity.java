@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -228,34 +229,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             //QR SCAN - set UI
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (result != null && result.getContents() != null) {
-                String buildingId = result.getContents();
-                if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
-                    Server.checkOut(new Callback<Building>() {
-                        @Override
-                        public void onSuccess(Building building) {
-                            student.setBuilding(null);
-                            currentBuilding.setText(R.string.none);
-                            Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
-                        }
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Log.e(TAG, "onFailure: checkOut failure");
-                        }
-                    });
-                } else {
-                    Server.checkIn(buildingId, new Callback<Building>() {
-                        @Override
-                        public void onSuccess(Building building) {
-                            student.setBuilding(buildingId);
-                            currentBuilding.setText(building.getName());
-                            Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
-                        }
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Log.e(TAG, "onFailure: checkIn failure");
-                        }
-                    });
-                }
+                didScanQR(result.getContents());
             } else {
                 Toast.makeText(this, "Not a valid building QR code", Toast.LENGTH_LONG).show();
             }
@@ -265,5 +239,38 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         qrScan.initiateScan();
+    }
+
+    @VisibleForTesting
+    public void didScanQR(String buildingId) {
+        Log.d("StudentActivity", buildingId);
+        if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
+            Server.checkOut(new Callback<Building>() {
+                @Override
+                public void onSuccess(Building building) {
+                    student.setBuilding(null);
+                    currentBuilding.setText(R.string.none);
+                    Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
+                }
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure: checkOut failure");
+                }
+            });
+        } else {
+            Server.checkIn(buildingId, new Callback<Building>() {
+                @Override
+                public void onSuccess(Building building) {
+                    student.setBuilding(buildingId);
+                    currentBuilding.setText(building.getName());
+                    Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
+                }
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure: checkIn failure");
+                    exception.printStackTrace();
+                }
+            });
+        }
     }
 }

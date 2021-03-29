@@ -7,17 +7,25 @@ import com.google.android.material.tabs.TabLayout;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
+import java.util.Collection;
+
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.PerformException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.espresso.util.HumanReadables;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import androidx.test.runner.lifecycle.Stage;
 
+import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static org.hamcrest.Matchers.allOf;
 
 /**
@@ -116,6 +124,7 @@ public class TestUtils {
     }
 
     public static final int WAIT_DATA = 3000;
+    public static final int WAIT_LONG_OP = 5000;
     public static final int WAIT_UI = 1000;
 
     public static void sleep(int ms) {
@@ -151,5 +160,28 @@ public class TestUtils {
                 }
             }
         };
+    }
+
+    /*public static AppCompatActivity getCurrentActivity() {
+        final AppCompatActivity[] activity = new AppCompatActivity[1];
+        onView(isRoot()).check((view, noViewFoundException) -> {
+            //activity[0] = (AppCompatActivity) view.getContext();
+            activity[0] = (AppCompatActivity) view.findViewById(android.R.id.content).getContext();
+        });
+        return activity[0];
+    }*/
+
+    public static AppCompatActivity getCurrentActivity() {
+        final AppCompatActivity[] activity = new AppCompatActivity[1];
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            AppCompatActivity currentActivity = null;
+            Collection resumedActivities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
+            if (resumedActivities.iterator().hasNext()){
+                currentActivity = (AppCompatActivity) resumedActivities.iterator().next();
+                activity[0] = currentActivity;
+            }
+        });
+
+        return activity[0];
     }
 }
