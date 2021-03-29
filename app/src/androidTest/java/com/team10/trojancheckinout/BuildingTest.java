@@ -5,6 +5,8 @@ import android.util.Log;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.NoMatchingViewException;
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.rule.ActivityTestRule;
 
 import junit.framework.AssertionFailedError;
@@ -187,20 +189,45 @@ public class BuildingTest {
         onView(withId(R.id.btnBcConfirm)).perform(click());
         sleep(WAIT_UI);
 
+        //Check if proper toast is displayed
         onView(withText("Please fill out all of the following fields"))
                 .inRoot(withDecorView(not(is(activityRule.getActivity().getWindow().getDecorView()))))
                 .check(matches(isDisplayed()));
     }
 
+    @Test
+    public void verifyProperAddBuilding() {
 
+        String confirmMessage = "Building " + buildingToAdd + " successfully added";
 
-    @After
-    public void logout() {
-        onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
         sleep(WAIT_UI);
-        onView(withId(R.id.btnLogout)).perform(click());
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
+
+        sleep(WAIT_DATA);
+        onView(withId(R.id.btnAddBuilding)).perform(click());
         sleep(WAIT_UI);
-        onView(withId(R.id.textView)).check(matches(isDisplayed()));
+
+        onView(withId(R.id.edtBcName)).perform(typeText(buildingToAdd));
+        onView(withId(R.id.edtBcMaxCap)).perform(typeText(String.valueOf(buildingMaxCap)));
+        onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
+
+        onView(withId(R.id.btnBcConfirm)).perform(click());
+
+        sleep(WAIT_DATA);
+        sleep(WAIT_DATA);
+        sleep(WAIT_DATA);
+        sleep(WAIT_UI);
+
+        onView(withId(R.id.building_tab_content)).check(matches(isDisplayed()));
+        onView(withId(R.id.building_list)).check(matches(isDisplayed()));
+        onView(withId(R.id.btnAddBuilding)).check(matches(isDisplayed()));
+
+        RecyclerView list = activityRule.getActivity().findViewById(R.id.building_list);
+        RecyclerView.Adapter buildAdapt = list.getAdapter();
+        int totalBuildingCount = list.getAdapter().getItemCount();
+        Log.d(TAG, "verifyProperAddBuilding: " + String.valueOf(totalBuildingCount));
+        onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(totalBuildingCount - 1));
+        onView(withRecyclerView(R.id.building_list).atPositionOnView(totalBuildingCount - 1, R.id.building_name)).check(matches(withText(buildingToAdd)));
     }
 
 }
