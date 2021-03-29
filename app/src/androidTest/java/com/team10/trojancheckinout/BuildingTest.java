@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.Root;
+import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.matcher.RootMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
@@ -258,6 +260,7 @@ public class BuildingTest {
         int initialTotalBuildingCount = list.getAdapter().getItemCount();
 
         onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(initialTotalBuildingCount - 1));
+        Matcher previous = withRecyclerView(R.id.building_list).atPositionOnView(initialTotalBuildingCount - 1, R.id.building_name);
         onView(withRecyclerView(R.id.building_list).atPositionOnView(initialTotalBuildingCount - 1, R.id.btnBuildingEdit)).perform(click());
 
         onView(withText("Delete Building")).inRoot(isPlatformPopup()).perform(click());
@@ -268,6 +271,7 @@ public class BuildingTest {
         int finalTotalBuildingCount = list.getAdapter().getItemCount();
 
         Assert.assertEquals(initialTotalBuildingCount, finalTotalBuildingCount);
+        onView(withRecyclerView(R.id.building_list).atPositionOnView(initialTotalBuildingCount - 1, R.id.building_name)).check(matches(previous));
     }
 
     @Test
@@ -277,6 +281,7 @@ public class BuildingTest {
         int initialTotalBuildingCount = list.getAdapter().getItemCount();
 
         onView(withId(R.id.building_list)).perform(RecyclerViewActions.scrollToPosition(initialTotalBuildingCount - 1));
+        Matcher last = withRecyclerView(R.id.building_list).atPositionOnView(initialTotalBuildingCount - 2, R.id.building_name);
         onView(withRecyclerView(R.id.building_list).atPositionOnView(initialTotalBuildingCount - 1, R.id.btnBuildingEdit)).perform(click());
 
         onView(withText("Delete Building")).inRoot(isPlatformPopup()).perform(click());
@@ -284,13 +289,22 @@ public class BuildingTest {
         onView(withText("OK")).inRoot(isDialog()).perform(click());
 
         sleep(WAIT_UI);
-        RecyclerView list2 = activityRule.getActivity().findViewById(R.id.building_list);
         sleep(WAIT_DATA);
 
-        int finalTotalBuildingCount = list2.getAdapter().getItemCount();
+        int finalTotalBuildingCount = list.getAdapter().getItemCount();
 
         Assert.assertEquals((initialTotalBuildingCount - 1), finalTotalBuildingCount);
+        onView(withRecyclerView(R.id.building_list).atPositionOnView(finalTotalBuildingCount - 1, R.id.building_name)).check(matches(last));
 
+    }
+
+    @After
+    public void logout() {
+        sleep(WAIT_UI);
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
+        sleep(WAIT_UI);
+        onView(withId(R.id.btnLogout)).perform(click());
+        sleep(WAIT_UI);
     }
 
 }
