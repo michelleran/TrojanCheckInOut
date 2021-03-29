@@ -1,6 +1,9 @@
 package com.team10.trojancheckinout;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
@@ -265,6 +268,30 @@ public class BuildingTest {
         int currPosition = matchRowBuilding(buildingToDelete);
         Assert.assertEquals(currPosition, -1);
     }*/
+
+    @Test
+    public void verifyUniqueQRCodes() {
+        RecyclerView list = getCurrentActivity().findViewById(R.id.building_list);
+        Bitmap lastQR = null;
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // view building's QR code
+            onView(withId(R.id.building_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            onView(withRecyclerView(R.id.building_list)
+                .atPositionOnView(i, R.id.btnBuildingEdit)).perform(click());
+            onView(withText("View QR Code")).inRoot(isPlatformPopup()).perform(click());
+
+            sleep(WAIT_DATA);
+            Bitmap qr = ((BitmapDrawable) ((ImageView) getCurrentActivity()
+                .findViewById(R.id.imgBcQR))
+                .getDrawable())
+                .getBitmap();
+            Espresso.pressBack();
+
+            assert qr != lastQR;
+            lastQR = qr;
+        }
+    }
 
     @After
     public void logout() {
