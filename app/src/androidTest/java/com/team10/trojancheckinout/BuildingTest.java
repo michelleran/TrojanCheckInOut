@@ -102,7 +102,7 @@ public class BuildingTest {
         sleep(WAIT_UI);
     }
 
-    // Renders list properly (check for KAP building)
+    // Renders list properly (check for KAP building) // TODO: what calls this?
     public int matchRowBuilding(String buildingToMatch) {
         sleep(WAIT_UI);
         onView(withId(R.id.tabs)).perform(selectTabAtPosition(1));
