@@ -296,31 +296,26 @@ public class BuildingTest {
 
     @Test
     public void verifyUniqueQRCodes() {
-        // select 1st building
-        onView(withRecyclerView(R.id.building_list)
-            .atPositionOnView(0, R.id.btnBuildingEdit)).perform(click());
-        onView(withText("View QR Code")).inRoot(isPlatformPopup()).perform(click());
+        RecyclerView list = getCurrentActivity().findViewById(R.id.building_list);
+        Bitmap lastQR = null;
+        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+            // view building's QR code
+            onView(withId(R.id.building_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            onView(withRecyclerView(R.id.building_list)
+                .atPositionOnView(i, R.id.btnBuildingEdit)).perform(click());
+            onView(withText("View QR Code")).inRoot(isPlatformPopup()).perform(click());
 
-        sleep(WAIT_DATA);
-        Bitmap qr1 = ((BitmapDrawable) ((ImageView) getCurrentActivity()
-            .findViewById(R.id.imgBcQR))
-            .getDrawable())
-            .getBitmap();
-        Espresso.pressBack();
+            sleep(WAIT_DATA);
+            Bitmap qr = ((BitmapDrawable) ((ImageView) getCurrentActivity()
+                .findViewById(R.id.imgBcQR))
+                .getDrawable())
+                .getBitmap();
+            Espresso.pressBack();
 
-        // select 2nd building
-        onView(withRecyclerView(R.id.building_list)
-            .atPositionOnView(1, R.id.btnBuildingEdit)).perform(click());
-        onView(withText("View QR Code")).inRoot(isPlatformPopup()).perform(click());
-
-        sleep(WAIT_DATA);
-        Bitmap qr2 = ((BitmapDrawable) ((ImageView) getCurrentActivity()
-            .findViewById(R.id.imgBcQR))
-            .getDrawable())
-            .getBitmap();
-        Espresso.pressBack();
-
-        assert qr1 != qr2;
+            assert qr != lastQR;
+            lastQR = qr;
+        }
     }
 
     @After
