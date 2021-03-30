@@ -141,6 +141,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         builder.setTitle(R.string.new_password);
         //Set up input
         final EditText input = new EditText(this);
+        input.setId(R.id.edtNewPassword);
         //Set input type to password
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         builder.setView(input);
