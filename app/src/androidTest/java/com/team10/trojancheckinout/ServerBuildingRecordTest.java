@@ -19,7 +19,8 @@ import static org.junit.Assert.*;
 import static com.team10.trojancheckinout.TestUtils.*;
 
 @RunWith(AndroidJUnit4.class)
-public class Server_Building_Record_Test {
+public class ServerBuildingRecordTest {
+
     @Test
     public void getValidBuilding() {
         Server.getBuilding("FGhcVP2KLHA6VgA1ceFr", new Callback<Building>() {
@@ -129,18 +130,35 @@ public class Server_Building_Record_Test {
         });
         sleep(WAIT_DATA);
 
-        Server.getBuilding("FGhcVP2KLHA6VgA1ceFr", new Callback<Building>() {
+        // Check in to new building
+        Server.checkIn("FGhcVP2KLHA6VgA1ceFr", new Callback<Building>() {
             @Override
             public void onSuccess(Building result) {
+                assertEquals("FGhcVP2KLHA6VgA1ceFr", result.getId());
+                assertEquals(1, result.getCurrentCapacity());
+                Server.getCurrentUser(new Callback<User>() {
+                    @Override
+                    public void onSuccess(User result) {
+                        Student s = (Student) result;
+                        assertEquals("FGhcVP2KLHA6VgA1ceFr", s.getCurrentBuilding());
+                        Log.d("ServerTest", "Success");
+                    }
+
+                    @Override
+                    public void onFailure(Exception exception) {
+                    }
+                });
+                sleep(WAIT_DATA);
 
             }
 
             @Override
             public void onFailure(Exception exception) {
+                Log.d("ServerTest", exception.getMessage());
 
             }
         });
-
+        sleep(WAIT_DATA);
 
         // Check out of building
         Server.checkOut(new Callback<Building>() {
@@ -340,7 +358,7 @@ public class Server_Building_Record_Test {
         sleep(WAIT_DATA);
 
         // Check In to building
-        Server.checkIn("4C55IS3bqEJzTLobc1AX", new Callback<Building>() {
+        Server.checkIn("FGhcVP2KLHA6VgA1ceFr", new Callback<Building>() {
             @Override
             public void onSuccess(Building result) {
 
@@ -354,7 +372,7 @@ public class Server_Building_Record_Test {
         sleep(WAIT_DATA);
 
         // Check in to same building
-        Server.checkIn("4C55IS3bqEJzTLobc1AX", new Callback<Building>() {
+        Server.checkIn("FGhcVP2KLHA6VgA1ceFr", new Callback<Building>() {
             @Override
             public void onSuccess(Building result) {
             }
@@ -400,7 +418,7 @@ public class Server_Building_Record_Test {
         sleep(WAIT_DATA);
 
         // Check In
-        Server.checkIn("4C55IS3bqEJzTLobc1AX", new Callback<Building>() {
+        Server.checkIn("FGhcVP2KLHA6VgA1ceFr", new Callback<Building>() {
             @Override
             public void onSuccess(Building result) {
                 Log.d("ServerTest", "Checked In");
