@@ -128,6 +128,7 @@ public class Server {
             s.put("id", id);
             s.put("deleted", false);
             s.put("major", major);
+            s.put("currentBuilding", null);
         }
 
         StorageReference fileRef = storage.child("images/"+uid + file.getLastPathSegment());
@@ -637,7 +638,7 @@ public class Server {
                     transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, oldBuilding.getId(), oldBuilding.getName(), false));
                     transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, buildingId, newBuilding.getName(), true));
                 }
-
+                newBuilding.setCurrentCapacity(newBuilding.getCurrentCapacity()+1);
                 // Success
                 return newBuilding;
             }
@@ -672,6 +673,11 @@ public class Server {
                         FirebaseFirestoreException.Code.ABORTED);
                 }
 
+                if(student.getCurrentBuilding() == null){
+                    throw new FirebaseFirestoreException("Student is not checked into a building",
+                            FirebaseFirestoreException.Code.ABORTED);
+                }
+
                 final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(student.getCurrentBuilding());
                 Building building = transaction.get(buildingDocRef).toObject(Building.class);
                 if (building == null) {
@@ -679,16 +685,13 @@ public class Server {
                         FirebaseFirestoreException.Code.ABORTED);
                 }
 
-                if(student.getCurrentBuilding() == null){
-                    throw new FirebaseFirestoreException("Student is not checked into a building",
-                        FirebaseFirestoreException.Code.ABORTED);
-                }
 
                 // Update database
                 transaction.update(buildingDocRef, "currentCapacity", building.getCurrentCapacity() - 1);
                 transaction.update(studentDocRef, "currentBuilding", null);
                 transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, building.getId(), building.getName(), false));
 
+                building.setCurrentCapacity(building.getCurrentCapacity()-1);
                 // Success
                 return building;
             }
