@@ -11,6 +11,8 @@ import com.team10.trojancheckinout.model.User;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -20,6 +22,11 @@ import static com.team10.trojancheckinout.TestUtils.*;
 
 @RunWith(AndroidJUnit4.class)
 public class ServerBuildingRecordTest {
+
+    @After
+    public void logout() {
+        Server.logout();
+    }
 
     @Test
     public void getValidBuilding() {
