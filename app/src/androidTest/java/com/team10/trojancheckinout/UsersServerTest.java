@@ -52,21 +52,16 @@ public class UsersServerTest {
     private final String PASSWORD = "12345678";
     private final String BADPASSWORD = "12345678910";
 
-
-
     @Rule
     public ActivityScenarioRule<LoginActivity> activityRule =
             new ActivityScenarioRule<LoginActivity>(LoginActivity.class);
 
     @Before
     public void logout() {
-
         Server.logout();
-        // log out
-
     }
 
-    @Test
+    /*@Test // redundant with ManagerProfileTest.checkProfileInformation()
     public void loginManager() {
         // login
         onView(withId(R.id.etEmail)).perform(typeText(MEMAIL));
@@ -82,32 +77,7 @@ public class UsersServerTest {
         onView(withId(R.id.txtEmail)).check(matches(withText("Email: " + MEMAIL)));
 
         onView(withId(R.id.btnLogout)).perform(click());
-//        Callback<User> callback = new Callback<User>() {
-//            @Override
-//            public void onSuccess(User result) {
-//                if (result instanceof Manager){
-////                    assert ((Manager) result).getEmail()== MEMAIL;
-////                    assert ((Manager) result).getGivenName() == "Michelle";
-////                    assert ((Manager) result).getPhotoUrl() == "https://firebasestorage.googleapis.com/v0/b/trojancheckinout.appspot.com/o/images%2F8yuIBxRB8wPOVt3A69aug2AVh7x1165080656?alt=media&token=f7a9b1a0-bab8-4e51-b702-20ca54d44a94";
-////                    assert ((Manager) result).getSurname() == "Ran";
-////                    assert ((Manager) result).getUid() == "8yuIBxRB8wPOVt3A69aug2AVh7x1";
-//                    onView(withId(R.id.btnLogout)).perform(click());
-//                }
-//                else{
-//                    assert false;
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Exception exception) {
-//                if (exception != null) {
-//                    Log.e("StartPage", exception.getMessage());
-//                }
-//                assert false;
-//            }
-//        };
-//        Server.getCurrentUser(callback);
-    }
+    }*/
 
     @Test
     public void loginStudent() {
@@ -125,28 +95,7 @@ public class UsersServerTest {
         onView(withId(R.id.major)).check(matches(withText("CSCI")));
         onView(withId(R.id.currentBuilding)).check(matches(withText("None")));
 
-//        Server.getCurrentUser(new Callback<User>() {
-//            @Override
-//            public void onSuccess(User result) {
-//                if (result instanceof Student) {
-//                    assert ((Student) result).getEmail()==SEMAIL;
-//                    assert ((Student) result).getGivenName() == "Student";
-//                    assert ((Student) result).getId() == "6998590265";
-//                    assert ((Student) result).getPhotoUrl() == "https://firebasestorage.googleapis.com/v0/b/trojancheckinout.appspot.com/o/images%2FOPnUgR1qHKPO7VKtgEipOFIkS5H32131230842?alt=media&token=6269b4a9-7774-4724-b5a0-4d8062a3b839";
-//                    assert ((Student) result).getSurname() == "Testing";
-//                    onView(withId(R.id.btnLogout)).perform(click());
-//                }
-//                else{
-//                    assert false;
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Exception exception) {
-//                assert false;
-//            }
-//        });
-
+        onView(withId(R.id.signOutbtn)).perform(click());
     }
 
     @Test
@@ -299,10 +248,6 @@ public class UsersServerTest {
         onView(withId(R.id.major)).check(matches(withText("CSCI")));
         onView(withId(R.id.currentBuilding)).check(matches(withText("None")));
 
-
         onView(withId(R.id.signOutbtn)).perform(click());
     }
-
-
-
 }
