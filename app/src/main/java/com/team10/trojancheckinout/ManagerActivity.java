@@ -60,7 +60,7 @@ class ManagerPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return new BuildingListFragment();
             case 2:
-                return new FilterFragment();
+                return new SearchFragment();
             default:
                 Log.e("ManagerActivity", "No fragment for position " + position);
                 return null;
