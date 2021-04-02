@@ -799,13 +799,24 @@ public class Server {
             query.get().addOnSuccessListener(result -> {
                 for (DocumentSnapshot doc : result.getDocuments()) {
                     Record record = doc.toObject(Record.class);
-                    if (name == null ||
-                        // search by name
-                        (record.getGivenName().contains(name) || record.getSurname().contains(name)))
-                    {
-                        // student matches
+                    if (name == null) {
                         getStudent(record.getStudentUid(), callback);
+                        continue;
                     }
+                    // search by name
+                    getStudent(record.getStudentUid(), new Callback<Student>() {
+                        @Override
+                        public void onSuccess(Student student) {
+                            if (student.getGivenName().contains(name) || student.getSurname().contains(name))
+                                // student matches
+                                callback.onSuccess(student);
+                        }
+
+                        @Override
+                        public void onFailure(Exception exception) {
+                            callback.onFailure(exception);
+                        }
+                    });
                 }
             }).addOnFailureListener(callback::onFailure);
         } else {

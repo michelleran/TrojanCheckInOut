@@ -9,8 +9,6 @@ import java.util.Locale;
 public class Record {
     private String studentUid;
     private String studentId;
-    private String givenName;
-    private String surname;
     private String major;
 
     private String buildingId;
@@ -28,8 +26,6 @@ public class Record {
     public Record(Student student, String buildingId, String buildingName, boolean checkIn) {
         this.studentUid = student.getUid();
         this.studentId = student.getId();
-        this.givenName = student.getGivenName();
-        this.surname = student.getSurname();
         this.major = student.getMajor();
 
         this.buildingId = buildingId;
@@ -44,8 +40,6 @@ public class Record {
 
     public String getStudentUid() { return studentUid; }
     public String getStudentId() { return studentId; }
-    public String getGivenName() { return givenName; }
-    public String getSurname() { return surname; }
     public String getMajor(){ return major;}
 
     public String getBuildingId() { return buildingId; }
