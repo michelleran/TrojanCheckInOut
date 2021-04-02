@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 
@@ -797,9 +798,17 @@ public class Server {
                 endYear, endMonth, endDay, endHour, endMin,
                 buildingName, "", major);
             query.get().addOnSuccessListener(result -> {
+                // track which students we've already returned
+                HashSet<String> students = new HashSet<>();
                 for (DocumentSnapshot doc : result.getDocuments()) {
                     Record record = doc.toObject(Record.class);
+
+                    if (!students.add(record.getStudentUid()))
+                        // already returned this student
+                        continue;
+
                     if (name == null) {
+                        // not searching by name
                         getStudent(record.getStudentUid(), callback);
                         continue;
                     }
