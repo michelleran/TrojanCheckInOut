@@ -65,7 +65,7 @@
         app:layout_constraintTop_toBottomOf="@+id/search_major_label" />
 
     <Spinner
-        android:id="@+id/spinner2"
+        android:id="@+id/search_building_spinner"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
@@ -109,8 +109,8 @@
         android:hint="Date and time"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/spinner2"
-        app:layout_constraintTop_toBottomOf="@+id/spinner2" />
+        app:layout_constraintStart_toStartOf="@+id/search_building_spinner"
+        app:layout_constraintTop_toBottomOf="@+id/search_building_spinner" />
 
     <EditText
         android:id="@+id/search_end_date"
@@ -133,7 +133,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/tab_text_3"
+        android:text="Button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search_end_date" />
