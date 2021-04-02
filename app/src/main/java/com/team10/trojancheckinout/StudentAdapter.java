@@ -24,10 +24,17 @@ public class StudentAdapter
     protected ArrayList<Student> students;
 
     private final String TAG = "StudentAdapter";
+    private boolean sortBySurname = false;
+
+    public StudentAdapter(boolean sortBySurname) {
+        this.sortBySurname = sortBySurname;
+    }
 
     @Override
     public void onSuccess(Student item) {
         students.add(item);
+        // sort alphabetically by surname
+        students.sort((Student s1, Student s2) -> s1.getSurname().compareTo(s2.getSurname()));
         notifyDataSetChanged();
     }
 
