@@ -1,5 +1,7 @@
 package com.team10.trojancheckinout;
 
+import android.util.Log;
+
 import junit.framework.AssertionFailedError;
 
 import org.junit.After;
@@ -14,7 +16,6 @@ import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
@@ -22,10 +23,6 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.core.AllOf.allOf;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.StringContains.containsString;
 
 import static com.team10.trojancheckinout.TestUtils.WAIT_DATA;
@@ -60,6 +57,8 @@ public class SearchTest {
 
     @After
     public void logout() {
+        onView(withId(R.id.tabs)).perform(selectTabAtPosition(0));
+        sleep(WAIT_UI);
         onView(withId(R.id.btnLogout)).perform(click());
     }
 
@@ -67,52 +66,63 @@ public class SearchTest {
     public void searchByNamePartialMatch() {
         final String INPUT = "t";
         onView(withId(R.id.search_name)).perform(typeText(INPUT));
+        Espresso.closeSoftKeyboard();
         onView(withId(R.id.search_button)).perform(click());
 
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+        Log.d("SearchTest", String.valueOf(list.getAdapter().getItemCount()));
+        for (int i = 0; i < Math.min(7, list.getAdapter().getItemCount()); i++) {
             // scroll to student
             onView(withId(R.id.results_list))
                 .perform(RecyclerViewActions.scrollToPosition(i));
             // assert that student's name contains input
-            onView(withId(R.id.record_student_name))
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_name))
                 .check(matches(withText(containsString(INPUT))));
             // open profile
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
             // assert again that student's name contains input
-            onView(anyOf(withId(R.id.givenName), withId(R.id.surname)))
-                .check(matches(withText(containsString(INPUT))));
+            try {
+                onView(withId(R.id.givenName)).check(matches(withText(containsString(INPUT))));
+            } catch (AssertionFailedError e) {
+                onView(withId(R.id.surname)).check(matches(withText(containsString(INPUT))));
+            }
             Espresso.pressBack();
         }
     }
 
     @Test
-    void searchByNameFullMatch() {
+    public void searchByNameFullMatch() {
         final String INPUT = "Student";
         onView(withId(R.id.search_name)).perform(typeText(INPUT));
+        Espresso.closeSoftKeyboard();
         onView(withId(R.id.search_button)).perform(click());
 
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+        for (int i = 0; i < Math.min(7, list.getAdapter().getItemCount()); i++) {
             // scroll to student
             onView(withId(R.id.results_list))
                 .perform(RecyclerViewActions.scrollToPosition(i));
             // assert that student's name contains input
-            onView(withId(R.id.record_student_name))
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_name))
                 .check(matches(withText(containsString(INPUT))));
             // open profile
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
             // assert again that student's name contains input
-            onView(anyOf(withId(R.id.givenName), withId(R.id.surname)))
-                .check(matches(withText(containsString(INPUT))));
+            try {
+                onView(withId(R.id.givenName)).check(matches(withText(containsString(INPUT))));
+            } catch (AssertionFailedError e) {
+                onView(withId(R.id.surname)).check(matches(withText(containsString(INPUT))));
+            }
             Espresso.pressBack();
         }
     }
@@ -125,7 +135,7 @@ public class SearchTest {
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+        for (int i = 0; i < Math.min(7, list.getAdapter().getItemCount()); i++) {
             // scroll to record
             onView(withId(R.id.results_list))
                 .perform(RecyclerViewActions.scrollToPosition(i));
@@ -161,27 +171,31 @@ public class SearchTest {
     public void searchByNameMajor() {
         final String INPUT = "Student";
         onView(withId(R.id.search_name)).perform(typeText(INPUT));
+        Espresso.closeSoftKeyboard();
         selectInSpinner(R.id.search_major_spinner, MAJOR);
         onView(withId(R.id.search_button)).perform(click());
 
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < list.getAdapter().getItemCount(); i++) {
+        for (int i = 0; i < Math.min(7, list.getAdapter().getItemCount()); i++) {
             // scroll to record
             onView(withId(R.id.results_list))
                 .perform(RecyclerViewActions.scrollToPosition(i));
             // assert that student's name contains input
-            onView(withId(R.id.record_student_name))
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_name))
                 .check(matches(withText(containsString(INPUT))));
             // open profile
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
             // assert again that student's name contains input
-            onView(anyOf(withId(R.id.givenName), withId(R.id.surname)))
-                .check(matches(withText(containsString(INPUT))));
-            Espresso.pressBack();
+            try {
+                onView(withId(R.id.givenName)).check(matches(withText(containsString(INPUT))));
+            } catch (AssertionFailedError e) {
+                onView(withId(R.id.surname)).check(matches(withText(containsString(INPUT))));
+            }
             // assert that major matches
             onView(withId(R.id.major)).check(matches(withText(MAJOR)));
             Espresso.pressBack();
