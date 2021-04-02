@@ -24,6 +24,7 @@ import com.team10.trojancheckinout.utils.QRCodeHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -710,10 +711,10 @@ public class Server {
         });
     }
 
-    public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
-                                     int endYear, int endMonth, int endDay, int endHour, int endMin,
-                                     String buildingName, String studentId, String major,
-                                     Callback<Record> callback) {
+    private static Query queryRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
+                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
+                                      String buildingName, String studentId, String major)
+    {
         Query query = db.collection(RECORD_COLLECTION);
 
         // Filter by building name
@@ -744,6 +745,18 @@ public class Server {
             query = query.startAt(end.toEpochSecond()); // b/c query direction is descending, we "start" at the end date
         }
 
+        return query;
+    }
+
+    public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
+                                     int endYear, int endMonth, int endDay, int endHour, int endMin,
+                                     String buildingName, String studentId, String major,
+                                     Callback<Record> callback)
+    {
+        Query query = queryRecords(
+            startYear, startMonth, startDay, startHour, startMin,
+            endYear, endMonth, endDay, endHour, endMin,
+            buildingName, studentId, major);
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -763,5 +776,46 @@ public class Server {
         });
     }
 
+    public static void searchStudents(String name, String major,
+                                      String buildingName,
+                                      int startYear, int startMonth, int startDay, int startHour, int startMin,
+                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
+                                      Callback<Student> callback)
+    {
+        if (buildingName != null) {
+            Query query = queryRecords(
+                startYear, startMonth, startDay, startHour, startMin,
+                endYear, endMonth, endDay, endHour, endMin,
+                buildingName, "", major);
+            query.get().addOnSuccessListener(result -> {
+                for (DocumentSnapshot doc : result.getDocuments()) {
+                    Record record = doc.toObject(Record.class);
+                    if (name == null ||
+                        // search by name
+                        (record.getGivenName().contains(name) || record.getSurname().contains(name)))
+                    {
+                        // student matches
+                        getStudent(record.getStudentUid(), callback);
+                    }
+                }
+            }).addOnFailureListener(callback::onFailure);
+        } else {
+            Query query = db.collection(USER_COLLECTION).whereEqualTo("student", true);
+            if (major != null)
+                query = query.whereEqualTo("major", major);
 
+            query.get().addOnSuccessListener(result -> {
+                for (DocumentSnapshot doc : result.getDocuments()) {
+                    Student student = doc.toObject(Student.class);
+                    if (name == null ||
+                        // search by name
+                        (student.getGivenName().contains(name) || student.getSurname().contains(name)))
+                    {
+                        // student matches
+                        callback.onSuccess(student);
+                    }
+                }
+            }).addOnFailureListener(callback::onFailure);
+        }
+    }
 }
