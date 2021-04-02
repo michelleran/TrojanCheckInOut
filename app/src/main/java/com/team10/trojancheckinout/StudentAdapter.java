@@ -26,10 +26,6 @@ public class StudentAdapter
     private final String TAG = "StudentAdapter";
     private boolean sortBySurname = false;
 
-    public StudentAdapter(boolean sortBySurname) {
-        this.sortBySurname = sortBySurname;
-    }
-
     @Override
     public void onSuccess(Student item) {
         students.add(item);
@@ -75,6 +71,11 @@ public class StudentAdapter
 
     public StudentAdapter() {
         students = new ArrayList<>();
+    }
+
+    public StudentAdapter(boolean sortBySurname) {
+        students = new ArrayList<>();
+        this.sortBySurname = sortBySurname;
     }
 
     @NonNull

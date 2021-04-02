@@ -107,10 +107,13 @@ public class SearchFragment extends Fragment {
         // get list of buildings
         Spinner buildings = rootView.findViewById(R.id.search_building_spinner);
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item);
+        adapter.add("Any");
+        buildings.setAdapter(adapter);
         Server.getAllBuildingNames(new Callback<String>() {
             @Override
             public void onSuccess(String building) {
                 adapter.add(building);
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -135,7 +138,7 @@ public class SearchFragment extends Fragment {
 
             // open search results (replace this fragment)
             final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-            ft.replace(R.id.filter_tab_content,
+            ft.replace(R.id.search_tab_content,
                 SearchResultsFragment.newInstance(
                     nameField.getText().toString().trim(),
                     majors.getSelectedItemPosition() == 0 ? "" : majors.getSelectedItem().toString(),
