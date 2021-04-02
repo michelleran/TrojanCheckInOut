@@ -140,7 +140,7 @@ public class SearchFragment extends Fragment {
             final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
             ft.replace(R.id.search_tab_content,
                 SearchResultsFragment.newInstance(
-                    nameField.getText().toString().trim(),
+                    nameField.getText().toString().trim().toLowerCase(),
                     majors.getSelectedItemPosition() == 0 ? "" : majors.getSelectedItem().toString(),
                     buildings.getSelectedItemPosition() == 0 ? "" : buildings.getSelectedItem().toString(),
                     startYear, startMonth, startDay, startHour, startMin,

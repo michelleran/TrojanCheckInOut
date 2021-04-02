@@ -8,6 +8,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.hamcrest.core.AllOf;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.test.runner.lifecycle.Stage;
 
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -34,6 +36,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static org.hamcrest.Matchers.allOf;
 
 import static androidx.test.espresso.action.ViewActions.click;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 /**
  * Modified from https://github.com/dannyroa/espresso-samples
@@ -181,6 +185,11 @@ public class TestUtils {
         });
 
         return activity[0];
+    }
+
+    public static void selectInSpinner(int id, String item) {
+        onView(withId(id)).perform(click());
+        onData(AllOf.allOf(is(instanceOf(String.class)), is(item))).perform(click());
     }
 
     public static void selectDateTime(Calendar cal) {
