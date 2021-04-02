@@ -428,6 +428,15 @@ public class Server {
         });
     }
 
+    public static void getAllBuildingNames(Callback<String> callback) {
+        db.collection(BUILDING_COLLECTION).get().addOnSuccessListener(result -> {
+            for (DocumentSnapshot doc : result) {
+                Building building = doc.toObject(Building.class);
+                callback.onSuccess(building.getName());
+            }
+        }).addOnFailureListener(callback::onFailure);
+    }
+
     public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) {
         DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document();
         String buildingID = newBuildingRef.getId();

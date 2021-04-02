@@ -17,6 +17,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.team10.trojancheckinout.model.Callback;
+import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.utils.Validator;
 
 import java.util.Calendar;
@@ -100,11 +102,22 @@ public class SearchFragment extends Fragment {
         EditText nameField = rootView.findViewById(R.id.search_name);
 
         Spinner majors = rootView.findViewById(R.id.search_major_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.majors_with_any, android.R.layout.simple_spinner_item);
-        majors.setAdapter(adapter);
+        majors.setAdapter(ArrayAdapter.createFromResource(getContext(), R.array.majors_with_any, android.R.layout.simple_spinner_item));
 
+        // get list of buildings
         Spinner buildings = rootView.findViewById(R.id.search_building_spinner);
-        // TODO: get list of buildings
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item);
+        Server.getAllBuildingNames(new Callback<String>() {
+            @Override
+            public void onSuccess(String building) {
+                adapter.add(building);
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                exception.printStackTrace();
+            }
+        });
 
         Button button = rootView.findViewById(R.id.search_button);
         button.setOnClickListener(view -> {
