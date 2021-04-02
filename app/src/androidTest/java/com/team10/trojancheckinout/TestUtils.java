@@ -1,12 +1,15 @@
 package com.team10.trojancheckinout;
 
 import android.view.View;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import com.google.android.material.tabs.TabLayout;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
+import java.util.Calendar;
 import java.util.Collection;
 
 import androidx.annotation.IdRes;
@@ -16,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.PerformException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.espresso.util.HumanReadables;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -25,8 +29,11 @@ import androidx.test.runner.lifecycle.Stage;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static org.hamcrest.Matchers.allOf;
+
+import static androidx.test.espresso.action.ViewActions.click;
 
 /**
  * Modified from https://github.com/dannyroa/espresso-samples
@@ -162,15 +169,6 @@ public class TestUtils {
         };
     }
 
-    /*public static AppCompatActivity getCurrentActivity() {
-        final AppCompatActivity[] activity = new AppCompatActivity[1];
-        onView(isRoot()).check((view, noViewFoundException) -> {
-            //activity[0] = (AppCompatActivity) view.getContext();
-            activity[0] = (AppCompatActivity) view.findViewById(android.R.id.content).getContext();
-        });
-        return activity[0];
-    }*/
-
     public static AppCompatActivity getCurrentActivity() {
         final AppCompatActivity[] activity = new AppCompatActivity[1];
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
@@ -183,5 +181,24 @@ public class TestUtils {
         });
 
         return activity[0];
+    }
+
+    public static void selectDateTime(Calendar cal) {
+        // select date
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
+            .perform(PickerActions.setDate(
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH) + 1,
+                cal.get(Calendar.DAY_OF_MONTH)));
+        // select ok
+        onView(withId(android.R.id.button1)).perform(click());
+
+        // select time
+        onView(withClassName(Matchers.equalTo(TimePicker.class.getName())))
+            .perform(PickerActions.setTime(
+                cal.get(Calendar.HOUR_OF_DAY),
+                cal.get(Calendar.MINUTE)));
+        // select ok
+        onView(withId(android.R.id.button1)).perform(click());
     }
 }
