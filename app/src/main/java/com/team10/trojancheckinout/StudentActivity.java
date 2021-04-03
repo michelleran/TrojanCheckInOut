@@ -188,19 +188,29 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                     .show();
             return;
         }
-        //set Current Building to None and Server.checkOut()
-        currentBuilding.setText(R.string.none);
-        Server.checkOut(new Callback<Building>() {
-            @Override
-            public void onSuccess(Building building) {
-                student.setBuilding(null);
-                Toast.makeText(getApplicationContext(), "Successfully checked out!", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onFailure(Exception exception) {
-                Log.e(TAG, "onFailure: manual checkout failure");
-            }
-        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to check out?")
+                .setTitle("Checkout?")
+                .setPositiveButton("Confirm", (dialog, id) -> {
+                    Server.checkOut(new Callback<Building>() {
+                        @Override
+                        public void onSuccess(Building building) {
+                            //set Current Building to None and Server.checkOut()
+                            currentBuilding.setText(R.string.none);
+                            student.setBuilding(null);
+                            Toast.makeText(getApplicationContext(), "Successfully checked out!", Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: manual checkout failure");
+                        }
+                    });
+                })
+                .setNegativeButton("Cancel", (dialog, id) -> {
+                    dialog.cancel();
+                }).setIcon(android.R.drawable.ic_dialog_alert).show();
     }
 
     @Override
