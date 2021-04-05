@@ -710,6 +710,25 @@ public class Server {
         });
     }
 
+    public static void listenToHistory(String id, Callback<Record> callback) {
+        db.collection(RECORD_COLLECTION)
+            .whereEqualTo("studentUid", id)
+            .orderBy("epochTime", Query.Direction.DESCENDING)
+            .addSnapshotListener((value, error) -> {
+                if (error != null) {
+                    callback.onFailure(new Exception(error.getMessage()));
+                    return;
+                }
+
+                for (DocumentChange dc : value.getDocumentChanges()) {
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        Record record = dc.getDocument().toObject(Record.class);
+                        callback.onSuccess(record);
+                    }
+                }
+            });
+    }
+
     public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
                                      String buildingName, String studentId, String major,
