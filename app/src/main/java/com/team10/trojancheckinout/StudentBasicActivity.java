@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ import com.team10.trojancheckinout.model.Student;
 public class StudentBasicActivity extends AppCompatActivity {
     private static final String TAG = "StudentBasicActivity";
     TextView givenName, surname, id, major, currentBuilding, deleted;
+    Student student;
     ImageView photoUrl;
 
     @Override
@@ -38,6 +40,7 @@ public class StudentBasicActivity extends AppCompatActivity {
         Server.getStudent(studentId, new Callback<Student>() {
             @Override
             public void onSuccess(Student result) {
+                student = (Student) result;
                 givenName.setText(result.getGivenName());
                 surname.setText(result.getSurname());
                 id.setText(result.getId());
@@ -53,8 +56,6 @@ public class StudentBasicActivity extends AppCompatActivity {
                     currentBuilding.setText("N/A");
                 }
                 else{
-                    deleted.setVisibility(TextView.INVISIBLE);
-
                     //gets building name through Server.getBuilding()
                     if (result.getCurrentBuilding() != null) {
                         Server.getBuilding(result.getCurrentBuilding(), new Callback<Building>() {
@@ -78,5 +79,13 @@ public class StudentBasicActivity extends AppCompatActivity {
                 Log.e(TAG, exception.getMessage() );
             }
         });
+    }
+
+    public void viewHistory(View view){
+        Intent i = new Intent(StudentBasicActivity.this, StudentHistory.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("usc_id", student.getId());
+        i.putExtras(bundle);
+        startActivity(i);
     }
 }
