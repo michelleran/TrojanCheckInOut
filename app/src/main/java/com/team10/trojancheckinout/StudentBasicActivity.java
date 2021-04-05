@@ -16,7 +16,7 @@ import com.team10.trojancheckinout.model.Student;
 
 public class StudentBasicActivity extends AppCompatActivity {
     private static final String TAG = "StudentBasicActivity";
-    TextView givenName, surname, id, major, currentBuilding;
+    TextView givenName, surname, id, major, currentBuilding, deleted;
     ImageView photoUrl;
 
     @Override
@@ -33,6 +33,7 @@ public class StudentBasicActivity extends AppCompatActivity {
         major = findViewById(R.id.major);
         currentBuilding = findViewById(R.id.currentBuilding);
         photoUrl = findViewById(R.id.student_photo);
+        deleted = findViewById(R.id.deletedAccount);
 
         Server.getStudent(studentId, new Callback<Student>() {
             @Override
@@ -42,32 +43,39 @@ public class StudentBasicActivity extends AppCompatActivity {
                 id.setText(result.getId());
                 major.setText(result.getMajor());
 
-                //gets building name through Server.getBuilding()
-                if (result.getCurrentBuilding() != null) {
-                    Server.getBuilding(result.getCurrentBuilding(), new Callback<Building>() {
-                        @Override
-                        public void onSuccess(Building result) {
-                            currentBuilding.setText(result.getName());
-                        }
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Log.e(TAG, "onFailure: getBuildingName failure");
-                        }
-                    });
-                } else {
-                    currentBuilding.setText(R.string.none);
-                }
-
                 Glide.with(getApplicationContext())
-                    .load(result.getPhotoUrl())
-                    .override(400, 400).centerCrop()
-                    .into(photoUrl);
+                        .load(result.getPhotoUrl())
+                        .override(400, 400).centerCrop()
+                        .into(photoUrl);
+
+                if(result.isDeleted()){
+                    deleted.setVisibility(TextView.VISIBLE);
+                    currentBuilding.setText("N/A");
+                }
+                else{
+                    deleted.setVisibility(TextView.INVISIBLE);
+
+                    //gets building name through Server.getBuilding()
+                    if (result.getCurrentBuilding() != null) {
+                        Server.getBuilding(result.getCurrentBuilding(), new Callback<Building>() {
+                            @Override
+                            public void onSuccess(Building result) {
+                                currentBuilding.setText(result.getName());
+                            }
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.e(TAG, "onFailure: getBuildingName failure");
+                            }
+                        });
+                    } else {
+                        currentBuilding.setText(R.string.none);
+                    }
+                }
             }
 
             @Override
             public void onFailure(Exception exception) {
                 Log.e(TAG, exception.getMessage() );
-
             }
         });
     }
