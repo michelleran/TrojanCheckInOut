@@ -810,6 +810,7 @@ public class Server {
                                       int endYear, int endMonth, int endDay, int endHour, int endMin,
                                       Callback<Student> callback)
     {
+
         if (buildingName != null) {
             Query query = queryRecords(
                 startYear, startMonth, startDay, startHour, startMin,
@@ -830,7 +831,9 @@ public class Server {
                         public void onSuccess(Student student) {
                             if (!student.isDeleted() &&
                                 // search by name, if applicable
-                                (name == null || student.getGivenName().contains(name) || student.getSurname().contains(name)))
+                                (name == null || name.isEmpty() ||
+                                    student.getGivenName().toLowerCase().contains(name) ||
+                                    student.getSurname().toLowerCase().contains(name)))
                                 // student matches
                                 callback.onSuccess(student);
                         }
@@ -852,10 +855,10 @@ public class Server {
             query.get().addOnSuccessListener(result -> {
                 for (DocumentSnapshot doc : result.getDocuments()) {
                     Student student = doc.toObject(Student.class);
-                    if (name == null ||
+                    if (name == null || name.isEmpty() ||
                         // search by name
-                        (student.getGivenName().toLowerCase().contains(name) ||
-                         student.getSurname().toLowerCase().contains(name)))
+                        student.getGivenName().toLowerCase().contains(name) ||
+                        student.getSurname().toLowerCase().contains(name))
                     {
                         // student matches
                         callback.onSuccess(student);
