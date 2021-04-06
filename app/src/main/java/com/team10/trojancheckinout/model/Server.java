@@ -854,7 +854,8 @@ public class Server {
                     Student student = doc.toObject(Student.class);
                     if (name == null ||
                         // search by name
-                        (student.getGivenName().contains(name) || student.getSurname().contains(name)))
+                        (student.getGivenName().toLowerCase().contains(name) ||
+                         student.getSurname().toLowerCase().contains(name)))
                     {
                         // student matches
                         callback.onSuccess(student);

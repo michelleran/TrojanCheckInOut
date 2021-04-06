@@ -82,7 +82,6 @@ public class SearchTest {
         sleep(WAIT_DATA);
 
         RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        Log.d("SearchTest", String.valueOf(list.getAdapter().getItemCount()));
         for (int i = 0; i < Math.min(7, list.getAdapter().getItemCount()); i++) {
             // scroll to student
             onView(withId(R.id.results_list))
