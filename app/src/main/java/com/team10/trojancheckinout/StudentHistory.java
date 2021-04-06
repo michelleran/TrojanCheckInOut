@@ -21,7 +21,7 @@ import com.team10.trojancheckinout.model.User;
 public class StudentHistory extends AppCompatActivity {
     private static final String TAG = "Student History";
     private RecordAdapter adapter;
-    String usc_id;
+    String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public class StudentHistory extends AppCompatActivity {
         setContentView(R.layout.activity_student_history);
 
         Bundle bundle = getIntent().getExtras();
-        usc_id = bundle.getString("usc_id");
+        uid = bundle.getString("uid");
 
         RecyclerView resultsList = findViewById(R.id.student_history_list);
 
@@ -40,19 +40,17 @@ public class StudentHistory extends AppCompatActivity {
         adapter = new RecordAdapter();
         resultsList.setAdapter(adapter);
 
-        Server.filterRecords(-1, -1, -1, -1, -1,
-                -1, -1, -1, -1, -1,
-                "", usc_id, "", new Callback<Record>() {
-                    @Override
-                    public void onSuccess(Record result) {
+        Server.listenToHistory(uid, new Callback<Record>() {
+            @Override
+            public void onSuccess(Record result) {
                         adapter.addRecord(result);
                     }
 
-                    @Override
-                    public void onFailure(Exception exception) {
-                        Log.e(TAG, exception.getMessage());
-                        // TODO: handle
-                    }
-                });
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e(TAG, exception.getMessage());
+                // TODO: handle
+            }
+        });
     }
 }
