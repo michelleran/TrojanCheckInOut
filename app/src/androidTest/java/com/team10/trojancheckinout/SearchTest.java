@@ -46,7 +46,7 @@ import static com.team10.trojancheckinout.TestUtils.sleep;
 @RunWith(AndroidJUnit4.class)
 public class SearchTest {
     private final String MAJOR = "CSCI";
-    private final String BUILDING = "Mudd Hall";
+    private final String BUILDING = "Doheny";
 
     @Rule
     public ActivityScenarioRule<LoginActivity> activityRule =
@@ -203,6 +203,7 @@ public class SearchTest {
             }
             assert buildingInHistory;
             Espresso.pressBack();
+            Espresso.pressBack();
         }
     }
 
@@ -247,6 +248,7 @@ public class SearchTest {
             }
             assert visitedBuildingInTimePeriod;
             Espresso.pressBack();
+            Espresso.pressBack();
         }
     }
 
@@ -290,6 +292,7 @@ public class SearchTest {
                 }
             }
             assert visitedBuildingInTimePeriod;
+            Espresso.pressBack();
             Espresso.pressBack();
         }
     }
@@ -339,6 +342,7 @@ public class SearchTest {
                 }
             }
             assert visitedBuildingInTimePeriod;
+            Espresso.pressBack();
             Espresso.pressBack();
         }
     }
@@ -442,6 +446,7 @@ public class SearchTest {
             }
             assert buildingInHistory;
             Espresso.pressBack();
+            Espresso.pressBack();
         }
     }
 
@@ -512,12 +517,13 @@ public class SearchTest {
             }
             assert visitedBuildingInTimePeriod;
             Espresso.pressBack();
+            Espresso.pressBack();
         }
     }
 
     private Calendar getStartDate() {
         return new Calendar.Builder()
-            .setDate(2021, 3, 1)
+            .setDate(2021, 2, 29)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
@@ -525,7 +531,7 @@ public class SearchTest {
 
     private Calendar getEndDate() {
         return new Calendar.Builder()
-            .setDate(2021, 3, 5)
+            .setDate(2021, 3, 6)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
