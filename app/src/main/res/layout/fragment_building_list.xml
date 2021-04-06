@@ -28,6 +28,14 @@
             android:text="Add Building"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Import CSV"
+            app:layout_constraintBottom_toBottomOf="@+id/building_list"
+            tools:layout_editor_absoluteX="159dp" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
