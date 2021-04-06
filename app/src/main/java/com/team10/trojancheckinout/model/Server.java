@@ -720,6 +720,24 @@ public class Server {
             }
         });
     }
+    public static void listenToHistory(String id, Callback<Record> callback) {
+        db.collection(RECORD_COLLECTION)
+            .whereEqualTo("studentUid", id)
+            .orderBy("epochTime", Query.Direction.DESCENDING)
+            .addSnapshotListener((value, error) -> {
+                if (error != null) {
+                    callback.onFailure(new Exception(error.getMessage()));
+                    return;
+                }
+
+                for (DocumentChange dc : value.getDocumentChanges()) {
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        Record record = dc.getDocument().toObject(Record.class);
+                        callback.onSuccess(record);
+                    }
+                }
+            });
+    }
 
     private static Query queryRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                       int endYear, int endMonth, int endDay, int endHour, int endMin,
@@ -807,16 +825,12 @@ public class Server {
                         // already returned this student
                         continue;
 
-                    if (name == null) {
-                        // not searching by name
-                        getStudent(record.getStudentUid(), callback);
-                        continue;
-                    }
-                    // search by name
                     getStudent(record.getStudentUid(), new Callback<Student>() {
                         @Override
                         public void onSuccess(Student student) {
-                            if (student.getGivenName().contains(name) || student.getSurname().contains(name))
+                            if (!student.isDeleted() &&
+                                // search by name, if applicable
+                                (name == null || student.getGivenName().contains(name) || student.getSurname().contains(name)))
                                 // student matches
                                 callback.onSuccess(student);
                         }
@@ -829,7 +843,9 @@ public class Server {
                 }
             }).addOnFailureListener(callback::onFailure);
         } else {
-            Query query = db.collection(USER_COLLECTION).whereEqualTo("student", true);
+            Query query = db.collection(USER_COLLECTION)
+                .whereEqualTo("student", true)
+                .whereEqualTo("deleted", false);
             if (major != null)
                 query = query.whereEqualTo("major", major);
 
