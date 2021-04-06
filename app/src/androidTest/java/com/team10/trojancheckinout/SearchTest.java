@@ -518,7 +518,7 @@ public class SearchTest {
 
     private Calendar getStartDate() {
         return new Calendar.Builder()
-            .setDate(2021, 3, 3)
+            .setDate(2021, 3, 1)
             .setTimeOfDay(9, 0, 0)
             .setTimeZone(TimeZone.getTimeZone(Record.pst))
             .build();
