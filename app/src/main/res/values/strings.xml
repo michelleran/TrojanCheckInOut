@@ -64,6 +64,7 @@
     <string name="cancel">Cancel</string>
     <string name="none">None</string>
     <string name="new_password">Input New Password</string>
+    <string name="account_deleted"><b>User Account Has Been Deleted!</b></string>
 
     <string name="filter_invalid_usc_id">Please enter a valid USC id or leave the field blank</string>
     <string name="filter_invalid_dates">Please select an end date that is after the selected start date</string>

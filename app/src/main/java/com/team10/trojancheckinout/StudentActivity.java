@@ -107,7 +107,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     public void viewHistory(View view){
         Intent i = new Intent(StudentActivity.this, StudentHistory.class);
         Bundle bundle = new Bundle();
-        bundle.putString("usc_id", student.getId());
+        bundle.putString("uid", student.getUid());
         i.putExtras(bundle);
         startActivity(i);
     }
