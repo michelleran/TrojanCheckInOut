@@ -33,13 +33,13 @@ import static org.hamcrest.Matchers.allOf;
 import static com.team10.trojancheckinout.TestUtils.*;
 
 @RunWith(AndroidJUnit4.class)
-public class BuildingsTest {
+public class BuildingRealtimeUpdateTest {
     @Rule
     public ActivityScenarioRule<LoginActivity> activityRule =
         new ActivityScenarioRule<LoginActivity>(LoginActivity.class);
 
     @Before
-    public void login_navigateToBuildingsTab() {
+    public void login() {
         // login
         onView(withId(R.id.etEmail)).perform(typeText("ranmiche@usc.edu"));
         onView(withId(R.id.etPassword)).perform(typeText("12345678"));
@@ -62,47 +62,9 @@ public class BuildingsTest {
         onView(withId(R.id.btnLogout)).perform(click());
     }
 
-    @Test
-    public void openBuilding_verifyDetails() {
-        final String BUILDING = "Mudd Hall";
-        // select building
-        onView(withId(R.id.building_list))
-            .perform(RecyclerViewActions.actionOnItem(
-                hasDescendant(withText(BUILDING)), click()));
-
-        sleep(WAIT_UI);
-
-        // check building name
-        onView(withId(R.id.building_details_name))
-            .check(matches(allOf(withText(BUILDING), isDisplayed())));
-
-        RecyclerView list = getCurrentActivity().findViewById(R.id.building_details_students);
-        int count = list.getAdapter().getItemCount();
-
-        // assert that current capacity = length of list
-        onView(withId(R.id.building_details_capacity))
-            .check(matches(
-                withText(startsWith(String.format(Locale.US, "Capacity: %d/", count)))
-            ));
-
-        for (int i = 0; i < count; i++) {
-            // scroll to student
-            onView(withId(R.id.building_details_students))
-                .perform(RecyclerViewActions.scrollToPosition(i));
-            // open profile
-            onView(withRecyclerView(R.id.building_details_students)
-                .atPositionOnView(i, R.id.record_student_photo))
-                .perform(click());
-            // assert that current building matches
-            onView(withId(R.id.currentBuilding)).check(matches(withText(BUILDING)));
-            Espresso.pressBack();
-        }
-        Espresso.pressBack();
-    }
-
     /** Must be run alone to give the transactions time to finish. */
     @Test
-    public void openBuilding_fakeCheckInThenOut() {
+    public void fakeCheckInThenOut() {
         final String BUILDING = "Mudd Hall";
         String STUDENT = "kZx50sTS79Wp8az6NHZbJjFU6AI2";
         String NAME = "Testing, Student";

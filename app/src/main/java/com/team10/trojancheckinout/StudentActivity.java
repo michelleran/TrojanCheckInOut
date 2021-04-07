@@ -108,7 +108,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     public void viewHistory(View view){
         Intent i = new Intent(StudentActivity.this, StudentHistory.class);
         Bundle bundle = new Bundle();
-        bundle.putString("usc_id", student.getId());
+        bundle.putString("uid", student.getUid());
         i.putExtras(bundle);
         startActivity(i);
     }
@@ -142,6 +142,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         builder.setTitle(R.string.new_password);
         //Set up input
         final EditText input = new EditText(this);
+        input.setId(R.id.edtNewPassword);
         //Set input type to password
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         builder.setView(input);

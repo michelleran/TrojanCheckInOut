@@ -128,6 +128,7 @@ public class Server {
             s.put("id", id);
             s.put("deleted", false);
             s.put("major", major);
+            s.put("currentBuilding", null);
         }
 
         StorageReference fileRef = storage.child("images/"+uid + file.getLastPathSegment());
@@ -534,7 +535,8 @@ public class Server {
             public Building apply(Transaction transaction) throws FirebaseFirestoreException {
                 Building building = transaction.get(buildingDocRef).toObject(Building.class);
                 // If new max capacity is smaller than old max capacity
-                if(building.getMaxCapacity() > maxCapacity){
+                if(building.getCurrentCapacity() > maxCapacity){
+                    Log.d(TAG, "Error");
                     throw new FirebaseFirestoreException("New capacity is smaller than old capacity",
                         FirebaseFirestoreException.Code.ABORTED);
                 }else{
@@ -637,7 +639,7 @@ public class Server {
                     transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, oldBuilding.getId(), oldBuilding.getName(), false));
                     transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, buildingId, newBuilding.getName(), true));
                 }
-
+                newBuilding.setCurrentCapacity(newBuilding.getCurrentCapacity()+1);
                 // Success
                 return newBuilding;
             }
@@ -672,6 +674,11 @@ public class Server {
                         FirebaseFirestoreException.Code.ABORTED);
                 }
 
+                if(student.getCurrentBuilding() == null){
+                    throw new FirebaseFirestoreException("Student is not checked into a building",
+                            FirebaseFirestoreException.Code.ABORTED);
+                }
+
                 final DocumentReference buildingDocRef = db.collection(BUILDING_COLLECTION).document(student.getCurrentBuilding());
                 Building building = transaction.get(buildingDocRef).toObject(Building.class);
                 if (building == null) {
@@ -679,16 +686,13 @@ public class Server {
                         FirebaseFirestoreException.Code.ABORTED);
                 }
 
-                if(student.getCurrentBuilding() == null){
-                    throw new FirebaseFirestoreException("Student is not checked into a building",
-                        FirebaseFirestoreException.Code.ABORTED);
-                }
 
                 // Update database
                 transaction.update(buildingDocRef, "currentCapacity", building.getCurrentCapacity() - 1);
                 transaction.update(studentDocRef, "currentBuilding", null);
                 transaction.set(db.collection(RECORD_COLLECTION).document(), new Record(student, building.getId(), building.getName(), false));
 
+                building.setCurrentCapacity(building.getCurrentCapacity()-1);
                 // Success
                 return building;
             }
@@ -705,6 +709,25 @@ public class Server {
                 Log.w(TAG, "Transaction failure.", e);
             }
         });
+    }
+
+    public static void listenToHistory(String id, Callback<Record> callback) {
+        db.collection(RECORD_COLLECTION)
+            .whereEqualTo("studentUid", id)
+            .orderBy("epochTime", Query.Direction.DESCENDING)
+            .addSnapshotListener((value, error) -> {
+                if (error != null) {
+                    callback.onFailure(new Exception(error.getMessage()));
+                    return;
+                }
+
+                for (DocumentChange dc : value.getDocumentChanges()) {
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        Record record = dc.getDocument().toObject(Record.class);
+                        callback.onSuccess(record);
+                    }
+                }
+            });
     }
 
     public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,

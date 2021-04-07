@@ -144,4 +144,35 @@
         app:layout_constraintStart_toEndOf="@+id/fname_text"
         app:layout_constraintTop_toTopOf="@+id/fname_text" />
 
+    <TextView
+        android:id="@+id/deletedAccount"
+        android:layout_width="304dp"
+        android:layout_height="41dp"
+        android:ems="10"
+        android:gravity="center"
+        android:paddingTop="10dp"
+        android:text="@string/account_deleted"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/currLoc_text"
+        app:layout_constraintVertical_bias="0.251" />
+
+    <Button
+        android:id="@+id/viewHistoryBtn_basic"
+        android:layout_width="152dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="12dp"
+        android:onClick="viewHistory"
+        android:text="@string/view_history"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/currLoc_text"
+        app:layout_constraintVertical_bias="0.0" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
