@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout.model;
 
 import android.content.Context;
+import android.nfc.Tag;
 import android.os.Environment;
 import android.util.Log;
 
@@ -428,59 +429,76 @@ public class Server {
     }
 
     public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) {
-        DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document();
-        String buildingID = newBuildingRef.getId();
-
-        byte[] qr = QRCodeHelper.generateQRCodeImage(buildingID, 250 , 250);
-        StorageReference fileRef = storage.child("qrcodes/" + buildingID);
-        StorageMetadata metadata = new StorageMetadata.Builder().setCustomMetadata("contentType", "image/jpeg").build();
-        UploadTask uploadTask = fileRef.putBytes(qr, metadata);
-
-        uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
-            @Override
-            public void onProgress(@NotNull UploadTask.TaskSnapshot taskSnapshot) {
-                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                Log.d(TAG, "Upload is " + progress + "% done");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-                Log.d(TAG, "could not handle Uri");
-                callback.onFailure(exception);
-                
-            }
-        }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
-            @Override
-            public void onSuccess(TaskSnapshot taskSnapshot) {
-                taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        db.collection(BUILDING_COLLECTION)
+                .whereEqualTo("name", name)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Uri uri) {
-                        Building building = new Building( newBuildingRef.getId(), name, uri.toString(),maxCapacity);
-                        db.collection(BUILDING_COLLECTION).document(buildingID).set(building)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "DocumentSnapshot added with ID: ");
-                                    callback.onSuccess(building);
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w(TAG, "Error adding document", e);
-                                    callback.onFailure(e);
-                                }
-                            });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        callback.onFailure(e);
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(!task.getResult().isEmpty()) {
+                                callback.onFailure(new Exception("Building with given name already exists"));
+                            }else{
+                                DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document();
+                                String buildingID = newBuildingRef.getId();
+
+                                byte[] qr = QRCodeHelper.generateQRCodeImage(buildingID, 250 , 250);
+                                StorageReference fileRef = storage.child("qrcodes/" + buildingID);
+                                StorageMetadata metadata = new StorageMetadata.Builder().setCustomMetadata("contentType", "image/jpeg").build();
+                                UploadTask uploadTask = fileRef.putBytes(qr, metadata);
+
+                                uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
+                                    @Override
+                                    public void onProgress(@NotNull UploadTask.TaskSnapshot taskSnapshot) {
+                                        double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                                        Log.d(TAG, "Upload is " + progress + "% done");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Handle unsuccessful uploads
+                                        Log.d(TAG, "could not handle Uri");
+                                        callback.onFailure(exception);
+
+                                    }
+                                }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(TaskSnapshot taskSnapshot) {
+                                        taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                Building building = new Building( newBuildingRef.getId(), name, uri.toString(),maxCapacity);
+                                                db.collection(BUILDING_COLLECTION).document(buildingID).set(building)
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                Log.d(TAG, "DocumentSnapshot added with ID: ");
+                                                                callback.onSuccess(building);
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Log.w(TAG, "Error adding document", e);
+                                                                callback.onFailure(e);
+                                                            }
+                                                        });
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                callback.onFailure(e);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
                     }
                 });
-            }
-        });
     }
 
     public static void removeBuilding(String id, Callback<Void> callback){

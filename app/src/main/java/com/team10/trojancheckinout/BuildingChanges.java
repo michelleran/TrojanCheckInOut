@@ -349,7 +349,13 @@ public class BuildingChanges extends Fragment {
                                 Log.e(TAG, "onFailure: Building add error");
                             }
                             if (getContext() != null) {
-                                Toast.makeText(getContext(), "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
+                                if(exception.getMessage() == "Building with given name already exists"){
+                                    Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(getContext(), "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
+
+                                }
+
                             }
                         }
                     });
