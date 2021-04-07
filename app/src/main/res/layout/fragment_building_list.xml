@@ -19,6 +19,8 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="50dp"/>
 
+
+
         <Button
             android:id="@+id/btnAddBuilding"
             android:layout_width="match_parent"
@@ -27,6 +29,15 @@
             android:backgroundTint="#FFFFFF"
             android:text="Add Building"
             app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floatingActionButton5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:srcCompat="@drawable/ic_baseline_add_24"
+            tools:layout_editor_absoluteX="326dp"
+            tools:layout_editor_absoluteY="600dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
