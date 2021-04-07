@@ -201,7 +201,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                             //set Current Building to None and Server.checkOut()
                             currentBuilding.setText(R.string.none);
                             student.setBuilding(null);
-                            Toast.makeText(getApplicationContext(), "Successfully checked out!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Successfully checked out of " + building.getName() + "!", Toast.LENGTH_LONG).show();
                         }
 
                         @Override
@@ -267,7 +267,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                                 student.setBuilding(null);
                                 currentBuilding.setText(R.string.none);
                                 Toast.makeText(getApplicationContext(),
-                                        "Successfully checked out!", Toast.LENGTH_LONG).show();
+                                        "Successfully checked out of "+ building.getName() +"!", Toast.LENGTH_LONG).show();
                             }
                             @Override
                             public void onFailure(Exception exception) {
@@ -279,11 +279,24 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                         dialog.cancel();
                     }).setIcon(android.R.drawable.ic_dialog_alert).show();
         } else if(student.getCurrentBuilding() != null && !student.getCurrentBuilding().equals(buildingId)){
+            final String[] temp = {""};
+            Server.getBuilding(student.getCurrentBuilding(), new Callback<Building>() {
+                @Override
+                public void onSuccess(Building result) {
+                    temp[0] = result.getName();
+                }
+
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure: Alert failure, couldn't get building");
+                    exception.printStackTrace();
+                }
+            });
             AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
             builder2.setCancelable(true)
                     .setTitle("Check In Denied")
-                    .setMessage("You are currently checked in to a different building." +
-                            "Please check out before checking into a new building.")
+                    .setMessage("You are currently checked in to "+ temp[0] + "." +
+                            " Please check out before checking into a new building.")
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -303,7 +316,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                             public void onSuccess(Building building) {
                                 student.setBuilding(buildingId);
                                 currentBuilding.setText(building.getName());
-                                Toast.makeText(getApplicationContext(), "Successfully checked in!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Successfully checked in to "+ building.getName() + "!", Toast.LENGTH_LONG).show();
                             }
 
                             @Override
