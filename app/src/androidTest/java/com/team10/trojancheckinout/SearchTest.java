@@ -41,8 +41,6 @@ import static com.team10.trojancheckinout.TestUtils.selectTabAtPosition;
 import static com.team10.trojancheckinout.TestUtils.selectInSpinner;
 import static com.team10.trojancheckinout.TestUtils.sleep;
 
-// TODO: can't test too well until we have students that fit every search criteria combination
-
 @RunWith(AndroidJUnit4.class)
 public class SearchTest {
     private final String MAJOR = "CSCI";
@@ -74,7 +72,7 @@ public class SearchTest {
 
     @Test
     public void searchByNamePartialMatch() {
-        final String INPUT = "t";
+        final String INPUT = "n";
         onView(withId(R.id.search_name)).perform(typeText(INPUT));
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.search_button)).perform(click());
@@ -110,7 +108,7 @@ public class SearchTest {
 
     @Test
     public void searchByNameFullMatch() {
-        final String INPUT = "Student";
+        final String INPUT = "Tester";
         onView(withId(R.id.search_name)).perform(typeText(INPUT));
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.search_button)).perform(click());
@@ -350,7 +348,7 @@ public class SearchTest {
     @Test
     public void searchByNameMajor() {
         // input name
-        final String INPUT = "Student";
+        final String INPUT = "n";
         onView(withId(R.id.search_name)).perform(typeText(INPUT));
         Espresso.closeSoftKeyboard();
 
@@ -392,7 +390,7 @@ public class SearchTest {
     @Test
     public void searchByNameMajorBuilding() {
         // input name
-        final String INPUT = "Student";
+        final String INPUT = "n";
         onView(withId(R.id.search_name)).perform(typeText(INPUT));
         Espresso.closeSoftKeyboard();
 
@@ -453,7 +451,7 @@ public class SearchTest {
     @Test
     public void searchByNameMajorBuildingStartEndDate() {
         // input name
-        final String INPUT = "Student";
+        final String INPUT = "n";
         onView(withId(R.id.search_name)).perform(typeText(INPUT));
         Espresso.closeSoftKeyboard();
 

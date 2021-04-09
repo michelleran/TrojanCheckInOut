@@ -32,6 +32,7 @@ public class SearchFragment extends Fragment {
     private final String DATE_TIME_FORMAT = "%02d/%02d/%04d %02d:%02d PDT";
 
     private String studentName;
+    private String id;
     private String major;
 
     private String buildingName;
@@ -100,6 +101,7 @@ public class SearchFragment extends Fragment {
         });
 
         EditText nameField = rootView.findViewById(R.id.search_name);
+        EditText idField = rootView.findViewById(R.id.search_id);
 
         Spinner majors = rootView.findViewById(R.id.search_major_spinner);
         majors.setAdapter(ArrayAdapter.createFromResource(getContext(), R.array.majors_with_any, android.R.layout.simple_spinner_item));
@@ -135,6 +137,8 @@ public class SearchFragment extends Fragment {
                 Toast.makeText(getContext(), R.string.filter_invalid_dates, Toast.LENGTH_LONG).show();
                 return;
             }
+
+            // TODO: pass id in too (but first, test search as it is)
 
             // open search results (replace this fragment)
             final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
