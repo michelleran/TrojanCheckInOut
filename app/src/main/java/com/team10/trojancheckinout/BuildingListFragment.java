@@ -2,13 +2,11 @@ package com.team10.trojancheckinout;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,13 +22,17 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Listener;
-import com.team10.trojancheckinout.model.Manager;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.utils.CSVParser;
 
-import java.lang.reflect.Array;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +40,7 @@ import java.util.HashMap;
 public class BuildingListFragment extends Fragment {
     private BuildingAdapter adapter;
     private Button btnAddBuilding;
+    private Button btnImportCSV;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,6 +53,7 @@ public class BuildingListFragment extends Fragment {
         // set up RecyclerView
         RecyclerView buildingList = rootView.findViewById(R.id.building_list);
         btnAddBuilding = rootView.findViewById(R.id.btnAddBuilding);
+        btnImportCSV = rootView.findViewById(R.id.btnImportCSV);
 
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -68,6 +72,27 @@ public class BuildingListFragment extends Fragment {
                 ft.replace(R.id.building_list_frame, BuildingChanges.newInstance("ADD", null));
                 ft.commit();
                 ft.addToBackStack(null);
+            }
+        });
+
+        btnImportCSV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                CSVParser.readCSV();
+                AssetManager am = getContext().getAssets();
+                try {
+//                    InputStream is = am.open("addresses.csv");
+                    CSVReader reader = new CSVReader(new InputStreamReader(am.open("addresses.csv")));//Specify asset file name
+                    String [] nextLine;
+                    nextLine = reader.readNext();
+
+                    while (nextLine != null) {
+                        Log.d("VariableTag", nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3] + " " + nextLine[4] + " " + nextLine[5] + "\n");
+                        nextLine = reader.readNext();
+                    }
+                } catch (IOException | CsvValidationException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
