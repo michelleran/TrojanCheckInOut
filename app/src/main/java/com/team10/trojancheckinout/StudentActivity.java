@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,6 +42,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     Student student;
     private IntentIntegrator qrScan;
     private String newPass;
+    private String imageLink;
 
     //load user data into profile
     @Override
@@ -171,8 +173,45 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
 
     //upload and change profile image from gallery on click
     public void editImage(View view){
-        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(openGalleryIntent, PICK_PHOTO_REQUEST);
+        String[] options = {"Choose from Gallery", "Use Web Link"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Upload New Profile Photo");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if ("Choose from Gallery".equals(options[which])) {
+                    Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(openGalleryIntent, PICK_PHOTO_REQUEST);
+                } else if ("Use Web Link".equals(options[which])) {
+                    //new alert dialog to accept user text input
+                    AlertDialog.Builder builder = new AlertDialog.Builder(StudentActivity.this);
+                    builder.setTitle("Insert Link for New Profile Photo");
+                    final EditText input = new EditText(StudentActivity.this);
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    builder.setView(input);
+                    builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            imageLink = input.getText().toString();
+                            Glide.with(getApplicationContext()).load(imageLink)
+                                    .placeholder(R.drawable.default_profile_picture)
+                                    .override(400, 400).centerCrop()
+                                    .into(photo);
+                            //TODO: insert new Server.updateProfilePhoto() function that takes web link instead of URI
+                        }
+                    });
+                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builder.show();
+                }
+            }
+        });
+        builder.show();
     }
 
     public void signOut(View view){
