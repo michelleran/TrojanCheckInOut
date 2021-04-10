@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout.model;
 
 import android.content.Context;
+import android.net.UrlQuerySanitizer;
 import android.os.Environment;
 import android.util.Log;
 
@@ -23,6 +24,9 @@ import com.team10.trojancheckinout.utils.QRCodeHelper;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -402,7 +406,23 @@ public class Server {
         });
     }
 
-    public static void getBuilding(String id, Callback<Building> callback) {
+
+    public static Uri urlToUri(String urlString){
+        URL url = null;
+        Uri uri = null;
+        try {
+            url = new URL(urlString); //create new URL
+            uri = Uri.parse(url.toURI().toString()); //convert URL to java URI and convert URI to Uri
+        } catch (MalformedURLException e1) {
+            e1.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return uri;
+    }
+
+
+        public static void getBuilding(String id, Callback<Building> callback) {
         // Get building from database
         DocumentReference docRef = db.collection(BUILDING_COLLECTION).document(id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
