@@ -9,10 +9,15 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
@@ -32,6 +37,13 @@ import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.Student;
 import com.team10.trojancheckinout.model.User;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+
 public class StudentActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "StudentActivity";
     private static final int PICK_PHOTO_REQUEST = 1000;
@@ -49,6 +61,9 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         givenName = findViewById(R.id.givenName);
         surname = findViewById(R.id.surname);
@@ -194,11 +209,27 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             imageLink = input.getText().toString();
-                            Glide.with(getApplicationContext()).load(imageLink)
-                                    .placeholder(R.drawable.default_profile_picture)
-                                    .override(400, 400).centerCrop()
-                                    .into(photo);
-                            //TODO: insert new Server.updateProfilePhoto() function that takes web link instead of URI
+
+                            //convert web link image to bitmap
+                            Bitmap bmp = getBitmapFromURL(imageLink);
+                            //convert bitmap to uri
+                            Uri link_uri = getImageUri(StudentActivity.this, bmp);
+
+                            Server.changePhoto(link_uri, new Callback<String>() {
+                                @Override
+                                public void onSuccess(String result) {
+                                    Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
+                                    // replace photo in UI
+                                    Glide.with(getApplicationContext()).load(result)
+                                            .placeholder(R.drawable.default_profile_picture)
+                                            .override(400, 400).centerCrop()
+                                            .into(photo);
+                                }
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    Log.e(TAG, "onFailure: upload prof pic failure");
+                                }
+                            });
                         }
                     });
                     builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -212,6 +243,28 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
         builder.show();
+    }
+
+    public Bitmap getBitmapFromURL(String webUrl) {
+        try {
+            java.net.URL url = new java.net.URL(webUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap bmp = BitmapFactory.decodeStream(input);
+            return bmp;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Uri getImageUri(Context context, Bitmap bitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Title", null);
+        return Uri.parse(path);
     }
 
     public void signOut(View view){
@@ -249,6 +302,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
         if(requestCode == PICK_PHOTO_REQUEST){
             if(resultCode == Activity.RESULT_OK){
                 Uri imageUri = data.getData();
+                Log.d(TAG, imageUri.toString());
                 Server.changePhoto(imageUri, new Callback<String>() {
                     @Override
                     public void onSuccess(String result) {
