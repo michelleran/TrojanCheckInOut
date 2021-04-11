@@ -823,7 +823,7 @@ public class Server {
         });
     }
 
-    public static void searchStudents(String name, String major,
+    public static void searchStudents(String name, String id, String major,
                                       String buildingName,
                                       int startYear, int startMonth, int startDay, int startHour, int startMin,
                                       int endYear, int endMonth, int endDay, int endHour, int endMin,
@@ -852,7 +852,9 @@ public class Server {
                                 // search by name, if applicable
                                 (name == null || name.isEmpty() ||
                                     student.getGivenName().toLowerCase().contains(name) ||
-                                    student.getSurname().toLowerCase().contains(name)))
+                                    student.getSurname().toLowerCase().contains(name)) &&
+                                // search by id, if applicable
+                                (id == null || id.isEmpty() || student.getId().contains(id)))
                                 // student matches
                                 callback.onSuccess(student);
                         }
@@ -877,7 +879,9 @@ public class Server {
                     if (name == null || name.isEmpty() ||
                         // search by name
                         student.getGivenName().toLowerCase().contains(name) ||
-                        student.getSurname().toLowerCase().contains(name))
+                        student.getSurname().toLowerCase().contains(name) &&
+                        // search by id, if applicable
+                       (id == null || id.isEmpty() || student.getId().contains(id)))
                     {
                         // student matches
                         callback.onSuccess(student);

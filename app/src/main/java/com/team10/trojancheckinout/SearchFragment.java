@@ -138,13 +138,12 @@ public class SearchFragment extends Fragment {
                 return;
             }
 
-            // TODO: pass id in too (but first, test search as it is)
-
             // open search results (replace this fragment)
             final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
             ft.replace(R.id.search_tab_content,
                 SearchResultsFragment.newInstance(
                     nameField.getText().toString().trim().toLowerCase(),
+                    idField.getText().toString(),
                     majors.getSelectedItemPosition() == 0 ? "" : majors.getSelectedItem().toString(),
                     buildings.getSelectedItemPosition() == 0 ? "" : buildings.getSelectedItem().toString(),
                     startYear, startMonth, startDay, startHour, startMin,

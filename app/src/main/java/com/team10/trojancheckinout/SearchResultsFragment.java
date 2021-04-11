@@ -22,6 +22,7 @@ import com.team10.trojancheckinout.model.Student;
 public class SearchResultsFragment extends Fragment {
 
     private static final String ARG_NAME = "name";
+    private static final String ARG_ID = "id";
     private static final String ARG_MAJOR = "major";
     private static final String ARG_BUILDING = "building";
 
@@ -38,6 +39,7 @@ public class SearchResultsFragment extends Fragment {
     private static final String ARG_END_MIN = "endMin";
 
     private String name;
+    private String id;
     private String major;
     private String building;
 
@@ -63,13 +65,14 @@ public class SearchResultsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static SearchResultsFragment newInstance(String name, String major, String building,
+    public static SearchResultsFragment newInstance(String name, String id, String major, String building,
                                                     int startYear, int startMonth, int startDay, int startHour, int startMin,
                                                     int endYear, int endMonth, int endDay, int endHour, int endMin) {
         SearchResultsFragment fragment = new SearchResultsFragment();
         Bundle args = new Bundle();
 
         args.putString(ARG_NAME, name);
+        args.putString(ARG_ID, id);
         args.putString(ARG_MAJOR, major);
         args.putString(ARG_BUILDING, building);
 
@@ -94,6 +97,7 @@ public class SearchResultsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             name = getArguments().getString(ARG_NAME);
+            id = getArguments().getString(ARG_ID);
             major = getArguments().getString(ARG_MAJOR);
             building = getArguments().getString(ARG_BUILDING);
 
@@ -126,7 +130,7 @@ public class SearchResultsFragment extends Fragment {
 
         adapter = new StudentAdapter(true);
         resultsList.setAdapter(adapter);
-        Server.searchStudents(name, major, building,
+        Server.searchStudents(name, id, major, building,
             startYear, startMonth, startDay, startHour, startMin,
             endYear, endMonth, endDay, endHour, endMin, adapter);
 

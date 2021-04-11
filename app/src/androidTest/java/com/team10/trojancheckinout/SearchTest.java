@@ -70,6 +70,8 @@ public class SearchTest {
         onView(withId(R.id.btnLogout)).perform(click());
     }
 
+    // TODO: add test for searching by id
+
     @Test
     public void searchByNamePartialMatch() {
         final String INPUT = "n";
