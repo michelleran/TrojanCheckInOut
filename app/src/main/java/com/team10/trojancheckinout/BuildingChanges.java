@@ -1,8 +1,10 @@
 package com.team10.trojancheckinout;
 
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -349,7 +351,23 @@ public class BuildingChanges extends Fragment {
                                 Log.e(TAG, "onFailure: Building add error");
                             }
                             if (getContext() != null) {
-                                Toast.makeText(getContext(), "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
+                                if(exception.getMessage() == "Building with given name already exists"){
+                                    AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+                                    alertDialog.setTitle("Add Building Error");
+                                    alertDialog.setMessage("Building with name \"" + buildingName + "\" already exists");
+                                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                                    alertDialog.show();
+
+                                }else{
+                                    Toast.makeText(getContext(), "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
+
+                                }
+
                             }
                         }
                     });
