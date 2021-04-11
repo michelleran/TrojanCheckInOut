@@ -2,7 +2,9 @@ package com.team10.trojancheckinout;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -30,6 +33,9 @@ import com.team10.trojancheckinout.model.Listener;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.utils.CSVParser;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,10 +43,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import static android.app.Activity.RESULT_OK;
+
 public class BuildingListFragment extends Fragment {
     private BuildingAdapter adapter;
     private Button btnAddBuilding;
     private Button btnImportCSV;
+
+    private static final String TAG = "BuildingListFragment";
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,25 +89,56 @@ public class BuildingListFragment extends Fragment {
         btnImportCSV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                CSVParser.readCSV();
-                AssetManager am = getContext().getAssets();
-                try {
-//                    InputStream is = am.open("addresses.csv");
-                    CSVReader reader = new CSVReader(new InputStreamReader(am.open("addresses.csv")));//Specify asset file name
-                    String [] nextLine;
-                    nextLine = reader.readNext();
 
-                    while (nextLine != null) {
-                        Log.d("VariableTag", nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3] + " " + nextLine[4] + " " + nextLine[5] + "\n");
-                        nextLine = reader.readNext();
-                    }
-                } catch (IOException | CsvValidationException e) {
-                    e.printStackTrace();
-                }
+                Intent intent = new Intent();
+                intent.setType("text/comma-separated-values");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(Intent.createChooser(intent, "Open CSV"), 1);
+//                AssetManager am = getContext().getAssets();
+//                try {
+//                    CSVReader reader = new CSVReader(new InputStreamReader(am.open("addresses.csv")));//Specify asset file name
+//                    String [] nextLine;
+//                    nextLine = reader.readNext();
+//
+//                    while (nextLine != null) {
+//                        Log.d("VariableTag", nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3] + " " + nextLine[4] + " " + nextLine[5] + "\n");
+//                        nextLine = reader.readNext();
+//                    }
+//                } catch (IOException | CsvValidationException e) {
+//                    e.printStackTrace();
+//                }
+
+
             }
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != 1 || resultCode != RESULT_OK || data == null || data.getData() == null) {
+            Log.e("VAR", "onActivityResult: Error" );
+        }
+        else {
+            String path = data.getData().getPath();
+            Log.d("VAR", "onActivityResult: Do work" );
+            Log.d("VAR", "onActivityResult: " + path);
+            try {
+                CSVReader dataRead = new CSVReader(new InputStreamReader(getContext().getContentResolver().openInputStream(data.getData())));
+                String [] nextLine;
+                nextLine = dataRead.readNext();
+                Log.d(TAG, "onActivityResult: " + nextLine[0]);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (CsvValidationException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
