@@ -22,37 +22,6 @@
             tools:layout_editor_absoluteY="-7dp"
             android:layout_marginBottom="50dp"/>
 
-<!--        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton-->
-<!--            android:id="@+id/btnAddBuilding"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="8dp"-->
-<!--            android:contentDescription="Desc"-->
-<!--            android:text="Add Building"-->
-<!--            app:layout_anchorGravity="bottom|right|end"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            android:visibility="invisible"-->
-<!--            app:layout_constraintHorizontal_bias="0.5"-->
-<!--            app:layout_constraintStart_toEndOf="@+id/btnImportCSV" />-->
-
-<!--        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton-->
-<!--            android:id="@+id/btnImportCSV"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="8dp"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:contentDescription="Desc"-->
-<!--            android:visibility="invisible"-->
-<!--            android:text=" Import CSV"-->
-<!--            app:layout_anchorGravity="bottom|right|end"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toStartOf="@+id/btnAddBuilding"-->
-<!--            app:layout_constraintHorizontal_bias="0.5"-->
-<!--            app:layout_constraintStart_toStartOf="parent" />-->
-<!--        android:background="@color/cardview_dark_background"-->
-
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -81,23 +50,6 @@
                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-<!--        <Button-->
-<!--            android:id="@+id/button"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="50dp"-->
-<!--            android:text="Button"-->
-<!--            android:background="@color/purple_500"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            tools:layout_editor_absoluteX="0dp" />-->
-
-<!--        <Button-->
-<!--            android:id="@+id/button"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="50dp"-->
-<!--            android:background="#000000"-->
-<!--            android:text="Add Building"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent" />-->
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
