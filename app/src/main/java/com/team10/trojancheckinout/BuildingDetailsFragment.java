@@ -19,7 +19,6 @@ import com.bumptech.glide.Glide;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Listener;
-import com.team10.trojancheckinout.model.Record;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.Student;
 
@@ -39,7 +38,7 @@ public class BuildingDetailsFragment extends Fragment {
     private String buildingName;
     private int maxCapacity;
 
-    private CheckedInStudentAdapter adapter;
+    private StudentAdapter adapter;
     private final String capacityFormat = "Capacity: %d/%d";
 
     private final String TAG = "BuildingDetailsFragment";
@@ -123,86 +122,4 @@ public class BuildingDetailsFragment extends Fragment {
 
         return rootView;
     }
-}
-
-class CheckedInStudentAdapter
-    extends RecyclerView.Adapter<CheckedInStudentAdapter.ViewHolder>
-    implements Listener<Student>
-{
-    protected ArrayList<Student> students;
-
-    private final String TAG = "CheckedInStudentAdapter";
-
-    @Override
-    public void onAdd(Student item) {
-        students.add(item);
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void onRemove(Student item) {
-        for (int i = 0; i < students.size(); i++) {
-            if (students.get(i).getUid().equals(item.getUid())) {
-                students.remove(i);
-                break;
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void onUpdate(Student item) { }
-    @Override
-    public void onFailure(Exception exception) { }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final ImageView studentPhoto;
-        public final TextView studentName;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            // get refs to views
-            studentPhoto = itemView.findViewById(R.id.record_student_photo);
-            studentName = itemView.findViewById(R.id.record_student_name);
-        }
-    }
-
-    public CheckedInStudentAdapter() {
-        students = new ArrayList<>();
-    }
-
-    @NonNull
-    @Override
-    public CheckedInStudentAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // create a new view, which defines the UI of the list item
-        View view = LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.row_student, parent, false);
-        return new CheckedInStudentAdapter.ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull CheckedInStudentAdapter.ViewHolder holder, int position) {
-        Student student = students.get(position);
-        // set student photo
-        Glide.with(holder.itemView)
-            .load(student.getPhotoUrl())
-            .override(400, 400).centerCrop()
-            .into(holder.studentPhoto);
-        // set student name
-        holder.studentName.setText(
-            String.format("%s, %s", student.getSurname(), student.getGivenName()));
-
-        holder.studentPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // open profile of student
-                Intent intent = new Intent(holder.itemView.getContext(), StudentBasicActivity.class);
-                intent.putExtra("studentId", student.getUid());
-                holder.itemView.getContext().startActivity(intent);
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount() { return students.size(); }
 }

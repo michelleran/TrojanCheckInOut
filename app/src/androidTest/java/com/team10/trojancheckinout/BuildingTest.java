@@ -17,6 +17,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.matcher.RootMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
 import junit.framework.AssertionFailedError;
@@ -70,6 +71,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 
+@RunWith(AndroidJUnit4.class)
 public class BuildingTest {
 
     private String TAG = "BuildingTest";
@@ -143,7 +145,6 @@ public class BuildingTest {
             onView(withId(R.id.currentBuilding)).check(matches(withText(BUILDING)));
             Espresso.pressBack();
         }
-        Espresso.pressBack();
     }
 
     @Test
@@ -240,7 +241,7 @@ public class BuildingTest {
         onView(withId(R.id.edtBcName)).perform(click());
         sleep(WAIT_UI);
         onView(withId(R.id.edtBcMaxCap)).perform(typeText(String.valueOf(buildingMaxCap)));
-        onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
+        Espresso.closeSoftKeyboard();
 
         onView(withId(R.id.edtBcName)).check(matches(hasErrorText("Building name cannot be empty")));
         onView(withId(R.id.btnBcCancel)).perform(click());

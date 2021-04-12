@@ -1,24 +1,30 @@
 package com.team10.trojancheckinout;
 
 import android.os.Bundle;
-import android.util.Log;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.team10.trojancheckinout.model.Callback;
-import com.team10.trojancheckinout.model.Record;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.model.Student;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link SearchResultsFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class SearchResultsFragment extends Fragment {
 
-public class FilterResultsFragment extends Fragment {
-    private final String TAG = "FilterResultsFragment";
+    private static final String ARG_NAME = "name";
+    private static final String ARG_ID = "id";
+    private static final String ARG_MAJOR = "major";
+    private static final String ARG_BUILDING = "building";
 
     private static final String ARG_START_YEAR = "startYear";
     private static final String ARG_START_MONTH = "startMonth";
@@ -32,9 +38,10 @@ public class FilterResultsFragment extends Fragment {
     private static final String ARG_END_HOUR = "endHour";
     private static final String ARG_END_MIN = "endMin";
 
-    private static final String ARG_BUILDING_NAME = "buildingName";
-    private static final String ARG_STUDENT_ID = "studentId";
-    private static final String ARG_MAJOR = "major";
+    private String name;
+    private String id;
+    private String major;
+    private String building;
 
     private int startYear = -1;
     private int startMonth = -1;
@@ -48,13 +55,9 @@ public class FilterResultsFragment extends Fragment {
     private int endHour = -1;
     private int endMin = -1;
 
-    private String buildingName;
-    private String studentId;
-    private String major;
+    private StudentAdapter adapter;
 
-    private RecordAdapter adapter;
-
-    public FilterResultsFragment() {
+    public SearchResultsFragment() {
         // Required empty public constructor
     }
 
@@ -62,11 +65,16 @@ public class FilterResultsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static FilterResultsFragment newInstance(int startYear, int startMonth, int startDay, int startHour, int startMin,
-                                                    int endYear, int endMonth, int endDay, int endHour, int endMin,
-                                                    String buildingName, String studentId, String major) {
-        FilterResultsFragment fragment = new FilterResultsFragment();
+    public static SearchResultsFragment newInstance(String name, String id, String major, String building,
+                                                    int startYear, int startMonth, int startDay, int startHour, int startMin,
+                                                    int endYear, int endMonth, int endDay, int endHour, int endMin) {
+        SearchResultsFragment fragment = new SearchResultsFragment();
         Bundle args = new Bundle();
+
+        args.putString(ARG_NAME, name);
+        args.putString(ARG_ID, id);
+        args.putString(ARG_MAJOR, major);
+        args.putString(ARG_BUILDING, building);
 
         args.putInt(ARG_START_YEAR, startYear);
         args.putInt(ARG_START_MONTH, startMonth);
@@ -80,10 +88,6 @@ public class FilterResultsFragment extends Fragment {
         args.putInt(ARG_END_HOUR, endHour);
         args.putInt(ARG_END_MIN, endMin);
 
-        args.putString(ARG_BUILDING_NAME, buildingName);
-        args.putString(ARG_STUDENT_ID, studentId);
-        args.putString(ARG_MAJOR, major);
-
         fragment.setArguments(args);
         return fragment;
     }
@@ -92,6 +96,11 @@ public class FilterResultsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            name = getArguments().getString(ARG_NAME);
+            id = getArguments().getString(ARG_ID);
+            major = getArguments().getString(ARG_MAJOR);
+            building = getArguments().getString(ARG_BUILDING);
+
             startYear = getArguments().getInt(ARG_START_YEAR);
             startMonth = getArguments().getInt(ARG_START_MONTH);
             startDay = getArguments().getInt(ARG_START_DAY);
@@ -103,17 +112,14 @@ public class FilterResultsFragment extends Fragment {
             endDay = getArguments().getInt(ARG_END_DAY);
             endHour = getArguments().getInt(ARG_END_HOUR);
             endMin = getArguments().getInt(ARG_END_MIN);
-
-            buildingName = getArguments().getString(ARG_BUILDING_NAME);
-            studentId = getArguments().getString(ARG_STUDENT_ID);
-            major = getArguments().getString(ARG_MAJOR);
         }
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(
-            R.layout.fragment_filter_results, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.fragment_search_results, container, false);
 
         // set up RecyclerView
         RecyclerView resultsList = rootView.findViewById(R.id.results_list);
@@ -122,25 +128,11 @@ public class FilterResultsFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         resultsList.setLayoutManager(llm);
 
-        adapter = new RecordAdapter();
+        adapter = new StudentAdapter(true);
         resultsList.setAdapter(adapter);
-
-        Log.d(TAG, String.format("%d/%d/%d %02d:%02d - %d/%d/%d %02d:%02d, %s, %s, %s", startYear, startMonth, startDay, startHour, startMin, endYear, endMonth, endDay, endHour, endMin, buildingName, studentId, major));
-
-        Server.filterRecords(startYear, startMonth, startDay, startHour, startMin,
-            endYear, endMonth, endDay, endHour, endMin,
-            buildingName, studentId, major, new Callback<Record>() {
-                @Override
-                public void onSuccess(Record result) {
-                    adapter.addRecord(result);
-                }
-
-                @Override
-                public void onFailure(Exception exception) {
-                    Log.e(TAG, exception.getMessage());
-                    // TODO: handle
-                }
-            });
+        Server.searchStudents(name, id, major, building,
+            startYear, startMonth, startDay, startHour, startMin,
+            endYear, endMonth, endDay, endHour, endMin, adapter);
 
         return rootView;
     }

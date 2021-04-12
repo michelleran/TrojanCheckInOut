@@ -40,10 +40,12 @@ public class Record {
 
     public String getStudentUid() { return studentUid; }
     public String getStudentId() { return studentId; }
+    public String getMajor(){ return major;}
+
     public String getBuildingId() { return buildingId; }
     public String getBuildingName() { return buildingName; }
     public boolean getCheckIn() { return checkIn; }
+
     public String getTime() { return time; }
     public long getEpochTime() { return epochTime; }
-    public String getMajor(){ return major;}
 }

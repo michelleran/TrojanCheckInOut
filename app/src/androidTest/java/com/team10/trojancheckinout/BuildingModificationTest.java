@@ -7,6 +7,7 @@ import androidx.test.espresso.Espresso;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import junit.framework.AssertionFailedError;
 
@@ -17,6 +18,7 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -38,6 +40,7 @@ import static com.team10.trojancheckinout.TestUtils.selectTabAtPosition;
 import static com.team10.trojancheckinout.TestUtils.sleep;
 import static com.team10.trojancheckinout.TestUtils.withRecyclerView;
 
+@RunWith(AndroidJUnit4.class)
 public class BuildingModificationTest {
 
     private String TAG = "BuildingTest";
@@ -78,7 +81,7 @@ public class BuildingModificationTest {
 
         onView(withId(R.id.edtBcName)).perform(typeText(buildingToAdd));
         onView(withId(R.id.edtBcMaxCap)).perform(typeText(String.valueOf(buildingMaxCap)));
-        onView(withId(R.id.filter_building_field)).perform(ViewActions.closeSoftKeyboard());
+        Espresso.closeSoftKeyboard();
 
         onView(withId(R.id.btnBcConfirm)).perform(click());
 
