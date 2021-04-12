@@ -92,6 +92,9 @@ public class BuildingDetailsFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         studentList.setLayoutManager(llm);
 
+        // display current capacity = 0 for now
+        capacity.setText(String.format(Locale.US, capacityFormat, 0, maxCapacity));
+
         adapter = new CheckedInStudentAdapter();
         studentList.setAdapter(adapter);
         Server.listenForCheckedInStudents(buildingId, new Listener<Student>() {
