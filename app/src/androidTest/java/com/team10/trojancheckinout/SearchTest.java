@@ -145,6 +145,58 @@ public class SearchTest {
     }
 
     @Test
+    public void searchByIdPartialMatch() {
+        final String INPUT = "22222";
+        onView(withId(R.id.search_id)).perform(typeText(INPUT));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.search_button)).perform(click());
+
+        sleep(WAIT_DATA);
+
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        for (int i = 0; i < Math.min(7, list.getAdapter().getItemCount()); i++) {
+            // scroll to student
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            // open profile
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert student is not deleted
+            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
+            // assert that student's id contains input
+            onView(withId(R.id.id)).check(matches(withText(containsString(INPUT))));
+            Espresso.pressBack();
+        }
+    }
+
+    @Test
+    public void searchByIdFullMatch() {
+        final String INPUT = "1111122222";
+        onView(withId(R.id.search_id)).perform(typeText(INPUT));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.search_button)).perform(click());
+
+        sleep(WAIT_DATA);
+
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        for (int i = 0; i < Math.min(7, list.getAdapter().getItemCount()); i++) {
+            // scroll to student
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            // open profile
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+            // assert student is not deleted
+            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
+            // assert that student's id contains input
+            onView(withId(R.id.id)).check(matches(withText(containsString(INPUT))));
+            Espresso.pressBack();
+        }
+    }
+
+    @Test
     public void searchByMajor() {
         selectInSpinner(R.id.search_major_spinner, MAJOR);
         onView(withId(R.id.search_button)).perform(click());
@@ -516,6 +568,76 @@ public class SearchTest {
                 }
             }
             assert visitedBuildingInTimePeriod;
+            Espresso.pressBack();
+            Espresso.pressBack();
+        }
+    }
+
+    @Test
+    public void searchByNameIdMajorBuilding() {
+        final String NAME = "n";
+        final String ID = "2";
+        final String MAJOR = "CSCI";
+        final String BUILDING = "Doheny";
+
+        // input name
+        onView(withId(R.id.search_name)).perform(typeText(NAME));
+        Espresso.closeSoftKeyboard();
+
+        // input id
+        onView(withId(R.id.search_id)).perform(typeText(ID));
+        Espresso.closeSoftKeyboard();
+
+        selectInSpinner(R.id.search_major_spinner, MAJOR);
+        selectInSpinner(R.id.search_building_spinner, BUILDING);
+
+        onView(withId(R.id.search_button)).perform(click());
+
+        sleep(WAIT_DATA);
+
+        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
+        for (int i = 0; i < Math.min(7, list.getAdapter().getItemCount()); i++) {
+            // scroll to record
+            onView(withId(R.id.results_list))
+                .perform(RecyclerViewActions.scrollToPosition(i));
+            // assert that student's name contains input
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_name))
+                .check(matches(withText(containsString(NAME))));
+            // open profile
+            onView(withRecyclerView(R.id.results_list)
+                .atPositionOnView(i, R.id.record_student_photo))
+                .perform(click());
+
+            // assert student is not deleted
+            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
+
+            // assert again that student's name contains input
+            try {
+                onView(withId(R.id.givenName)).check(matches(withText(containsString(NAME))));
+            } catch (AssertionFailedError e) {
+                onView(withId(R.id.surname)).check(matches(withText(containsString(NAME))));
+            }
+
+            // assert that student's id contains input
+            onView(withId(R.id.id)).check(matches(withText(containsString(ID))));
+            // assert that major matches
+            onView(withId(R.id.major)).check(matches(withText(MAJOR)));
+
+            // view history
+            onView(withId(R.id.viewHistoryBtn_basic)).perform(click());
+            // record for this building may not be visible, so we'll directly check the adapter
+            RecordAdapter adapter = (RecordAdapter)
+                ((RecyclerView) getCurrentActivity().findViewById(R.id.student_history_list)).getAdapter();
+            // assert that building is in history
+            boolean buildingInHistory = false;
+            for (Record record : adapter.records) {
+                if (record.getBuildingName().equals(BUILDING)) {
+                    buildingInHistory = true;
+                    break;
+                }
+            }
+            assert buildingInHistory;
             Espresso.pressBack();
             Espresso.pressBack();
         }
