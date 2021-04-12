@@ -94,7 +94,7 @@ public class BuildingDetailsFragment extends Fragment {
         // display current capacity = 0 for now
         capacity.setText(String.format(Locale.US, capacityFormat, 0, maxCapacity));
 
-        adapter = new CheckedInStudentAdapter();
+        adapter = new StudentAdapter();
         studentList.setAdapter(adapter);
         Server.listenForCheckedInStudents(buildingId, new Listener<Student>() {
             @Override
