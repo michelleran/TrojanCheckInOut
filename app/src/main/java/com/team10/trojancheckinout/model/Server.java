@@ -346,6 +346,33 @@ public class Server {
                 });
     }
 
+    public static void photoURLInput(String URL, Callback<String> callback) {
+        if (auth.getCurrentUser() == null) {
+            Log.d("changePhoto", "No Logged In User");
+            callback.onFailure(null);
+            return;
+        }
+
+        String uID = auth.getCurrentUser().getUid();
+        DocumentReference docRef = db.collection(USER_COLLECTION)
+                .document(auth.getCurrentUser().getUid()); //get the current user document
+        docRef.update("photoUrl", URL)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("changePhotoUrl", "DocumentSnapshot successfully updated!");
+                        callback.onSuccess(URL);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("changePhotoUrl", "Error updating document", e);
+                        callback.onFailure(e);
+                    }
+                });
+    }
+
     public static void changePhoto(Uri file, Callback<String> callback){
         if(auth.getCurrentUser()==null){
             Log.d("changePhoto", "No Logged In User");

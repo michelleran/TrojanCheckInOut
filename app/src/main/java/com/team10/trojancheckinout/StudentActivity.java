@@ -209,13 +209,29 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             imageLink = input.getText().toString();
+//
+//                            //convert web link image to bitmap
+//                            Bitmap bmp = getBitmapFromURL(imageLink);
+//                            //convert bitmap to uri
+//                            Uri link_uri = getImageUri(StudentActivity.this, bmp);
+//
+//                            Server.changePhoto(link_uri, new Callback<String>() {
+//                                @Override
+//                                public void onSuccess(String result) {
+//                                    Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
+//                                    // replace photo in UI
+//                                    Glide.with(getApplicationContext()).load(result)
+//                                            .placeholder(R.drawable.default_profile_picture)
+//                                            .override(400, 400).centerCrop()
+//                                            .into(photo);
+//                                }
+//                                @Override
+//                                public void onFailure(Exception exception) {
+//                                    Log.e(TAG, "onFailure: upload prof pic failure");
+//                                }
+//                            });
 
-                            //convert web link image to bitmap
-                            Bitmap bmp = getBitmapFromURL(imageLink);
-                            //convert bitmap to uri
-                            Uri link_uri = getImageUri(StudentActivity.this, bmp);
-
-                            Server.changePhoto(link_uri, new Callback<String>() {
+                            Server.photoURLInput(imageLink, new Callback<String>() {
                                 @Override
                                 public void onSuccess(String result) {
                                     Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
