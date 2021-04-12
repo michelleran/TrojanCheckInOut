@@ -58,8 +58,7 @@ public class BuildingListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(
-            R.layout.fragment_building_list, container, false);
-
+                R.layout.fragment_building_list, container, false);
 
 
         // set up RecyclerView
@@ -106,27 +105,46 @@ public class BuildingListFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode != REQUEST_CODE || resultCode != RESULT_OK || data == null || data.getData() == null) {
-            Log.e("VAR", "onActivityResult: Error" );
+            Log.e("VAR", "onActivityResult: Error");
         }
         else {
             try {
                 CSVReader dataRead = new CSVReader(new InputStreamReader(getContext().getContentResolver().openInputStream(data.getData())));
-                ArrayList<String[]> information  = CSVParser.parseCSV(dataRead);
+                ArrayList<String[]> information = CSVParser.parseCSV(dataRead);
 
                 for (String[] info : information) {
                     if (info[0].equals("U")) {
-                        Log.d(TAG, "onActivityResult: Update " + info[1] + " max cap to " + info[2]);
-                    }
-                    else if (info[0].equals("A")) {
-                        Log.d(TAG, "onActivityResult: Update " + info[1] + " max cap to " + info[2]);
-                    }
-                    else if (info[0].equals("D")) {
+                        Server.getBuildingIDByName(info[1], new Callback<String>() {
+                            @Override
+                            public void onSuccess(String result) {
+                                if (result != null) {
+                                    int maxCapacity = Integer.parseInt(info[2]);
+                                    Server.setBuildingMaxCapacity(result, maxCapacity, new Callback<Building>() {
+                                        @Override
+                                        public void onSuccess(Building result) {
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception exception) {
+                                            Log.e(TAG, "onFailure: building update failed ", exception);
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.e(TAG, "getBuildingID failed for " + info[1], exception);
+                            }
+                        });
+                    } else if (info[0].equals("A")) {
+
+                    } else if (info[0].equals("D")) {
 
                     }
                 }
+
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

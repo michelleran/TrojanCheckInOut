@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout.model;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 import androidx.annotation.Nullable;
@@ -427,6 +429,28 @@ public class Server {
         });
     }
 
+    public static void getBuildingIDByName (String buildingName, Callback<String> callback) {
+        Query query = db.collection(BUILDING_COLLECTION)
+                .whereEqualTo("name", buildingName);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot results = task.getResult();
+                    if (results.getDocuments().size() == 1) {
+                        callback.onSuccess(results.getDocuments().get(0).getId());
+                    }
+                    else {
+                        callback.onSuccess(null);
+                    }
+                }
+                else {
+                    callback.onFailure(task.getException());
+                }
+            }
+        });
+    }
+
     public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) {
         DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document();
         String buildingID = newBuildingRef.getId();
@@ -560,6 +584,8 @@ public class Server {
             }
         });
     }
+
+
 
     public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
         db.collection(USER_COLLECTION).whereEqualTo("currentBuilding", buildingId)
@@ -729,6 +755,8 @@ public class Server {
                 }
             });
     }
+
+
 
     public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
