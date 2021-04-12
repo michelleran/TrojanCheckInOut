@@ -6,9 +6,8 @@
 
     <string name="tab_text_1">Profile</string>
     <string name="tab_text_2">Buildings</string>
-    <string name="tab_text_3">Filter</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tab_text_3">Search</string>
+
     <string name="checked_into">Checked into</string>
     <string name="checked_out_of">Checked out of</string>
 
@@ -51,7 +50,7 @@
         <item>ENE</item>
         <item>ISE</item>
     </string-array>
-    
+
     <string name="title_activity_test">test</string>
     <string name="firstname"><u>First Name:</u></string>
     <string name="lastname"><u>Last Name:</u></string>
