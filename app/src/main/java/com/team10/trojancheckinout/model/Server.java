@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
@@ -430,6 +429,28 @@ public class Server {
         });
     }
 
+    public static void getBuildingIDByName (String buildingName, Callback<String> callback) {
+        Query query = db.collection(BUILDING_COLLECTION)
+                .whereEqualTo("name", buildingName);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot results = task.getResult();
+                    if (results.getDocuments().size() == 1) {
+                        callback.onSuccess(results.getDocuments().get(0).getId());
+                    }
+                    else {
+                        callback.onSuccess(null);
+                    }
+                }
+                else {
+                    callback.onFailure(task.getException());
+                }
+            }
+        });
+    }
+                
     public static void getAllBuildingNames(Callback<String> callback) {
         db.collection(BUILDING_COLLECTION).get().addOnSuccessListener(result -> {
             for (DocumentSnapshot doc : result) {
@@ -757,6 +778,7 @@ public class Server {
                 }
             });
     }
+
 
     private static Query queryRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                       int endYear, int endMonth, int endDay, int endHour, int endMin,
