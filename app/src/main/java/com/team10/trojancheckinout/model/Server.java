@@ -1,7 +1,6 @@
 package com.team10.trojancheckinout.model;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -27,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
-
 
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -585,8 +582,6 @@ public class Server {
         });
     }
 
-
-
     public static void listenForCheckedInStudents(String buildingId, Listener<Student> listener) {
         db.collection(USER_COLLECTION).whereEqualTo("currentBuilding", buildingId)
             .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -755,9 +750,7 @@ public class Server {
                 }
             });
     }
-
-
-
+    
     public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
                                      String buildingName, String studentId, String major,
