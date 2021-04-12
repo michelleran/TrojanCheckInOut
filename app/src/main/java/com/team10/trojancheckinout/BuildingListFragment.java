@@ -51,6 +51,7 @@ public class BuildingListFragment extends Fragment {
     private Button btnImportCSV;
 
     private static final String TAG = "BuildingListFragment";
+    private static final int REQUEST_CODE = 1;
 
 
     @Override
@@ -89,26 +90,11 @@ public class BuildingListFragment extends Fragment {
         btnImportCSV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent();
                 intent.setType("text/comma-separated-values");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(Intent.createChooser(intent, "Open CSV"), 1);
-//                AssetManager am = getContext().getAssets();
-//                try {
-//                    CSVReader reader = new CSVReader(new InputStreamReader(am.open("addresses.csv")));//Specify asset file name
-//                    String [] nextLine;
-//                    nextLine = reader.readNext();
-//
-//                    while (nextLine != null) {
-//                        Log.d("VariableTag", nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3] + " " + nextLine[4] + " " + nextLine[5] + "\n");
-//                        nextLine = reader.readNext();
-//                    }
-//                } catch (IOException | CsvValidationException e) {
-//                    e.printStackTrace();
-//                }
-
+                startActivityForResult(Intent.createChooser(intent, "Import CSV"), REQUEST_CODE);
 
             }
         });
@@ -119,23 +105,28 @@ public class BuildingListFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != 1 || resultCode != RESULT_OK || data == null || data.getData() == null) {
+        if (requestCode != REQUEST_CODE || resultCode != RESULT_OK || data == null || data.getData() == null) {
             Log.e("VAR", "onActivityResult: Error" );
         }
         else {
-            String path = data.getData().getPath();
-            Log.d("VAR", "onActivityResult: Do work" );
-            Log.d("VAR", "onActivityResult: " + path);
             try {
                 CSVReader dataRead = new CSVReader(new InputStreamReader(getContext().getContentResolver().openInputStream(data.getData())));
-                String [] nextLine;
-                nextLine = dataRead.readNext();
-                Log.d(TAG, "onActivityResult: " + nextLine[0]);
+                ArrayList<String[]> information  = CSVParser.parseCSV(dataRead);
+
+                for (String[] info : information) {
+                    if (info[0].equals("U")) {
+                        Log.d(TAG, "onActivityResult: Update " + info[1] + " max cap to " + info[2]);
+                    }
+                    else if (info[0].equals("A")) {
+                        Log.d(TAG, "onActivityResult: Update " + info[1] + " max cap to " + info[2]);
+                    }
+                    else if (info[0].equals("D")) {
+
+                    }
+                }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (CsvValidationException e) {
                 e.printStackTrace();
             }
         }
