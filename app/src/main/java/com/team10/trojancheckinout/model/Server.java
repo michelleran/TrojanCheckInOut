@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout.model;
 
 import android.content.Context;
+import android.nfc.Tag;
 import android.os.Environment;
 import android.util.Log;
 
@@ -24,7 +25,9 @@ import com.team10.trojancheckinout.utils.QRCodeHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import androidx.annotation.Nullable;
@@ -447,61 +450,87 @@ public class Server {
             }
         });
     }
+                
+    public static void getAllBuildingNames(Callback<String> callback) {
+        db.collection(BUILDING_COLLECTION).get().addOnSuccessListener(result -> {
+            for (DocumentSnapshot doc : result) {
+                Building building = doc.toObject(Building.class);
+                callback.onSuccess(building.getName());
+            }
+        }).addOnFailureListener(callback::onFailure);
+    }
 
     public static void addBuilding(String name, int maxCapacity, Callback<Building> callback) {
-        DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document();
-        String buildingID = newBuildingRef.getId();
-
-        byte[] qr = QRCodeHelper.generateQRCodeImage(buildingID, 250 , 250);
-        StorageReference fileRef = storage.child("qrcodes/" + buildingID);
-        StorageMetadata metadata = new StorageMetadata.Builder().setCustomMetadata("contentType", "image/jpeg").build();
-        UploadTask uploadTask = fileRef.putBytes(qr, metadata);
-
-        uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
-            @Override
-            public void onProgress(@NotNull UploadTask.TaskSnapshot taskSnapshot) {
-                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                Log.d(TAG, "Upload is " + progress + "% done");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-                Log.d(TAG, "could not handle Uri");
-                callback.onFailure(exception);
-                
-            }
-        }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
-            @Override
-            public void onSuccess(TaskSnapshot taskSnapshot) {
-                taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        db.collection(BUILDING_COLLECTION)
+                .whereEqualTo("name", name)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Uri uri) {
-                        Building building = new Building( newBuildingRef.getId(), name, uri.toString(),maxCapacity);
-                        db.collection(BUILDING_COLLECTION).document(buildingID).set(building)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "DocumentSnapshot added with ID: ");
-                                    callback.onSuccess(building);
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w(TAG, "Error adding document", e);
-                                    callback.onFailure(e);
-                                }
-                            });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        callback.onFailure(e);
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(!task.getResult().isEmpty()) {
+                                callback.onFailure(new Exception("Building with given name already exists"));
+                            }else{
+                                DocumentReference newBuildingRef = db.collection(BUILDING_COLLECTION).document();
+                                String buildingID = newBuildingRef.getId();
+
+                                byte[] qr = QRCodeHelper.generateQRCodeImage(buildingID, 250 , 250);
+                                StorageReference fileRef = storage.child("qrcodes/" + buildingID);
+                                StorageMetadata metadata = new StorageMetadata.Builder().setCustomMetadata("contentType", "image/jpeg").build();
+                                UploadTask uploadTask = fileRef.putBytes(qr, metadata);
+
+                                uploadTask.addOnProgressListener(new OnProgressListener<TaskSnapshot>() {
+                                    @Override
+                                    public void onProgress(@NotNull UploadTask.TaskSnapshot taskSnapshot) {
+                                        double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                                        Log.d(TAG, "Upload is " + progress + "% done");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Handle unsuccessful uploads
+                                        Log.d(TAG, "could not handle Uri");
+                                        callback.onFailure(exception);
+
+                                    }
+                                }).addOnSuccessListener(new OnSuccessListener<TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(TaskSnapshot taskSnapshot) {
+                                        taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                Building building = new Building( newBuildingRef.getId(), name, uri.toString(),maxCapacity);
+                                                db.collection(BUILDING_COLLECTION).document(buildingID).set(building)
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                Log.d(TAG, "DocumentSnapshot added with ID: ");
+                                                                callback.onSuccess(building);
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Log.w(TAG, "Error adding document", e);
+                                                                callback.onFailure(e);
+                                                            }
+                                                        });
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                callback.onFailure(e);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
                     }
                 });
-            }
-        });
     }
 
     public static void removeBuilding(String id, Callback<Void> callback){
@@ -731,7 +760,6 @@ public class Server {
             }
         });
     }
-
     public static void listenToHistory(String id, Callback<Record> callback) {
         db.collection(RECORD_COLLECTION)
             .whereEqualTo("studentUid", id)
@@ -750,11 +778,12 @@ public class Server {
                 }
             });
     }
-    
-    public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
-                                     int endYear, int endMonth, int endDay, int endHour, int endMin,
-                                     String buildingName, String studentId, String major,
-                                     Callback<Record> callback) {
+
+
+    private static Query queryRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
+                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
+                                      String buildingName, String studentId, String major)
+    {
         Query query = db.collection(RECORD_COLLECTION);
 
         // Filter by building name
@@ -785,6 +814,18 @@ public class Server {
             query = query.startAt(end.toEpochSecond()); // b/c query direction is descending, we "start" at the end date
         }
 
+        return query;
+    }
+
+    public static void filterRecords(int startYear, int startMonth, int startDay, int startHour, int startMin,
+                                     int endYear, int endMonth, int endDay, int endHour, int endMin,
+                                     String buildingName, String studentId, String major,
+                                     Callback<Record> callback)
+    {
+        Query query = queryRecords(
+            startYear, startMonth, startDay, startHour, startMin,
+            endYear, endMonth, endDay, endHour, endMin,
+            buildingName, studentId, major);
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -804,5 +845,71 @@ public class Server {
         });
     }
 
+    public static void searchStudents(String name, String id, String major,
+                                      String buildingName,
+                                      int startYear, int startMonth, int startDay, int startHour, int startMin,
+                                      int endYear, int endMonth, int endDay, int endHour, int endMin,
+                                      Callback<Student> callback)
+    {
 
+        if (buildingName != null) {
+            Query query = queryRecords(
+                startYear, startMonth, startDay, startHour, startMin,
+                endYear, endMonth, endDay, endHour, endMin,
+                buildingName, "", major);
+            query.get().addOnSuccessListener(result -> {
+                // track which students we've already returned
+                HashSet<String> students = new HashSet<>();
+                for (DocumentSnapshot doc : result.getDocuments()) {
+                    Record record = doc.toObject(Record.class);
+
+                    if (!students.add(record.getStudentUid()))
+                        // already returned this student
+                        continue;
+
+                    getStudent(record.getStudentUid(), new Callback<Student>() {
+                        @Override
+                        public void onSuccess(Student student) {
+                            if (!student.isDeleted() &&
+                                // search by name, if applicable
+                                (name == null || name.isEmpty() ||
+                                    student.getGivenName().toLowerCase().contains(name) ||
+                                    student.getSurname().toLowerCase().contains(name)) &&
+                                // search by id, if applicable
+                                (id == null || id.isEmpty() || student.getId().contains(id)))
+                                // student matches
+                                callback.onSuccess(student);
+                        }
+
+                        @Override
+                        public void onFailure(Exception exception) {
+                            callback.onFailure(exception);
+                        }
+                    });
+                }
+            }).addOnFailureListener(callback::onFailure);
+        } else {
+            Query query = db.collection(USER_COLLECTION)
+                .whereEqualTo("student", true)
+                .whereEqualTo("deleted", false);
+            if (major != null)
+                query = query.whereEqualTo("major", major);
+
+            query.get().addOnSuccessListener(result -> {
+                for (DocumentSnapshot doc : result.getDocuments()) {
+                    Student student = doc.toObject(Student.class);
+                    if (name == null || name.isEmpty() ||
+                        // search by name
+                        student.getGivenName().toLowerCase().contains(name) ||
+                        student.getSurname().toLowerCase().contains(name) &&
+                        // search by id, if applicable
+                       (id == null || id.isEmpty() || student.getId().contains(id)))
+                    {
+                        // student matches
+                        callback.onSuccess(student);
+                    }
+                }
+            }).addOnFailureListener(callback::onFailure);
+        }
+    }
 }

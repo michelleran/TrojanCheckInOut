@@ -24,7 +24,8 @@ import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder> {
-    protected ArrayList<Record> records;
+    @VisibleForTesting
+    ArrayList<Record> records;
 
     private final String TAG = "RecordAdapter";
 
