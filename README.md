@@ -40,5 +40,5 @@ Managers can import a CSV file in order to update the capacities of existing bui
 CSV files must be of this format:
 * Each update record must be on a new line
 * Each update record must be in the following format: `U`,`<NAME_OF_BUILDING>`,`<MAX_CAPACITY>`
-* * Replace <NAME_OF_BUILDING> with the name of the building that you wish to update
-* * Replace <MAX_CAPACITY> with the new maximum capacity. This **must** be an integer.
+..* Replace <NAME_OF_BUILDING> with the name of the building that you wish to update
+..* Replace <MAX_CAPACITY> with the new maximum capacity. This **must** be an integer.
