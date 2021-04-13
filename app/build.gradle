@@ -40,7 +40,8 @@ dependencies {
     implementation "com.google.zxing:core:3.4.0"
     implementation 'com.google.zxing:javase:3.3.0'
     implementation 'com.github.kenglxn.QRGen:android:2.6.0'
-
+    implementation 'com.opencsv:opencsv:4.6'
+    
     implementation platform('com.google.firebase:firebase-bom:26.5.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'

@@ -10,27 +10,32 @@ import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.team10.trojancheckinout.model.Callback;
+import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.utils.Validator;
 
 import java.util.Calendar;
 import java.util.Locale;
 
-public class FilterFragment extends Fragment {
-    private TextView start;
-    private TextView end;
+
+public class SearchFragment extends Fragment {
+    private EditText start;
+    private EditText end;
 
     private final String DATE_TIME_FORMAT = "%02d/%02d/%04d %02d:%02d PDT";
 
+    private String studentName;
+    private String id;
+    private String major;
+
+    private String buildingName;
     private int startYear = -1;
     private int startMonth = -1;
     private int startDay = -1;
@@ -43,18 +48,14 @@ public class FilterFragment extends Fragment {
     private int endHour = -1;
     private int endMin = -1;
 
-    private String buildingName;
-    private String studentId;
-    private String major;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(
-            R.layout.fragment_filter, container, false);
+            R.layout.fragment_search, container, false);
 
         // get fields
-        start = rootView.findViewById(R.id.start_date);
+        start = rootView.findViewById(R.id.search_start_date);
         start.setOnClickListener(view -> {
             // show date picker dialog
             final Calendar cal = Calendar.getInstance();
@@ -77,7 +78,7 @@ public class FilterFragment extends Fragment {
             picker.show();
         });
 
-        end = rootView.findViewById(R.id.end_date);
+        end = rootView.findViewById(R.id.search_end_date);
         end.setOnClickListener(view -> {
             // show date picker dialog
             final Calendar cal = Calendar.getInstance();
@@ -99,51 +100,56 @@ public class FilterFragment extends Fragment {
             picker.show();
         });
 
-        EditText buildingNameField = rootView.findViewById(R.id.filter_building_field);
-        EditText studentIdField = rootView.findViewById(R.id.filter_student_id_field);
+        EditText nameField = rootView.findViewById(R.id.search_name);
+        EditText idField = rootView.findViewById(R.id.search_id);
 
-        Spinner spinner = rootView.findViewById(R.id.filter_major_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.majors_with_any, android.R.layout.simple_spinner_item);
-        spinner.setAdapter(adapter);
+        Spinner majors = rootView.findViewById(R.id.search_major_spinner);
+        majors.setAdapter(ArrayAdapter.createFromResource(getContext(), R.array.majors_with_any, android.R.layout.simple_spinner_item));
 
-        Button filter = rootView.findViewById(R.id.filter_button);
-        filter.setOnClickListener(view -> {
-            // get remaining inputs (may be empty)
-            buildingName = buildingNameField.getText().toString().trim();
-            studentId = studentIdField.getText().toString().trim();
-            if (!studentId.isEmpty() && !Validator.validateID(studentId)) {
-                // invalid student id
-                Toast.makeText(getContext(), R.string.filter_invalid_usc_id, Toast.LENGTH_LONG).show();
-                return;
+        // get list of buildings
+        Spinner buildings = rootView.findViewById(R.id.search_building_spinner);
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item);
+        adapter.add("Any");
+        buildings.setAdapter(adapter);
+        Server.getAllBuildingNames(new Callback<String>() {
+            @Override
+            public void onSuccess(String building) {
+                adapter.add(building);
+                adapter.notifyDataSetChanged();
             }
 
+            @Override
+            public void onFailure(Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+
+        Button button = rootView.findViewById(R.id.search_button);
+        button.setOnClickListener(view -> {
             // validate that start <= end date
             if (startYear != -1 && endYear != -1 &&
                 (startYear > endYear ||
-                (startYear == endYear && startMonth > endMonth) ||
-                (startYear == endYear && startMonth == endMonth && startDay > endDay) ||
-                (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour > endHour) ||
-                (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour == endHour && startMin > endMin)))
+                    (startYear == endYear && startMonth > endMonth) ||
+                    (startYear == endYear && startMonth == endMonth && startDay > endDay) ||
+                    (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour > endHour) ||
+                    (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour == endHour && startMin > endMin)))
             {
                 Toast.makeText(getContext(), R.string.filter_invalid_dates, Toast.LENGTH_LONG).show();
                 return;
             }
 
-            if (spinner.getSelectedItemPosition() == 0) {
-                major = "";
-            } else {
-                major = spinner.getSelectedItem().toString();
-            }
-
-            // open filter results (replace this fragment)
+            // open search results (replace this fragment)
             final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-            ft.replace(R.id.filter_tab_content,
-                FilterResultsFragment.newInstance(
+            ft.replace(R.id.search_tab_content,
+                SearchResultsFragment.newInstance(
+                    nameField.getText().toString().trim().toLowerCase(),
+                    idField.getText().toString(),
+                    majors.getSelectedItemPosition() == 0 ? "" : majors.getSelectedItem().toString(),
+                    buildings.getSelectedItemPosition() == 0 ? "" : buildings.getSelectedItem().toString(),
                     startYear, startMonth, startDay, startHour, startMin,
-                    endYear, endMonth, endDay, endHour, endMin,
-                    buildingName, studentId, major));
+                    endYear, endMonth, endDay, endHour, endMin));
             ft.commit();
-            ft.addToBackStack("filter");
+            ft.addToBackStack("search");
         });
 
         return rootView;

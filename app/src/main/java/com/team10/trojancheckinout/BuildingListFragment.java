@@ -3,17 +3,18 @@ package com.team10.trojancheckinout;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -24,32 +25,46 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Listener;
-import com.team10.trojancheckinout.model.Manager;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.utils.CSVParser;
 
-import java.lang.reflect.Array;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import static android.app.Activity.RESULT_OK;
+
 public class BuildingListFragment extends Fragment {
     private BuildingAdapter adapter;
     private Button btnAddBuilding;
+    private Button btnImportCSV;
+
+    private static final String TAG = "BuildingListFragment";
+    private static final int REQUEST_CODE = 1;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(
-            R.layout.fragment_building_list, container, false);
-
+                R.layout.fragment_building_list, container, false);
 
 
         // set up RecyclerView
         RecyclerView buildingList = rootView.findViewById(R.id.building_list);
         btnAddBuilding = rootView.findViewById(R.id.btnAddBuilding);
+        btnImportCSV = rootView.findViewById(R.id.btnImportCSV);
 
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -71,7 +86,68 @@ public class BuildingListFragment extends Fragment {
             }
         });
 
+        btnImportCSV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("text/comma-separated-values");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(Intent.createChooser(intent, "Import CSV"), REQUEST_CODE);
+
+            }
+        });
+
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQUEST_CODE || resultCode != RESULT_OK || data == null || data.getData() == null) {
+            Log.e("VAR", "onActivityResult: Error");
+        }
+        else {
+            try {
+                CSVReader dataRead = new CSVReader(new InputStreamReader(getContext().getContentResolver().openInputStream(data.getData())));
+                ArrayList<String[]> information = CSVParser.parseCSV(dataRead);
+
+                for (String[] info : information) {
+                    if (info[0].equals("U")) {
+                        Server.getBuildingIDByName(info[1], new Callback<String>() {
+                            @Override
+                            public void onSuccess(String result) {
+                                if (result != null) {
+                                    int maxCapacity = Integer.parseInt(info[2]);
+                                    Server.setBuildingMaxCapacity(result, maxCapacity, new Callback<Building>() {
+                                        @Override
+                                        public void onSuccess(Building result) {
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception exception) {
+                                            Log.e(TAG, "onFailure: building update failed ", exception);
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.e(TAG, "getBuildingID failed for " + info[1], exception);
+                            }
+                        });
+                    } else if (info[0].equals("A")) {
+
+                    } else if (info[0].equals("D")) {
+
+                    }
+                }
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
