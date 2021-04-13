@@ -43,4 +43,4 @@ CSV files must be of this format:
   * Replace `<NAME_OF_BUILDING>` with the name of the building that you wish to update
   * Replace `<MAX_CAPACITY>` with the new maximum capacity. This **must** be an integer.
 
-An example CSV file by the name of `example_csv.csv` can be found in the root directory
+An example CSV file by the name of [`example_csv.csv`](./example_csv.csv) can be found in the root directory
