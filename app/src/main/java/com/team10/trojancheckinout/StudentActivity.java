@@ -257,8 +257,8 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
     public void didScanQR(String buildingId) {
         Log.d("StudentActivity", buildingId);
         if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-            builder1.setMessage("Are you sure you want to check out?")
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Are you sure you want to check out?")
                     .setTitle("Checkout?")
                     .setPositiveButton("Confirm", (dialog, id) -> {
                         Server.checkOut(new Callback<Building>() {
@@ -292,11 +292,10 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                     exception.printStackTrace();
                 }
             });
-            AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
-            builder2.setCancelable(true)
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(true)
                     .setTitle("Check In Denied")
-                    .setMessage("You are currently checked in to "+ temp[0] + "." +
-                            " Please check out before checking into a new building.")
+                    .setMessage("You are currently checked into a different building. Please check out before checking into a new building.")
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -307,8 +306,8 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
 
             return;
         } else {
-            AlertDialog.Builder builder3 = new AlertDialog.Builder(this);
-            builder3.setMessage("Are you sure you want to check in?")
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Are you sure you want to check in?")
                     .setTitle("Check in?")
                     .setPositiveButton("Confirm", (dialog, id) -> {
                         Server.checkIn(buildingId, new Callback<Building>() {
@@ -316,7 +315,7 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                             public void onSuccess(Building building) {
                                 student.setBuilding(buildingId);
                                 currentBuilding.setText(building.getName());
-                                Toast.makeText(getApplicationContext(), "Successfully checked in to "+ building.getName() + "!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Successfully checked into "+ building.getName() + "!", Toast.LENGTH_LONG).show();
                             }
 
                             @Override
@@ -331,4 +330,50 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                     }).setIcon(android.R.drawable.ic_dialog_alert).show();
         }
     }
+    /*@VisibleForTesting
+    public void didScanQR(String buildingId) {
+        Log.d("StudentActivity", buildingId);
+        if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
+            Server.checkOut(new Callback<Building>() {
+                @Override
+                public void onSuccess(Building building) {
+                    student.setBuilding(null);
+                    currentBuilding.setText(R.string.none);
+                    Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
+                }
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure: checkOut failure");
+                }
+            });
+        }else if(student.getCurrentBuilding() != null && !student.getCurrentBuilding().equals(buildingId)){
+            AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+            builder2.setCancelable(true)
+                    .setTitle("Check In Denied")
+                    .setMessage("You are currently checked into a different building! Please check out before checking into a new building.")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
+
+            return;
+        } else {
+            Server.checkIn(buildingId, new Callback<Building>() {
+                @Override
+                public void onSuccess(Building building) {
+                    student.setBuilding(buildingId);
+                    currentBuilding.setText(building.getName());
+                    Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
+                }
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure: checkIn failure");
+                    exception.printStackTrace();
+                }
+            });
+        }
+    }*/
 }
