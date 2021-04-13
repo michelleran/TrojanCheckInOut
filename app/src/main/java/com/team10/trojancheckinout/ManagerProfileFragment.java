@@ -7,7 +7,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.telecom.Call;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,9 +46,7 @@ public class ManagerProfileFragment extends Fragment {
     private ImageView imgPhoto;
     private String urlImgPhoto;
     private int viewState;
-
-
-
+    private String imageLink;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -193,10 +193,61 @@ public class ManagerProfileFragment extends Fragment {
         }
         else if (viewState == 0) {
             viewState = 2;
-            Intent choosePic = new Intent();
-            choosePic.setType("image/*");
-            choosePic.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(choosePic, 1);
+//            Intent choosePic = new Intent();
+//            choosePic.setType("image/*");
+//            choosePic.setAction(Intent.ACTION_GET_CONTENT);
+//            startActivityForResult(choosePic, 1);
+            String[] options = {"Choose from Gallery", "Use Web Link"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Upload New Profile Photo");
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if ("Choose from Gallery".equals(options[which])) {
+                        Intent choosePic = new Intent();
+                        choosePic.setType("image/*");
+                        choosePic.setAction(Intent.ACTION_GET_CONTENT);
+                        startActivityForResult(choosePic, 1);
+                    } else if ("Use Web Link".equals(options[which])) {
+                        //new alert dialog to accept user text input
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle("Insert Link for New Profile Photo");
+                        final EditText input = new EditText(getActivity());
+                        input.setInputType(InputType.TYPE_CLASS_TEXT);
+                        builder.setView(input);
+                        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                imageLink = input.getText().toString();
+
+                                Server.photoURLInput(imageLink, new Callback<String>() {
+                                    @Override
+                                    public void onSuccess(String result) {
+                                        Toast.makeText(getActivity(), "Updated Profile Picture", Toast.LENGTH_LONG).show();
+                                        // replace photo in UI
+                                        triggerPhotoRefresh(result);
+                                    }
+                                    @Override
+                                    public void onFailure(Exception exception) {
+                                        Log.e("Manager Profile Fragment", "onFailure: upload prof pic failure");
+                                        viewState = 0;
+                                    }
+                                });
+                            }
+                        });
+                        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                                viewState = 0;
+                            }
+                        });
+                        builder.show();
+                    }
+                }
+            });
+            builder.show();
         }
     }
 
