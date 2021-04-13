@@ -37,7 +37,7 @@ To run this project:
 * Run on emulator by clicking "Run" button
 ## CSV file format
 Managers can import a CSV file in order to update the capacities of existing buildings.
-CSV files must be of this format:
+CSV files must be of the following format:
 * Each update record must be on a new line
 * Each update record must be in the following format: `U`,`<NAME_OF_BUILDING>`,`<MAX_CAPACITY>`
   * Replace `<NAME_OF_BUILDING>` with the name of the building that you wish to update
