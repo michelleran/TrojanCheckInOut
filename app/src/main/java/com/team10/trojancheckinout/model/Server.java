@@ -878,7 +878,6 @@ public class Server {
                                       int endYear, int endMonth, int endDay, int endHour, int endMin,
                                       Callback<Student> callback)
     {
-
         if (buildingName != null) {
             Query query = queryRecords(
                 startYear, startMonth, startDay, startHour, startMin,
@@ -897,13 +896,12 @@ public class Server {
                     getStudent(record.getStudentUid(), new Callback<Student>() {
                         @Override
                         public void onSuccess(Student student) {
-                            if (!student.isDeleted() &&
-                                // search by name, if applicable
-                                (name == null || name.isEmpty() ||
+                            // search by name, if applicable
+                            if ((name == null || name.isEmpty() ||
                                     student.getGivenName().toLowerCase().contains(name) ||
                                     student.getSurname().toLowerCase().contains(name)) &&
                                 // search by id, if applicable
-                                (id == null || id.isEmpty() || student.getId().contains(id)))
+                                (id == null || id.isEmpty() || student.getId().equals(id)))
                                 // student matches
                                 callback.onSuccess(student);
                         }
@@ -917,8 +915,7 @@ public class Server {
             }).addOnFailureListener(callback::onFailure);
         } else {
             Query query = db.collection(USER_COLLECTION)
-                .whereEqualTo("student", true)
-                .whereEqualTo("deleted", false);
+                .whereEqualTo("student", true);
             if (major != null)
                 query = query.whereEqualTo("major", major);
 
@@ -930,7 +927,7 @@ public class Server {
                         student.getGivenName().toLowerCase().contains(name) ||
                         student.getSurname().toLowerCase().contains(name) &&
                         // search by id, if applicable
-                       (id == null || id.isEmpty() || student.getId().contains(id)))
+                       (id == null || id.isEmpty() || student.getId().equals(id)))
                     {
                         // student matches
                         callback.onSuccess(student);

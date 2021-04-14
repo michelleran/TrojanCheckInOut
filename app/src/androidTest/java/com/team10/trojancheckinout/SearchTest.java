@@ -95,9 +95,6 @@ public class SearchTest {
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
 
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
-
             // assert again that student's name contains input
             try {
                 onView(withId(R.id.givenName)).check(matches(withText(containsString(INPUT))));
@@ -131,9 +128,6 @@ public class SearchTest {
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
 
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
-
             // assert again that student's name contains input
             try {
                 onView(withId(R.id.givenName)).check(matches(withText(containsString(INPUT))));
@@ -145,7 +139,7 @@ public class SearchTest {
     }
 
     @Test
-    public void searchByIdPartialMatch() {
+    public void searchByIdTooShort() {
         final String INPUT = "22222";
         onView(withId(R.id.search_id)).perform(typeText(INPUT));
         Espresso.closeSoftKeyboard();
@@ -153,26 +147,13 @@ public class SearchTest {
 
         sleep(WAIT_DATA);
 
-        RecyclerView list = getCurrentActivity().findViewById(R.id.results_list);
-        for (int i = 0; i < Math.min(7, list.getAdapter().getItemCount()); i++) {
-            // scroll to student
-            onView(withId(R.id.results_list))
-                .perform(RecyclerViewActions.scrollToPosition(i));
-            // open profile
-            onView(withRecyclerView(R.id.results_list)
-                .atPositionOnView(i, R.id.record_student_photo))
-                .perform(click());
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
-            // assert that student's id contains input
-            onView(withId(R.id.id)).check(matches(withText(containsString(INPUT))));
-            Espresso.pressBack();
-        }
+        // assert we have not proceeded to search results
+        onView(withId(R.id.search_button)).check(matches(isDisplayed()));
     }
 
     @Test
-    public void searchByIdFullMatch() {
-        final String INPUT = "1111122222";
+    public void searchById() {
+        final String INPUT = "6998590265";
         onView(withId(R.id.search_id)).perform(typeText(INPUT));
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.search_button)).perform(click());
@@ -188,10 +169,8 @@ public class SearchTest {
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
-            // assert that student's id contains input
-            onView(withId(R.id.id)).check(matches(withText(containsString(INPUT))));
+            // assert that student's id is input
+            onView(withId(R.id.id)).check(matches(withText(INPUT)));
             Espresso.pressBack();
         }
     }
@@ -212,8 +191,6 @@ public class SearchTest {
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
             // assert that major matches
             onView(withId(R.id.major)).check(matches(withText(MAJOR)));
             Espresso.pressBack();
@@ -236,9 +213,6 @@ public class SearchTest {
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
-
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
 
             // view history
             onView(withId(R.id.viewHistoryBtn_basic)).perform(click());
@@ -281,9 +255,6 @@ public class SearchTest {
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
 
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
-
             // view history
             onView(withId(R.id.viewHistoryBtn_basic)).perform(click());
             // record for this building may not be visible, so we'll directly check the adapter
@@ -325,9 +296,6 @@ public class SearchTest {
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
-
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
 
             // view history
             onView(withId(R.id.viewHistoryBtn_basic)).perform(click());
@@ -376,9 +344,6 @@ public class SearchTest {
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
 
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
-
             // view history
             onView(withId(R.id.viewHistoryBtn_basic)).perform(click());
             // record for this building may not be visible, so we'll directly check the adapter
@@ -426,9 +391,6 @@ public class SearchTest {
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
 
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
-
             // assert again that student's name contains input
             try {
                 onView(withId(R.id.givenName)).check(matches(withText(containsString(INPUT))));
@@ -470,9 +432,6 @@ public class SearchTest {
             onView(withRecyclerView(R.id.results_list)
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
-
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
 
             // assert again that student's name contains input
             try {
@@ -541,9 +500,6 @@ public class SearchTest {
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
 
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
-
             // assert again that student's name contains input
             try {
                 onView(withId(R.id.givenName)).check(matches(withText(containsString(INPUT))));
@@ -576,7 +532,7 @@ public class SearchTest {
     @Test
     public void searchByNameIdMajorBuilding() {
         final String NAME = "n";
-        final String ID = "2";
+        final String ID = "6998590265";
         final String MAJOR = "CSCI";
         final String BUILDING = "Doheny";
 
@@ -609,9 +565,6 @@ public class SearchTest {
                 .atPositionOnView(i, R.id.record_student_photo))
                 .perform(click());
 
-            // assert student is not deleted
-            onView(withId(R.id.deletedAccount)).check(matches(not(isDisplayed())));
-
             // assert again that student's name contains input
             try {
                 onView(withId(R.id.givenName)).check(matches(withText(containsString(NAME))));
@@ -619,8 +572,8 @@ public class SearchTest {
                 onView(withId(R.id.surname)).check(matches(withText(containsString(NAME))));
             }
 
-            // assert that student's id contains input
-            onView(withId(R.id.id)).check(matches(withText(containsString(ID))));
+            // assert that student's id is input
+            onView(withId(R.id.id)).check(matches(withText(ID)));
             // assert that major matches
             onView(withId(R.id.major)).check(matches(withText(MAJOR)));
 
