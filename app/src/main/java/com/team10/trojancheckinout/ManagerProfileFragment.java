@@ -224,7 +224,6 @@ public class ManagerProfileFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 imageLink = input.getText().toString();
-
                                 Server.photoURLInput(imageLink, new Callback<String>() {
                                     @Override
                                     public void onSuccess(String result) {
@@ -270,6 +269,7 @@ public class ManagerProfileFragment extends Fragment {
                 fileDesc = getContext().getContentResolver().openAssetFileDescriptor(newImage,"r");
                 long fileSize = fileDesc.getLength();
                 Log.d("File Size", String.format("value = %d", fileSize));
+                // Check if photo is larger than 2 MB
                 if(fileSize > 2097152){
                     AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
                     alertDialog.setTitle("File Size Too Large");
