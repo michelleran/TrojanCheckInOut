@@ -920,7 +920,6 @@ public class Server {
                 query = query.whereEqualTo("major", major);
 
             query.get().addOnSuccessListener(result -> {
-                Log.d("searchStudents", "" + result.getDocuments().size());
                 for (DocumentSnapshot doc : result.getDocuments()) {
                     Student student = doc.toObject(Student.class);
                     if ((name.isEmpty() ||

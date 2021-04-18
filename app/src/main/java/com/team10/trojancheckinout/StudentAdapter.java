@@ -29,12 +29,10 @@ public class StudentAdapter
 
     @Override
     public void onSuccess(Student item) {
-        Log.d(TAG, item.getUid());
         students.add(item);
         // sort alphabetically by surname
         students.sort((Student s1, Student s2) -> s1.getSurname().compareTo(s2.getSurname()));
         notifyDataSetChanged();
-        Log.d(TAG, "" + students.size());
     }
 
     @Override
