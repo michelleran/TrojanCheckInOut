@@ -138,7 +138,7 @@ public class SearchFragment extends Fragment {
             }
 
             String id = idField.getText().toString();
-            if (!Validator.validateID(id)) {
+            if (!id.isEmpty() && !Validator.validateID(id)) {
                 Toast.makeText(getContext(), R.string.search_invalid_usc_id, Toast.LENGTH_LONG).show();
                 return;
             }
