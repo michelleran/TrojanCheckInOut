@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +29,12 @@ public class StudentAdapter
 
     @Override
     public void onSuccess(Student item) {
+        Log.d(TAG, item.getUid());
         students.add(item);
         // sort alphabetically by surname
         students.sort((Student s1, Student s2) -> s1.getSurname().compareTo(s2.getSurname()));
         notifyDataSetChanged();
+        Log.d(TAG, "" + students.size());
     }
 
     @Override
@@ -55,7 +58,9 @@ public class StudentAdapter
     public void onUpdate(Student item) { }
 
     @Override
-    public void onFailure(Exception exception) { }
+    public void onFailure(Exception exception) {
+        exception.printStackTrace();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView studentPhoto;
