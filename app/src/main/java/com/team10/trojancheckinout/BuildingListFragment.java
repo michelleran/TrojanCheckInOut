@@ -137,9 +137,22 @@ public class BuildingListFragment extends Fragment {
                                 Log.e(TAG, "getBuildingID failed for " + info[1], exception);
                             }
                         });
-                    } else if (info[0].equals("A")) {
+                    }
+                    else if (info[0].equals("A")) {
+                        int maxCapacity = Integer.parseInt(info[2]);
+                        Server.addBuilding(info[1], maxCapacity, new Callback<Building>() {
+                            @Override
+                            public void onSuccess(Building result) {
+                                Log.d(TAG, "onSuccess: " + result.getName() + " added");
+                            }
 
-                    } else if (info[0].equals("D")) {
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.e(TAG, "onFailure: building addition failed", exception);
+                            }
+                        });
+                    }
+                    else if (info[0].equals("D")) {
 
                     }
                 }
