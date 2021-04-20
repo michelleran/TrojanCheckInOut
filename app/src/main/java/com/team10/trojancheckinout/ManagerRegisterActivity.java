@@ -2,8 +2,13 @@ package com.team10.trojancheckinout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +18,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.team10.trojancheckinout.model.Callback;
+import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.User;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import static com.team10.trojancheckinout.model.Server.registerManager;
 import static com.team10.trojancheckinout.utils.Validator.validateEmail;
@@ -74,21 +83,52 @@ public class ManagerRegisterActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Please add a photo!" ,Toast.LENGTH_SHORT).show();
                 } else {
                     // all inputs are valid
-                    registerManager(iFname, iLname, iEmail, imageUri, iPassword, new Callback<User>() {
-                        @Override
-                        public void onSuccess(User result) {
-                            Toast.makeText(ManagerRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
 
-                            Intent it = new Intent(ManagerRegisterActivity.this, ManagerActivity.class);
-                            startActivity(it);
-                        }
+                    Context context = ManagerRegisterActivity.this;
+                    AssetFileDescriptor fileDesc = null;
+                    try {
+                        fileDesc = context.getContentResolver().openAssetFileDescriptor(imageUri,"r");
+                        long fileSize = fileDesc.getLength();
+                        Log.d("File Size", String.format("value = %d", fileSize));
+                        // Check if photo is larger than 2 MB
+                        if(fileSize > 2097152){
+                            AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+                            alertDialog.setTitle("File Size Too Large");
+                            alertDialog.setMessage("Selected file has size " + (float)fileSize/1000000 + " MB, which is larger than the 2 MB limit.");
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            alertDialog.show();
 
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Toast.makeText(ManagerRegisterActivity.this, "Registration failed: " + exception, Toast.LENGTH_SHORT).show();
-                            Log.d("Frontend Manager Register", "Failed to add manager to server");
+                        }else{
+                            registerManager(iFname, iLname, iEmail, imageUri, iPassword, new Callback<User>() {
+                                @Override
+                                public void onSuccess(User result) {
+                                    Toast.makeText(ManagerRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+
+                                    Intent it = new Intent(ManagerRegisterActivity.this, ManagerActivity.class);
+                                    startActivity(it);
+                                }
+
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    Toast.makeText(ManagerRegisterActivity.this, "Registration failed: " + exception, Toast.LENGTH_SHORT).show();
+                                    Log.d("Frontend Manager Register", "Failed to add manager to server");
+                                }
+                            });
+
                         }
-                    });
+                        fileDesc.close();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
         });

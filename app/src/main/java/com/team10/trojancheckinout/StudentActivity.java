@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -39,10 +40,13 @@ import com.team10.trojancheckinout.model.User;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+
+import static com.team10.trojancheckinout.model.Server.registerManager;
 
 public class StudentActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "StudentActivity";
@@ -282,21 +286,53 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             if(resultCode == Activity.RESULT_OK){
                 Uri imageUri = data.getData();
                 Log.d(TAG, imageUri.toString());
-                Server.changePhoto(imageUri, new Callback<String>() {
-                    @Override
-                    public void onSuccess(String result) {
-                        Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
-                        // replace photo
-                        Glide.with(getApplicationContext()).load(result)
-                            .placeholder(R.drawable.default_profile_picture)
-                            .override(400, 400).centerCrop()
-                            .into(photo);
+
+                Context context = StudentActivity.this;
+
+                AssetFileDescriptor fileDesc = null;
+                try {
+                    fileDesc = context.getContentResolver().openAssetFileDescriptor(imageUri,"r");
+                    long fileSize = fileDesc.getLength();
+                    Log.d("File Size", String.format("value = %d", fileSize));
+                    // Check if photo is larger than 2 MB
+                    if(fileSize > 2097152){
+                        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+                        alertDialog.setTitle("File Size Too Large");
+                        alertDialog.setMessage("Selected file has size " + (float)fileSize/1000000 + " MB, which is larger than the 2 MB limit.");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
+
+                    }else{
+                        Server.changePhoto(imageUri, new Callback<String>() {
+                            @Override
+                            public void onSuccess(String result) {
+                                Toast.makeText(StudentActivity.this, "Updated Profile Picture", Toast.LENGTH_LONG).show();
+                                // replace photo
+                                Glide.with(getApplicationContext()).load(result)
+                                        .placeholder(R.drawable.default_profile_picture)
+                                        .override(400, 400).centerCrop()
+                                        .into(photo);
+                            }
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.e(TAG, "onFailure: upload prof pic failure");
+                            }
+                        });
+
                     }
-                    @Override
-                    public void onFailure(Exception exception) {
-                        Log.e(TAG, "onFailure: upload prof pic failure");
-                    }
-                });
+                    fileDesc.close();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
         } else {
             //QR SCAN - set UI

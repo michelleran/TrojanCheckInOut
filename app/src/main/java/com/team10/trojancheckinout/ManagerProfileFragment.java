@@ -3,6 +3,7 @@ package com.team10.trojancheckinout;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +29,9 @@ import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Manager;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.User;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -220,7 +224,6 @@ public class ManagerProfileFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 imageLink = input.getText().toString();
-
                                 Server.photoURLInput(imageLink, new Callback<String>() {
                                     @Override
                                     public void onSuccess(String result) {
@@ -260,21 +263,51 @@ public class ManagerProfileFragment extends Fragment {
         }
         else {
             Uri newImage = data.getData();
-            Log.d("Manager Profile Fragment PHOTO UPDATE", newImage.toString());
-            Server.changePhoto(newImage, new Callback<String>() {
-                @Override
-                public void onSuccess(String result) {
-                    Toast.makeText(getActivity(), "Successfully Updated Profile Photo", Toast.LENGTH_SHORT).show();
-                    triggerPhotoRefresh(result);
-                }
 
-                @Override
-                public void onFailure(Exception exception) {
-                    Log.e("Manager Profile Fragment", "Profile Photo Update Failure", exception);
-                    Toast.makeText(getActivity(), "Profile Photo Update Failure", Toast.LENGTH_SHORT).show();
+            AssetFileDescriptor fileDesc = null;
+            try {
+                fileDesc = getContext().getContentResolver().openAssetFileDescriptor(newImage,"r");
+                long fileSize = fileDesc.getLength();
+                Log.d("File Size", String.format("value = %d", fileSize));
+                // Check if photo is larger than 2 MB
+                if(fileSize > 2097152){
+                    AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+                    alertDialog.setTitle("File Size Too Large");
+                    alertDialog.setMessage("Selected file has size " + (float)fileSize/1000000 + " MB, which is larger than the 2 MB limit.");
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
                     viewState = 0;
+
+                }else{
+                    Log.d("Manager Profile Fragment PHOTO UPDATE", newImage.toString());
+                    Server.changePhoto(newImage, new Callback<String>() {
+                        @Override
+                        public void onSuccess(String result) {
+                            Toast.makeText(getActivity(), "Successfully Updated Profile Photo", Toast.LENGTH_SHORT).show();
+                            triggerPhotoRefresh(result);
+                        }
+
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e("Manager Profile Fragment", "Profile Photo Update Failure", exception);
+                            Toast.makeText(getActivity(), "Profile Photo Update Failure", Toast.LENGTH_SHORT).show();
+                            viewState = 0;
+                        }
+                    });
+
                 }
-            });
+                fileDesc.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

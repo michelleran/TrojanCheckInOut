@@ -1,6 +1,7 @@
 package com.team10.trojancheckinout;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +56,9 @@ public class StudentAdapter
     public void onUpdate(Student item) { }
 
     @Override
-    public void onFailure(Exception exception) { }
+    public void onFailure(Exception exception) {
+        exception.printStackTrace();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView studentPhoto;
