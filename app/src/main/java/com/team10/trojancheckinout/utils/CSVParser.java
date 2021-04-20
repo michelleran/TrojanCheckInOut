@@ -37,8 +37,9 @@ public class CSVParser {
             while (nextLine != null) {
                 if (nextLine.length >= 2) {
                     String opType = nextLine[0];
-                    if (opType.equals("U")) {
-                        Log.d(TAG, "parseCSV: Update");
+                    if (opType.equals("U") || opType.equals("A")) {
+
+                        Log.d(TAG, "parseCSV: Update or Add");
                         if (nextLine.length == 3) {
                             String [] entry = new String [3];
                             entry[0] = opType;
@@ -47,12 +48,12 @@ public class CSVParser {
                             if (valid) {
                                 entry[2] = nextLine[2];
                                 information.add(entry);
+                                Log.d(TAG, entry[2]);
                             }
                         }
+
                     }
-                    else if (opType.equals("A")) {
-                        Log.d(TAG, "parseCSV: Add");
-                    }
+
                     else if (opType.equals("D")) {
                         Log.d(TAG, "parseCSV: Delete");
                     }
