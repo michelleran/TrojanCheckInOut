@@ -878,8 +878,7 @@ public class Server {
                                       int endYear, int endMonth, int endDay, int endHour, int endMin,
                                       Callback<Student> callback)
     {
-
-        if (buildingName != null) {
+        if (!buildingName.isEmpty()) {
             Query query = queryRecords(
                 startYear, startMonth, startDay, startHour, startMin,
                 endYear, endMonth, endDay, endHour, endMin,
@@ -897,13 +896,12 @@ public class Server {
                     getStudent(record.getStudentUid(), new Callback<Student>() {
                         @Override
                         public void onSuccess(Student student) {
-                            if (!student.isDeleted() &&
-                                // search by name, if applicable
-                                (name == null || name.isEmpty() ||
+                            // search by name, if applicable
+                            if ((name.isEmpty() ||
                                     student.getGivenName().toLowerCase().contains(name) ||
                                     student.getSurname().toLowerCase().contains(name)) &&
                                 // search by id, if applicable
-                                (id == null || id.isEmpty() || student.getId().contains(id)))
+                                (id.isEmpty() || student.getId().equals(id)))
                                 // student matches
                                 callback.onSuccess(student);
                         }
@@ -917,20 +915,19 @@ public class Server {
             }).addOnFailureListener(callback::onFailure);
         } else {
             Query query = db.collection(USER_COLLECTION)
-                .whereEqualTo("student", true)
-                .whereEqualTo("deleted", false);
-            if (major != null)
+                .whereEqualTo("student", true);
+            if (!major.isEmpty())
                 query = query.whereEqualTo("major", major);
 
             query.get().addOnSuccessListener(result -> {
                 for (DocumentSnapshot doc : result.getDocuments()) {
                     Student student = doc.toObject(Student.class);
-                    if (name == null || name.isEmpty() ||
+                    if ((name.isEmpty() ||
                         // search by name
                         student.getGivenName().toLowerCase().contains(name) ||
-                        student.getSurname().toLowerCase().contains(name) &&
+                        student.getSurname().toLowerCase().contains(name)) &&
                         // search by id, if applicable
-                       (id == null || id.isEmpty() || student.getId().contains(id)))
+                       (id.isEmpty() || student.getId().equals(id)))
                     {
                         // student matches
                         callback.onSuccess(student);
