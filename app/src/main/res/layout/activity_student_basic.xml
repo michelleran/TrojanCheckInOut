@@ -146,8 +146,8 @@
 
     <TextView
         android:id="@+id/deletedAccount"
-        android:layout_width="304dp"
-        android:layout_height="41dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:ems="10"
         android:gravity="center"
         android:paddingTop="10dp"
@@ -158,7 +158,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/currLoc_text"
+        app:layout_constraintTop_toBottomOf="@+id/viewHistoryBtn_basic"
         app:layout_constraintVertical_bias="0.251" />
 
     <Button

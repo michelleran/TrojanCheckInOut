@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.team10.trojancheckinout.model.Callback;
@@ -134,7 +133,13 @@ public class SearchFragment extends Fragment {
                     (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour > endHour) ||
                     (startYear == endYear && startMonth == endMonth && startDay == endDay && startHour == endHour && startMin > endMin)))
             {
-                Toast.makeText(getContext(), R.string.filter_invalid_dates, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.search_invalid_dates, Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            String id = idField.getText().toString();
+            if (!id.isEmpty() && !Validator.validateID(id)) {
+                Toast.makeText(getContext(), R.string.search_invalid_usc_id, Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -143,7 +148,7 @@ public class SearchFragment extends Fragment {
             ft.replace(R.id.search_tab_content,
                 SearchResultsFragment.newInstance(
                     nameField.getText().toString().trim().toLowerCase(),
-                    idField.getText().toString(),
+                    id,
                     majors.getSelectedItemPosition() == 0 ? "" : majors.getSelectedItem().toString(),
                     buildings.getSelectedItemPosition() == 0 ? "" : buildings.getSelectedItem().toString(),
                     startYear, startMonth, startDay, startHour, startMin,
