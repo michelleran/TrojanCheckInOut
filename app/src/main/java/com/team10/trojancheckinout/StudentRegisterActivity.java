@@ -3,7 +3,11 @@ package com.team10.trojancheckinout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +22,10 @@ import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.User;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import static com.team10.trojancheckinout.model.Server.registerManager;
 import static com.team10.trojancheckinout.model.Server.registerStudent;
 import static com.team10.trojancheckinout.utils.Validator.validateEmail;
 import static com.team10.trojancheckinout.utils.Validator.validateID;
@@ -89,20 +97,50 @@ public class StudentRegisterActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Please add a photo!" ,Toast.LENGTH_SHORT).show();
                 } else {
                     // all inputs are valid
-                    registerStudent(iID, iFname, iLname, iEmail, imageUri, iMajor, iPassword, new Callback<User>() {
-                        @Override
-                        public void onSuccess(User result) {
-                            Toast.makeText(StudentRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(StudentRegisterActivity.this, StudentActivity.class);
-                            startActivity(intent);
-                        }
 
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Toast.makeText(StudentRegisterActivity.this, "Registration failed: " + exception, Toast.LENGTH_SHORT).show();
-                            Log.d("Frontend Student Register", "Failed to add student to server");
+                    Context context = StudentRegisterActivity.this;
+                    AssetFileDescriptor fileDesc = null;
+                    try {
+                        fileDesc = context.getContentResolver().openAssetFileDescriptor(imageUri,"r");
+                        long fileSize = fileDesc.getLength();
+                        Log.d("File Size", String.format("value = %d", fileSize));
+                        // Check if photo is larger than 2 MB
+                        if(fileSize > 2097152){
+                            AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+                            alertDialog.setTitle("File Size Too Large");
+                            alertDialog.setMessage("Selected file has size " + (float)fileSize/1000000 + " MB, which is larger than the 2 MB limit.");
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            alertDialog.show();
+
+                        }else{
+                            registerStudent(iID, iFname, iLname, iEmail, imageUri, iMajor, iPassword, new Callback<User>() {
+                                @Override
+                                public void onSuccess(User result) {
+                                    Toast.makeText(StudentRegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(StudentRegisterActivity.this, StudentActivity.class);
+                                    startActivity(intent);
+                                }
+
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    Toast.makeText(StudentRegisterActivity.this, "Registration failed: " + exception, Toast.LENGTH_SHORT).show();
+                                    Log.d("Frontend Student Register", "Failed to add student to server");
+                                }
+                            });
                         }
-                    });
+                        fileDesc.close();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
         });
