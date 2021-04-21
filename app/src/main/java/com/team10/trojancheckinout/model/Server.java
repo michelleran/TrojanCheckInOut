@@ -78,8 +78,9 @@ public class Server {
     }
 
     public static void logout() {
-        FirebaseAuth.getInstance().signOut();
-        Log.w("log out", "log out attempt");
+        String id = auth.getCurrentUser().getUid();
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(id);
+        auth.signOut();
     }
 
     public static void registerManager(String givenName, String surname, String email,
