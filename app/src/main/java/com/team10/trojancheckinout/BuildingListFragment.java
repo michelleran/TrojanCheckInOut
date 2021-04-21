@@ -164,7 +164,7 @@ public class BuildingListFragment extends Fragment {
                     String warningMessage = "";
                     int errorCount = 0;
                     for (String error : capacityErrors) {
-                        if (errorCount > 100) {
+                        if (errorCount > 30) {
                             warningMessage += ", ...";
                             break;
                         }
@@ -176,7 +176,10 @@ public class BuildingListFragment extends Fragment {
                     }
                     warningMessage = warningMessage.substring(2);
                     warningMessage = "The following " + String.valueOf(capacityErrors.size())
-                            + " buildings have invalid capacities:\n" + warningMessage;
+                            + " buildings have invalid capacities:\n"
+                            + warningMessage
+                            + "\n\nAll building capacities must be non-negative integers";
+
 
                     new AlertDialog.Builder(getContext())
                             .setTitle("WARNING: Invalid Capacities")
