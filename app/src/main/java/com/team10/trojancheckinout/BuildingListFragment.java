@@ -162,8 +162,17 @@ public class BuildingListFragment extends Fragment {
                 }
                 if (capacityErrors.size() > 0) {
                     String warningMessage = "";
+                    int errorCount = 0;
                     for (String error : capacityErrors) {
-                        warningMessage += ", " + error;
+                        if (errorCount > 100) {
+                            warningMessage += ", ...";
+                            break;
+                        }
+                        else {
+                            warningMessage += ", " + error;
+                            errorCount++;
+                        }
+
                     }
                     warningMessage = warningMessage.substring(2);
                     warningMessage = "The following " + String.valueOf(capacityErrors.size())
