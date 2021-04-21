@@ -128,6 +128,7 @@ public class BuildingListFragment extends Fragment {
                                         @Override
                                         public void onFailure(Exception exception) {
                                             Log.e(TAG, "onFailure: building update failed ", exception);
+                                            Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 }
