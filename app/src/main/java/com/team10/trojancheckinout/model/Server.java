@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.*;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
@@ -107,7 +108,14 @@ public class Server {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d("registerStudent", "createUserWithEmail:success");
-                            writeUserData(id, givenName, surname, email, file, major, callback, true);
+                            FirebaseMessaging.getInstance().subscribeToTopic(auth.getCurrentUser().getUid())
+                                .addOnCompleteListener(subtask -> {
+                                    if (!subtask.isSuccessful()) {
+                                        callback.onFailure(subtask.getException());
+                                    } else {
+                                        writeUserData(id, givenName, surname, email, file, major, callback, true);
+                                    }
+                                });
                         }
                         else {
                             Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
@@ -115,6 +123,12 @@ public class Server {
                         }
                     }
                 });
+    }
+
+    // TODO: delete this method later
+    private static void subscribeToSelfTopic() {
+        FirebaseMessaging.getInstance().subscribeToTopic(auth.getCurrentUser().getUid())
+            .addOnCompleteListener(subtask -> { });
     }
 
     private static void writeUserData(String id, String givenName, String surname, String email,
@@ -200,6 +214,10 @@ public class Server {
                         if(document.getBoolean("student")) {
                             //can also check if the user is deleted by checking against "deleted"
                             Student student = document.toObject(Student.class);
+
+                            // TODO: this ensures all accts created prior to implementation of FCM are subscribed; delete this eventually
+                            subscribeToSelfTopic();
+
                             callback.onSuccess(student);
                         }
                         else {
