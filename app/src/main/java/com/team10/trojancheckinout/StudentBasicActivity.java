@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.team10.trojancheckinout.model.Building;
@@ -87,5 +88,25 @@ public class StudentBasicActivity extends AppCompatActivity {
         bundle.putString("uid", student.getUid());
         i.putExtras(bundle);
         startActivity(i);
+    }
+
+    public void forceKickout(View view){
+        if(student.getCurrentBuilding() == null){
+            Toast.makeText(getApplicationContext(), "Student is not currently checked in!", Toast.LENGTH_LONG).show();
+        }
+        else {
+            Server.checkOutStudent(student.getUid(), new Callback<Building>() {
+                @Override
+                public void onSuccess(Building result) {
+                    student.setBuilding(null);
+                    currentBuilding.setText(R.string.none);
+                    Toast.makeText(getApplicationContext(), "Force kick out successful!", Toast.LENGTH_LONG).show();
+                }
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure: force kickout failure");
+                }
+            });
+        }
     }
 }
