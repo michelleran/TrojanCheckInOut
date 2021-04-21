@@ -109,14 +109,17 @@ public class Server {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d("registerStudent", "createUserWithEmail:success");
-                            FirebaseMessaging.getInstance().subscribeToTopic(auth.getCurrentUser().getUid())
-                                .addOnCompleteListener(subtask -> {
-                                    if (!subtask.isSuccessful()) {
-                                        callback.onFailure(subtask.getException());
-                                    } else {
-                                        writeUserData(id, givenName, surname, email, file, major, callback, true);
-                                    }
-                                });
+                            subscribeToSelfTopic(new Callback<Void>() {
+                                @Override
+                                public void onSuccess(Void _) {
+                                    writeUserData(id, givenName, surname, email, file, major, callback, true);
+                                }
+
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    callback.onFailure(exception);
+                                }
+                            });
                         }
                         else {
                             Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
@@ -126,10 +129,10 @@ public class Server {
                 });
     }
 
-    // TODO: delete this method later
-    private static void subscribeToSelfTopic() {
+    private static void subscribeToSelfTopic(Callback<Void> callback) {
         FirebaseMessaging.getInstance().subscribeToTopic(auth.getCurrentUser().getUid())
-            .addOnCompleteListener(subtask -> { });
+            .addOnSuccessListener(r -> callback.onSuccess(null))
+            .addOnFailureListener(callback::onFailure);
     }
 
     private static void writeUserData(String id, String givenName, String surname, String email,
@@ -210,16 +213,22 @@ public class Server {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){ //success
                     DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
+                    if (document != null && document.exists()) {
                         Log.d("getUser", "DocumentSnapshot data: " + document.getData());
                         if(document.getBoolean("student")) {
                             //can also check if the user is deleted by checking against "deleted"
                             Student student = document.toObject(Student.class);
+                            subscribeToSelfTopic(new Callback<Void>() {
+                                @Override
+                                public void onSuccess(Void _) {
+                                    callback.onSuccess(student);
+                                }
 
-                            // TODO: this ensures all accts created prior to implementation of FCM are subscribed; delete this eventually
-                            subscribeToSelfTopic();
-
-                            callback.onSuccess(student);
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    callback.onFailure(exception);
+                                }
+                            });
                         }
                         else {
                             //make manager
@@ -288,7 +297,7 @@ public class Server {
                 Log.d("deleteStudent", "account deleted.");
                 DocumentReference docRef = db.collection(USER_COLLECTION)
                     .document(uid); //get the current user document
-                docRef.update("deleted", true) // TODO: this fails
+                docRef.update("deleted", true)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
