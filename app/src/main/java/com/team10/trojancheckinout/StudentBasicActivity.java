@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
+import com.team10.trojancheckinout.model.Listener;
 import com.team10.trojancheckinout.model.Server;
 import com.team10.trojancheckinout.model.Student;
 
@@ -52,32 +53,39 @@ public class StudentBasicActivity extends AppCompatActivity {
                         .override(400, 400).centerCrop()
                         .into(photoUrl);
 
-                if(result.isDeleted()){
+                if (result.isDeleted())
                     deleted.setVisibility(TextView.VISIBLE);
-                    currentBuilding.setText("N/A");
-                }
-                else{
-                    //gets building name through Server.getBuilding()
-                    if (result.getCurrentBuilding() != null) {
-                        Server.getBuilding(result.getCurrentBuilding(), new Callback<Building>() {
-                            @Override
-                            public void onSuccess(Building result) {
-                                currentBuilding.setText(result.getName());
-                            }
-                            @Override
-                            public void onFailure(Exception exception) {
-                                Log.e(TAG, "onFailure: getBuildingName failure");
-                            }
-                        });
-                    } else {
-                        currentBuilding.setText(R.string.none);
-                    }
-                }
             }
 
             @Override
             public void onFailure(Exception exception) {
                 Log.e(TAG, exception.getMessage() );
+            }
+        });
+
+        Server.listenForCurrentBuilding(studentId, new Callback<String>() {
+            @Override
+            public void onSuccess(String building) {
+                //gets building name
+                if (building != null) {
+                    Server.getBuilding(building, new Callback<Building>() {
+                        @Override
+                        public void onSuccess(Building result) {
+                            currentBuilding.setText(result.getName());
+                        }
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e(TAG, "onFailure: getBuildingName failure");
+                        }
+                    });
+                } else {
+                    currentBuilding.setText(R.string.none);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                exception.printStackTrace();
             }
         });
     }
@@ -95,11 +103,9 @@ public class StudentBasicActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Student is not currently checked in!", Toast.LENGTH_LONG).show();
         }
         else {
-            Server.checkOutStudent(student.getUid(), new Callback<Building>() {
+            Server.kickOut(student.getUid(), new Callback<Building>() {
                 @Override
                 public void onSuccess(Building result) {
-                    student.setBuilding(null);
-                    currentBuilding.setText(R.string.none);
                     Toast.makeText(getApplicationContext(), "Force kick out successful!", Toast.LENGTH_LONG).show();
                 }
                 @Override

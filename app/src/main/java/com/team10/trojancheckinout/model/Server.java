@@ -326,6 +326,20 @@ public class Server {
         });
     }
 
+    public static void listenForCurrentBuilding(String studentId, Callback<String> callback) {
+        db.collection(USER_COLLECTION).document(studentId).addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.w(TAG, error.getMessage());
+                return;
+            }
+            if (snapshot != null && snapshot.exists()) {
+                callback.onSuccess(snapshot.toObject(Student.class).getCurrentBuilding());
+            } else {
+                callback.onFailure(new Exception("Student not found"));
+            }
+        });
+    }
+
     public static void photoURLInput(String URL, Callback<String> callback) {
         if (auth.getCurrentUser() == null) {
             Log.d("changePhoto", "No Logged In User");
@@ -787,6 +801,11 @@ public class Server {
             }
         });
     }
+
+    public static void kickOut(String id, Callback<Building> callback) {
+        // TODO
+    }
+
     public static void listenToHistory(String id, Callback<Record> callback) {
         db.collection(RECORD_COLLECTION)
             .whereEqualTo("studentUid", id)
