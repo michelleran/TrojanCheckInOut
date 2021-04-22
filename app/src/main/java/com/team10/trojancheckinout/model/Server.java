@@ -17,10 +17,12 @@ import androidx.annotation.NonNull;
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.*;
 import com.google.firebase.storage.*;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
 import com.google.zxing.WriterException;
+import com.team10.trojancheckinout.MessagingService;
 import com.team10.trojancheckinout.utils.QRCodeHelper;
 
 import org.jetbrains.annotations.NotNull;
@@ -832,6 +834,32 @@ public class Server {
 
     public static void kickOut(String id, Callback<Building> callback) {
         // TODO
+        checkOutStudent(id, new Callback<Building>() {
+            @Override
+            public void onSuccess(Building result) {
+                sendToTopic(id);
+                Log.d(TAG, "onSuccess: kick out successful");
+            }
+            @Override
+            public void onFailure(Exception exception) {
+                Log.w(TAG, "onFailure: kick out failure", exception);
+            }
+        });
+
+    }
+
+    public static void sendToTopic(String uid) throws FirebaseMessagingException{
+        String topic = uid;
+
+        Message message = Message.builder()
+                .setNotification(Notification.builder()
+                        .setTitle("Check Out Alert")
+                        .setBody("You've been kicked out of your current building by a manager").build())
+                .setTopic(topic)
+                .build();
+
+        String response = FirebaseMessaging.getInstance().send(message);
+        System.out.println("Successfully sent message: " + response);
     }
 
     public static void listenToHistory(String id, Callback<Record> callback) {
