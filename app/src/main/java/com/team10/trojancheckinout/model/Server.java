@@ -1,10 +1,8 @@
 package com.team10.trojancheckinout.model;
 
-import android.content.Context;
-import android.nfc.Tag;
-import android.os.Environment;
 import android.util.Log;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -16,19 +14,17 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.*;
 import com.google.firebase.storage.*;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
-import com.google.zxing.WriterException;
-import com.team10.trojancheckinout.MessagingService;
 import com.team10.trojancheckinout.utils.QRCodeHelper;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -41,6 +37,7 @@ public class Server {
     private static FirebaseAuth auth;
     private static FirebaseFirestore db;
     private static StorageReference storage;
+    private static FirebaseFunctions mFunctions;
 
     private static final String USER_COLLECTION = "users";
     private static final String BUILDING_COLLECTION = "buildings";
@@ -52,6 +49,7 @@ public class Server {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
+        mFunctions = FirebaseFunctions.getInstance();
     }
 
     public static void login(String email, String password, Callback<User> callback){
@@ -837,7 +835,7 @@ public class Server {
         checkOutStudent(id, new Callback<Building>() {
             @Override
             public void onSuccess(Building result) {
-                sendToTopic(id);
+                sendToTopic(id); //???
                 Log.d(TAG, "onSuccess: kick out successful");
             }
             @Override
@@ -848,18 +846,21 @@ public class Server {
 
     }
 
-    public static void sendToTopic(String uid) throws FirebaseMessagingException{
+    public static void sendToTopic(String uid){
         String topic = uid;
+        Map<String, String> data = new HashMap<>();
+        data.put("text", uid);
 
-        Message message = Message.builder()
-                .setNotification(Notification.builder()
-                        .setTitle("Check Out Alert")
-                        .setBody("You've been kicked out of your current building by a manager").build())
-                .setTopic(topic)
-                .build();
-
-        String response = FirebaseMessaging.getInstance().send(message);
-        System.out.println("Successfully sent message: " + response);
+        mFunctions
+                .getHttpsCallable("kickout")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                    @Override
+                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        String result = (String) task.getResult().getData();
+                        return result;
+                    }
+                });
     }
 
     public static void listenToHistory(String id, Callback<Record> callback) {
