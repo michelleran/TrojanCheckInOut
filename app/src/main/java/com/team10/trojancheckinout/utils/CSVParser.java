@@ -47,9 +47,13 @@ public class CSVParser {
                             boolean valid = Pattern.matches(CAPACITY_REGEX, nextLine[2]);
                             if (valid) {
                                 entry[2] = nextLine[2];
-                                information.add(entry);
                                 Log.d(TAG, entry[2]);
+                            } else {
+                                entry[0] = "W";
+                                entry[2] = null;
+                                Log.d(TAG, "parseCSV: error");
                             }
+                            information.add(entry);
                         }
 
                     }

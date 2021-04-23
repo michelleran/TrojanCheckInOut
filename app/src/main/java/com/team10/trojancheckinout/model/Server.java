@@ -656,7 +656,7 @@ public class Server {
                 // If new max capacity is smaller than old max capacity
                 if(building.getCurrentCapacity() > maxCapacity){
                     Log.d(TAG, "Error");
-                    throw new FirebaseFirestoreException("New capacity is smaller than old capacity",
+                    throw new FirebaseFirestoreException("New capacity is smaller than current capacity",
                         FirebaseFirestoreException.Code.ABORTED);
                 }else{
                     transaction.update(buildingDocRef, "maxCapacity", maxCapacity);
