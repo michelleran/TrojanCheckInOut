@@ -831,11 +831,10 @@ public class Server {
     }
 
     public static void kickOut(String id, Callback<Building> callback) {
-        // TODO
         checkOutStudent(id, new Callback<Building>() {
             @Override
             public void onSuccess(Building result) {
-                sendToTopic(id); //???
+                sendToTopic(id);
                 Log.d(TAG, "onSuccess: kick out successful");
             }
             @Override
