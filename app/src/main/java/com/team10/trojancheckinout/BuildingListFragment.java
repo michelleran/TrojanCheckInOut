@@ -39,6 +39,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -111,7 +112,7 @@ public class BuildingListFragment extends Fragment {
             try {
                 CSVReader dataRead = new CSVReader(new InputStreamReader(getContext().getContentResolver().openInputStream(data.getData())));
                 ArrayList<String[]> information = CSVParser.parseCSV(dataRead);
-
+                ArrayList<String> capacityErrors = new ArrayList<String>(0);
                 for (String[] info : information) {
                     if (info[0].equals("U")) {
                         Server.getBuildingIDByName(info[1], new Callback<String>() {
@@ -127,6 +128,7 @@ public class BuildingListFragment extends Fragment {
                                         @Override
                                         public void onFailure(Exception exception) {
                                             Log.e(TAG, "onFailure: building update failed ", exception);
+                                            Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 }
@@ -155,6 +157,36 @@ public class BuildingListFragment extends Fragment {
                     else if (info[0].equals("D")) {
 
                     }
+                    else if (info[0].equals("W")) {
+                        capacityErrors.add(info[1]);
+                    }
+                }
+                if (capacityErrors.size() > 0) {
+                    String warningMessage = "";
+                    int errorCount = 0;
+                    for (String error : capacityErrors) {
+                        if (errorCount > 30) {
+                            warningMessage += ", ...";
+                            break;
+                        }
+                        else {
+                            warningMessage += ", " + error;
+                            errorCount++;
+                        }
+
+                    }
+                    warningMessage = warningMessage.substring(2);
+                    warningMessage = "The following " + String.valueOf(capacityErrors.size())
+                            + " buildings have invalid capacities:\n"
+                            + warningMessage
+                            + "\n\nAll building capacities must be non-negative integers";
+
+
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("WARNING: Invalid Capacities")
+                            .setMessage(warningMessage)
+                            .setNeutralButton(android.R.string.ok, null)
+                            .show();
                 }
 
             } catch (FileNotFoundException e) {

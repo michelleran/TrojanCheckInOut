@@ -1,10 +1,8 @@
 package com.team10.trojancheckinout.model;
 
-import android.content.Context;
-import android.nfc.Tag;
-import android.os.Environment;
 import android.util.Log;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -16,16 +14,17 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.*;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
-import com.google.zxing.WriterException;
 import com.team10.trojancheckinout.utils.QRCodeHelper;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,6 +37,7 @@ public class Server {
     private static FirebaseAuth auth;
     private static FirebaseFirestore db;
     private static StorageReference storage;
+    private static FirebaseFunctions mFunctions;
 
     private static final String USER_COLLECTION = "users";
     private static final String BUILDING_COLLECTION = "buildings";
@@ -49,6 +49,7 @@ public class Server {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
+        mFunctions = FirebaseFunctions.getInstance();
     }
 
     public static void login(String email, String password, Callback<User> callback){
@@ -77,8 +78,9 @@ public class Server {
     }
 
     public static void logout() {
-        FirebaseAuth.getInstance().signOut();
-        Log.w("log out", "log out attempt");
+        String id = auth.getCurrentUser().getUid();
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(id);
+        auth.signOut();
     }
 
     public static void registerManager(String givenName, String surname, String email,
@@ -107,7 +109,17 @@ public class Server {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d("registerStudent", "createUserWithEmail:success");
-                            writeUserData(id, givenName, surname, email, file, major, callback, true);
+                            subscribeToSelfTopic(new Callback<Void>() {
+                                @Override
+                                public void onSuccess(Void _) {
+                                    writeUserData(id, givenName, surname, email, file, major, callback, true);
+                                }
+
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    callback.onFailure(exception);
+                                }
+                            });
                         }
                         else {
                             Log.w("registerStudent", "createUserWithEmail:failure", task.getException());
@@ -115,6 +127,12 @@ public class Server {
                         }
                     }
                 });
+    }
+
+    private static void subscribeToSelfTopic(Callback<Void> callback) {
+        FirebaseMessaging.getInstance().subscribeToTopic(auth.getCurrentUser().getUid())
+            .addOnSuccessListener(r -> callback.onSuccess(null))
+            .addOnFailureListener(callback::onFailure);
     }
 
     private static void writeUserData(String id, String givenName, String surname, String email,
@@ -195,12 +213,22 @@ public class Server {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){ //success
                     DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
+                    if (document != null && document.exists()) {
                         Log.d("getUser", "DocumentSnapshot data: " + document.getData());
                         if(document.getBoolean("student")) {
                             //can also check if the user is deleted by checking against "deleted"
                             Student student = document.toObject(Student.class);
-                            callback.onSuccess(student);
+                            subscribeToSelfTopic(new Callback<Void>() {
+                                @Override
+                                public void onSuccess(Void _) {
+                                    callback.onSuccess(student);
+                                }
+
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    callback.onFailure(exception);
+                                }
+                            });
                         }
                         else {
                             //make manager
@@ -269,7 +297,7 @@ public class Server {
                 Log.d("deleteStudent", "account deleted.");
                 DocumentReference docRef = db.collection(USER_COLLECTION)
                     .document(uid); //get the current user document
-                docRef.update("deleted", true) // TODO: this fails
+                docRef.update("deleted", true)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -322,6 +350,20 @@ public class Server {
                     Log.d("getStudent", "get failed with ", task.getException());
                     callback.onFailure(task.getException());
                 }
+            }
+        });
+    }
+
+    public static void listenForCurrentBuilding(String studentId, Callback<String> callback) {
+        db.collection(USER_COLLECTION).document(studentId).addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.w(TAG, error.getMessage());
+                return;
+            }
+            if (snapshot != null && snapshot.exists()) {
+                callback.onSuccess(snapshot.toObject(Student.class).getCurrentBuilding());
+            } else {
+                callback.onFailure(new Exception("Student not found"));
             }
         });
     }
@@ -614,7 +656,7 @@ public class Server {
                 // If new max capacity is smaller than old max capacity
                 if(building.getCurrentCapacity() > maxCapacity){
                     Log.d(TAG, "Error");
-                    throw new FirebaseFirestoreException("New capacity is smaller than old capacity",
+                    throw new FirebaseFirestoreException("New capacity is smaller than current capacity",
                         FirebaseFirestoreException.Code.ABORTED);
                 }else{
                     transaction.update(buildingDocRef, "maxCapacity", maxCapacity);
@@ -787,6 +829,39 @@ public class Server {
             }
         });
     }
+
+    public static void kickOut(String id, Callback<Building> callback) {
+        checkOutStudent(id, new Callback<Building>() {
+            @Override
+            public void onSuccess(Building result) {
+                sendToTopic(id);
+                Log.d(TAG, "onSuccess: kick out successful");
+            }
+            @Override
+            public void onFailure(Exception exception) {
+                Log.w(TAG, "onFailure: kick out failure", exception);
+            }
+        });
+
+    }
+
+    public static void sendToTopic(String uid){
+        String topic = uid;
+        Map<String, String> data = new HashMap<>();
+        data.put("text", uid);
+
+        mFunctions
+                .getHttpsCallable("kickout")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                    @Override
+                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        String result = (String) task.getResult().getData();
+                        return result;
+                    }
+                });
+    }
+
     public static void listenToHistory(String id, Callback<Record> callback) {
         db.collection(RECORD_COLLECTION)
             .whereEqualTo("studentUid", id)

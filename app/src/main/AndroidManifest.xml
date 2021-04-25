@@ -41,6 +41,18 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".StudentRegisterActivity" />
         <activity android:name=".ManagerRegisterActivity" />
+
+        <service
+            android:name=".MessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="Trojan_Check_In_Out" />
     </application>
 
 </manifest>

@@ -78,24 +78,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onSuccess(User result) {
                 student = (Student) result;
-
-                //gets building name through Server.getBuilding()
-                if (student.getCurrentBuilding() != null) {
-                    Server.getBuilding(student.getCurrentBuilding(), new Callback<Building>() {
-                        @Override
-                        public void onSuccess(Building result) {
-                            currentBuilding.setText(result.getName());
-                        }
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Log.e(TAG, "onFailure: getBuildingName failure");
-                        }
-                    });
-                } else {
-                    currentBuilding.setText(R.string.none);
-                }
-
-                //set student data into TextView
                 givenName.setText(student.getGivenName());
                 surname.setText(student.getSurname());
                 id.setText(student.getId());
@@ -105,6 +87,33 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                     .placeholder(R.drawable.default_profile_picture)
                     .override(400, 400).centerCrop()
                     .into(photo);
+
+                Server.listenForCurrentBuilding(student.getUid(), new Callback<String>() {
+                    @Override
+                    public void onSuccess(String building) {
+                        student.setBuilding(building);
+                        //gets building name
+                        if (building != null) {
+                            Server.getBuilding(building, new Callback<Building>() {
+                                @Override
+                                public void onSuccess(Building result) {
+                                    currentBuilding.setText(result.getName());
+                                }
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    Log.e(TAG, "onFailure: getBuildingName failure");
+                                }
+                            });
+                        } else {
+                            currentBuilding.setText(R.string.none);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
             }
 
             @Override
@@ -262,9 +271,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                     Server.checkOut(new Callback<Building>() {
                         @Override
                         public void onSuccess(Building building) {
-                            //set Current Building to None and Server.checkOut()
-                            currentBuilding.setText(R.string.none);
-                            student.setBuilding(null);
                             Toast.makeText(getApplicationContext(), "Successfully checked out of " + building.getName() + "!", Toast.LENGTH_LONG).show();
                         }
 
@@ -361,8 +367,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                         Server.checkOut(new Callback<Building>() {
                             @Override
                             public void onSuccess(Building building) {
-                                student.setBuilding(null);
-                                currentBuilding.setText(R.string.none);
                                 Toast.makeText(getApplicationContext(),
                                         "Successfully checked out of "+ building.getName() +"!", Toast.LENGTH_LONG).show();
                             }
@@ -410,8 +414,6 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                         Server.checkIn(buildingId, new Callback<Building>() {
                             @Override
                             public void onSuccess(Building building) {
-                                student.setBuilding(buildingId);
-                                currentBuilding.setText(building.getName());
                                 Toast.makeText(getApplicationContext(), "Successfully checked into "+ building.getName() + "!", Toast.LENGTH_LONG).show();
                             }
 
@@ -442,51 +444,4 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
 
         }
     }
-
-    /*@VisibleForTesting
-    public void didScanQR(String buildingId) {
-        Log.d("StudentActivity", buildingId);
-        if (student.getCurrentBuilding() != null && student.getCurrentBuilding().equals(buildingId)) {
-            Server.checkOut(new Callback<Building>() {
-                @Override
-                public void onSuccess(Building building) {
-                    student.setBuilding(null);
-                    currentBuilding.setText(R.string.none);
-                    Toast.makeText(getApplicationContext(),"Successfully checked out!", Toast.LENGTH_LONG).show();
-                }
-                @Override
-                public void onFailure(Exception exception) {
-                    Log.e(TAG, "onFailure: checkOut failure");
-                }
-            });
-        }else if(student.getCurrentBuilding() != null && !student.getCurrentBuilding().equals(buildingId)){
-            AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
-            builder2.setCancelable(true)
-                    .setTitle("Check In Denied")
-                    .setMessage("You are currently checked into a different building! Please check out before checking into a new building.")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    })
-                    .show();
-
-            return;
-        } else {
-            Server.checkIn(buildingId, new Callback<Building>() {
-                @Override
-                public void onSuccess(Building building) {
-                    student.setBuilding(buildingId);
-                    currentBuilding.setText(building.getName());
-                    Toast.makeText(getApplicationContext(),"Successfully checked in!", Toast.LENGTH_LONG).show();
-                }
-                @Override
-                public void onFailure(Exception exception) {
-                    Log.e(TAG, "onFailure: checkIn failure");
-                    exception.printStackTrace();
-                }
-            });
-        }
-    }*/
 }
