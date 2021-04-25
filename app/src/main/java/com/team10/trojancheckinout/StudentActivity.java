@@ -419,14 +419,30 @@ public class StudentActivity extends AppCompatActivity implements View.OnClickLi
                             public void onFailure(Exception exception) {
                                 Log.e(TAG, "onFailure: checkIn failure");
                                 exception.printStackTrace();
+                                if(exception.getMessage() == "Building is full"){
+                                    Context context = StudentActivity.this;
+                                    AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+                                    alertDialog.setTitle("Building Full");
+                                    alertDialog.setMessage("Selected building is at maximum capacity.");
+                                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                                    alertDialog.show();
+
+                                }
                             }
                         });
                     })
                     .setNegativeButton("Cancel", (dialog, id) -> {
                         dialog.cancel();
                     }).setIcon(android.R.drawable.ic_dialog_alert).show();
+
         }
     }
+
     /*@VisibleForTesting
     public void didScanQR(String buildingId) {
         Log.d("StudentActivity", buildingId);
