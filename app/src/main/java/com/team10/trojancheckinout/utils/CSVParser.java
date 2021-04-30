@@ -60,6 +60,12 @@ public class CSVParser {
 
                     else if (opType.equals("D")) {
                         Log.d(TAG, "parseCSV: Delete");
+                        if (nextLine.length == 2 || nextLine.length == 3) {
+                            String [] entry = new String [3];
+                            entry[0] = opType;
+                            entry[1] = nextLine[1];
+                            information.add(entry);
+                        }
                     }
                 }
                 nextLine = data.readNext();
