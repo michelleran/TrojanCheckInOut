@@ -656,7 +656,7 @@ public class Server {
                 // If new max capacity is smaller than old max capacity
                 if(building.getCurrentCapacity() > maxCapacity){
                     Log.d(TAG, "Error");
-                    throw new FirebaseFirestoreException("New capacity is smaller than old capacity",
+                    throw new FirebaseFirestoreException("New capacity is smaller than current capacity",
                         FirebaseFirestoreException.Code.ABORTED);
                 }else{
                     transaction.update(buildingDocRef, "maxCapacity", maxCapacity);
@@ -831,11 +831,10 @@ public class Server {
     }
 
     public static void kickOut(String id, Callback<Building> callback) {
-        // TODO
         checkOutStudent(id, new Callback<Building>() {
             @Override
             public void onSuccess(Building result) {
-                sendToTopic(id); //???
+                sendToTopic(id);
                 Log.d(TAG, "onSuccess: kick out successful");
             }
             @Override

@@ -47,15 +47,25 @@ public class CSVParser {
                             boolean valid = Pattern.matches(CAPACITY_REGEX, nextLine[2]);
                             if (valid) {
                                 entry[2] = nextLine[2];
-                                information.add(entry);
                                 Log.d(TAG, entry[2]);
+                            } else {
+                                entry[0] = "W";
+                                entry[2] = null;
+                                Log.d(TAG, "parseCSV: error");
                             }
+                            information.add(entry);
                         }
 
                     }
 
                     else if (opType.equals("D")) {
                         Log.d(TAG, "parseCSV: Delete");
+                        if (nextLine.length == 2 || nextLine.length == 3) {
+                            String [] entry = new String [3];
+                            entry[0] = opType;
+                            entry[1] = nextLine[1];
+                            information.add(entry);
+                        }
                     }
                 }
                 nextLine = data.readNext();

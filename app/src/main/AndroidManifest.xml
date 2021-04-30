@@ -21,7 +21,9 @@
         <activity
             android:name=".StudentHistory"/>
         <activity android:name=".StudentBasicActivity" />
-        <activity android:name=".StudentActivity" />
+        <activity android:name=".StudentActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
         <activity
             android:name=".ManagerActivity"
             android:label="@string/title_activity_manager"
