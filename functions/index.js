@@ -30,7 +30,7 @@ month          1-12 (or names, see below)
 day of week    0-7 (0 or 7 is Sunday, or use names)
 */
 
-exports.scheduledFunctionCrontab = functions.pubsub.schedule('55 21 * * *') //12 am every day  //uncomment this when you want it to actually work
+exports.scheduledFunctionCrontab = functions.pubsub.schedule('0 0 * * *') //12 am every day  //uncomment this when you want it to actually work
 //exports.scheduledFunctionCrontab = functions.pubsub.schedule('10 19 * * *') //7:10 pm PST every day (testing purposes)
     //.timeZone('America/Los_Angeles') // set time zone (default is already LA)
     .onRun((context) => {
@@ -43,12 +43,11 @@ exports.scheduledFunctionCrontab = functions.pubsub.schedule('55 21 * * *') //12
 
 
 async function getStudentUsers(UIDSet) { 
-    const UserRef = firestore.collection('users')
-    const buildingRef = firestore.collection('buildings')
+    const UserRef = admin.firestore().collection('users')//admin.firestore.collection('users') 
+    const buildingRef = admin.firestore().collection('buildings')//admin.firestore.collection('buildings')
     //let bulkWriter = firestore.bulkWriter();
     const db = admin.firestore();
     const batch = db.batch();
-    db.Firestore
     const payLoad = {
         notification: {
           title: "You have been kicked out!",
@@ -71,7 +70,7 @@ async function getStudentUsers(UIDSet) {
         try {
             const deleted = doc.data().deleted;
             if (deleted == false){
-                const res = await doc.update({currentBuilding: null});
+                batch.update(doc.ref, {currentBuilding: null});
             }
         } 
         catch (error) {
@@ -86,10 +85,11 @@ async function getStudentUsers(UIDSet) {
     }
     snapshot2.forEach(doc => {
         try {
-            const res2 = await doc.update({currentCapacity: 0});
+            batch.update(doc.ref, {currentCapacity: 0});
         } 
         catch (e) {
             console.log("snapshot2", e);
         }
     });
+    await batch.commit();
 }
