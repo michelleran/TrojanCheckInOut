@@ -1011,4 +1011,11 @@ public class Server {
             }).addOnFailureListener(callback::onFailure);
         }
     }
+
+    /** Replace with https://github.com/michelleran/TrojanCheckInOut/pull/101/ */
+
+    public static void setBuildingName(String id, String newName, Callback<Void> callback) {
+        Log.d(TAG, "setBuildingName: setting building name with id: " + id + " to: " + newName);
+        callback.onSuccess(null);
+    }
 }

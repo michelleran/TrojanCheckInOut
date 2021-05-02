@@ -189,21 +189,31 @@ public class BuildingChanges extends Fragment {
     }
 
     public void setViewEdit() {
-        edtBCname.setVisibility(View.INVISIBLE);
+        edtBCname.setVisibility(View.VISIBLE);
         imgBcQR.setVisibility(View.INVISIBLE);
-        txtBcName.setVisibility(View.VISIBLE);
+        txtBcName.setVisibility(View.INVISIBLE);
         edtBcMaxCap.setVisibility(View.VISIBLE);
 
         btnBcConfirm.setText("Confirm");
 
 
         if (buildingName != null) {
-            txtBcName.setText("Building: " + buildingName);
+            edtBCname.setText(buildingName);
         }
         if (buildingMaxCapacity != -1) {
             edtBcMaxCap.setText(String.valueOf(buildingMaxCapacity));
         }
 
+        edtBCname.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(!b) {
+                    if (edtBCname.getText().toString().trim().equals("")){
+                        edtBCname.setError("Building name cannot be empty");
+                    }
+                }
+            }
+        });
 
         edtBcMaxCap.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -236,8 +246,25 @@ public class BuildingChanges extends Fragment {
                         public void onSuccess(Building result) {
                             pbBcLoading.setVisibility(View.INVISIBLE);
                             if (result != null) {
-                                Log.d(TAG, "onSuccess: Maximum Capacity of Building " + result.getName() + " set to " + result.getMaxCapacity());
-                                Toast.makeText(getContext(), "Maximum Capacity of Building " + result.getName() + " set to " +  result.getMaxCapacity(), Toast.LENGTH_SHORT).show();
+
+                                String resultBuildingName = result.getName();
+                                int resultBuildingMaxCapacity = result.getMaxCapacity();
+                                Log.d(TAG, "onSuccess: Maximum Capacity of Building " + resultBuildingName + " set to " + resultBuildingMaxCapacity);
+                                String newBuildingName = edtBCname.getText().toString().trim();
+                                Server.setBuildingName(buildingId, newBuildingName, new Callback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void result) {
+                                        Log.d(TAG, "onSuccess: Building name set to " + newBuildingName);
+                                        Toast.makeText(getContext(), "Successfully set building name to " + newBuildingName + " and max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception exception) {
+                                        Log.e(TAG, "onFailure: failed to change building name", exception);
+                                        Toast.makeText(getContext(), "Successfully set building name to " + newBuildingName + " but FAILED to set max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
                             } else {
                                 Log.d(TAG, "onSuccess: Building is null");
                             }
