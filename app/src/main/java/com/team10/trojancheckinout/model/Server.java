@@ -647,17 +647,43 @@ public class Server {
     }
 
     public static void removeBuilding(String id, Callback<Void> callback){
-        db.collection(BUILDING_COLLECTION).document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+        DocumentReference docRef = db.collection(BUILDING_COLLECTION).document(id);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(Void aVoid) {
-                callback.onSuccess(aVoid);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                callback.onFailure(e);
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        long currentCapacity = (long) document.get("currentCapacity");
+                        if(currentCapacity != 0){
+                            callback.onFailure(new Exception("Error: Selected Building for Deletion is Not Empty"));
+                        }else{
+                            db.collection(BUILDING_COLLECTION).document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    callback.onSuccess(aVoid);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    callback.onFailure(e);
+                                }
+                            });
+
+                        }
+                    } else {
+                        Log.d(TAG, "No such document");
+                        callback.onFailure(new Exception("No such Building"));
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                    callback.onFailure(new Exception(task.getException()));
+                }
             }
         });
+
+
     }
 
     public static void listenForBuildings(Listener<Building> listener) {
