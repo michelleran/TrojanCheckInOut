@@ -23,7 +23,7 @@ public class BuildingSearchResultsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static BuildingSearchResultsFragment newInstance() {
+    public static BuildingSearchResultsFragment newInstance(String name, int currentCapacity, int maxCapacity) {
         BuildingSearchResultsFragment fragment = new BuildingSearchResultsFragment();
         Bundle args = new Bundle();
 
