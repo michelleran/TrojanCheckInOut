@@ -155,7 +155,31 @@ public class BuildingListFragment extends Fragment {
                         });
                     }
                     else if (info[0].equals("D")) {
+                        Log.d(TAG, "onActivityResult: Going to delete!");
+                        Server.getBuildingIDByName(info[1], new Callback<String>() {
+                            @Override
+                            public void onSuccess(String result) {
+                                if (result != null) {
+                                    Server.removeBuilding(result, new Callback<Void>() {
+                                        @Override
+                                        public void onSuccess(Void result) {
 
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception exception) {
+                                            Log.e(TAG, "onFailure: building delete failed ", exception);
+                                            Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.e(TAG, "getBuildingID failed for " + info[1], exception);
+                            }
+                        });
                     }
                     else if (info[0].equals("W")) {
                         capacityErrors.add(info[1]);

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,8 +54,10 @@ public class StudentBasicActivity extends AppCompatActivity {
                         .override(400, 400).centerCrop()
                         .into(photoUrl);
 
-                if (result.isDeleted())
+                if (result.isDeleted()) {
                     deleted.setVisibility(TextView.VISIBLE);
+                    findViewById(R.id.forceKickout).setVisibility(Button.GONE);
+                }
             }
 
             @Override
