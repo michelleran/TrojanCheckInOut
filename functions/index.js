@@ -42,9 +42,6 @@ exports.scheduledFunctionCrontab = functions.pubsub.schedule('0 17 * * *') //12 
         return null;
 });
 
-
-
-
 async function getStudentUsers(checkouts) { 
     const UserRef = admin.firestore().collection('users')
     const buildingRef = admin.firestore().collection('buildings')
