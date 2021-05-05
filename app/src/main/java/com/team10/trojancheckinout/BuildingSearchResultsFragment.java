@@ -12,8 +12,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class BuildingSearchResultsFragment extends Fragment {
+    private static final String ARG_NAME = "name";
+    private static final String ARG_CURRENT = "current";
+    private static final String ARG_MAX = "max";
 
     private BuildingAdapter adapter;
+
+    private String name;
+    private int current;
+    private int max;
 
     public BuildingSearchResultsFragment() {
         // Required empty public constructor
@@ -27,7 +34,9 @@ public class BuildingSearchResultsFragment extends Fragment {
         BuildingSearchResultsFragment fragment = new BuildingSearchResultsFragment();
         Bundle args = new Bundle();
 
-        // TODO
+        args.putString(ARG_NAME, name);
+        args.putInt(ARG_CURRENT, currentCapacity);
+        args.putInt(ARG_MAX, maxCapacity);
 
         fragment.setArguments(args);
         return fragment;
@@ -37,7 +46,9 @@ public class BuildingSearchResultsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            // TODO
+            name = getArguments().getString(ARG_NAME);
+            current = getArguments().getInt(ARG_CURRENT);
+            max = getArguments().getInt(ARG_MAX);
         }
     }
 
