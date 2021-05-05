@@ -37,6 +37,8 @@ public class BuildingSearchFragment extends Fragment {
         EditText currentCapacityField = rootView.findViewById(R.id.search_current);
         EditText maxCapacityField = rootView.findViewById(R.id.search_max);
 
+        // TODO: more useful if we can search less/greater than capacity
+
         Button button = rootView.findViewById(R.id.search_button);
         button.setOnClickListener(view -> {
             int currentCapacity, maxCapacity;
