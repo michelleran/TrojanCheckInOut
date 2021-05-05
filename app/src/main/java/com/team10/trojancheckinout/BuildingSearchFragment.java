@@ -18,7 +18,7 @@ public class BuildingSearchFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static BuildingSearchFragment newInstance(String param1, String param2) {
+    public static BuildingSearchFragment newInstance() {
         BuildingSearchFragment fragment = new BuildingSearchFragment();
         return fragment;
     }
@@ -41,20 +41,20 @@ public class BuildingSearchFragment extends Fragment {
 
         Button button = rootView.findViewById(R.id.search_button);
         button.setOnClickListener(view -> {
-            int currentCapacity, maxCapacity;
+            int currentCapacity = -1;
+            int maxCapacity = -1;
             try {
                 currentCapacity = Integer.parseInt(currentCapacityField.getText().toString().trim());
                 maxCapacity = Integer.parseInt(maxCapacityField.getText().toString().trim());
             } catch (NumberFormatException e) {
-                Toast.makeText(getContext(), "Please enter a valid number", Toast.LENGTH_LONG).show();
-                return;
+                // ignore
             }
 
             // open search results (replace this fragment)
             final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-            ft.replace(R.id.building_tab_content,
+            ft.replace(R.id.building_list_frame,
                 BuildingSearchResultsFragment.newInstance(
-                    nameField.getText().toString().trim().toLowerCase(),
+                    nameField.getText().toString().trim(),
                     currentCapacity, maxCapacity));
             ft.commit();
             ft.addToBackStack("building_search");

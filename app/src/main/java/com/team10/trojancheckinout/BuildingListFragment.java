@@ -99,6 +99,14 @@ public class BuildingListFragment extends Fragment {
             }
         });
 
+        Button btnSearch = rootView.findViewById(R.id.buildings_search_button);
+        btnSearch.setOnClickListener(view -> {
+            FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+            ft.replace(R.id.building_list_frame, BuildingSearchFragment.newInstance());
+            ft.commit();
+            ft.addToBackStack("start_building_search");
+        });
+
         return rootView;
     }
 

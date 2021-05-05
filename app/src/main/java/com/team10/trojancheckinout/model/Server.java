@@ -1035,10 +1035,11 @@ public class Server {
         // Filter by name
         if(!name.isEmpty()){
             query = query.whereEqualTo("name", name);
+        } else {
+            //Order by name
+            query = query.orderBy("name", Query.Direction.DESCENDING);
         }
 
-        //Order by name
-        query = query.orderBy("name", Query.Direction.DESCENDING);
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -1050,7 +1051,6 @@ public class Server {
                 for (DocumentChange dc : value.getDocumentChanges()) {
                     if (dc.getType() == DocumentChange.Type.ADDED) {
                         Building building = dc.getDocument().toObject(Building.class);
-                        Log.d("filterRecords", "Found: " + building);
                         callback.onSuccess(building);
                     }
                 }
