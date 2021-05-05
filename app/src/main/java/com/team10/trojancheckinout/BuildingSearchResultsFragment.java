@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.team10.trojancheckinout.model.Building;
+import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Server;
 
 import androidx.fragment.app.Fragment;
@@ -67,7 +69,17 @@ public class BuildingSearchResultsFragment extends Fragment {
 
         adapter = new BuildingAdapter(getParentFragmentManager());
         resultsList.setAdapter(adapter);
-        // TODO
+        Server.filterBuildings(name, current, max, new Callback<Building>() {
+            @Override
+            public void onSuccess(Building result) {
+                adapter.onAdd(result);
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                exception.printStackTrace();
+            }
+        });
 
         return rootView;
     }
