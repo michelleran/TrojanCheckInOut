@@ -329,7 +329,7 @@ class BuildingAdapter
             public void onClick(View view) {
                 // open building details (replace this fragment)
                 final FragmentTransaction ft = fragmentManager.beginTransaction();
-                ft.replace(R.id.building_tab_content,
+                ft.replace(R.id.building_list_frame,
                             BuildingDetailsFragment.newInstance(building));
 
                 ft.commit();
