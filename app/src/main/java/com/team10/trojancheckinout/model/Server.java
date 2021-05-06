@@ -530,28 +530,21 @@ public class Server {
                     // Check if building already exists with new name
                     if(task.getResult().isEmpty()){
                         final DocumentReference sfDocRef = db.collection(BUILDING_COLLECTION).document(id);
-                        db.runTransaction(new Transaction.Function<Void>() {
-                            @Override
-                            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-                                DocumentSnapshot snapshot = transaction.get(sfDocRef);
-                                transaction.update(sfDocRef, "name", newName);
-                                // Success
-                                return null;
-                            }
-                        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "Transaction success!");
-                                callback.onSuccess(aVoid);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Transaction failure.", e);
-                                callback.onFailure(e);
-                            }
-                        });
+                        sfDocRef.update("name", newName)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                        callback.onSuccess(aVoid);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w(TAG, "Error updating document", e);
+                                        callback.onFailure(e);
+                                    }
+                                });
                     }else{
                         callback.onFailure(new Exception("A building with the supplied name already exists"));
                     }
