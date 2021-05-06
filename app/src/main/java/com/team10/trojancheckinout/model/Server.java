@@ -519,6 +519,42 @@ public class Server {
             }
         });
     }
+
+    public static void setBuildingName(String id, String newName, Callback<Void> callback){
+        Query query = db.collection(BUILDING_COLLECTION)
+                .whereEqualTo("name", newName);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    // Check if building already exists with new name
+                    if(task.getResult().isEmpty()){
+                        final DocumentReference sfDocRef = db.collection(BUILDING_COLLECTION).document(id);
+                        sfDocRef.update("name", newName)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                        callback.onSuccess(aVoid);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w(TAG, "Error updating document", e);
+                                        callback.onFailure(e);
+                                    }
+                                });
+                    }else{
+                        callback.onFailure(new Exception("A building with the supplied name already exists"));
+                    }
+                }
+                else {
+                    callback.onFailure(task.getException());
+                }
+            }
+        });
+    }
                 
     public static void getAllBuildingNames(Callback<String> callback) {
         db.collection(BUILDING_COLLECTION).get().addOnSuccessListener(result -> {
@@ -973,6 +1009,10 @@ public class Server {
         });
     }
 
+
+
+
+
     public static void searchStudents(String name, String id, String major,
                                       String buildingName,
                                       int startYear, int startMonth, int startDay, int startHour, int startMin,
@@ -1037,4 +1077,106 @@ public class Server {
             }).addOnFailureListener(callback::onFailure);
         }
     }
+
+
+    public static void filterBuildings(int currentCapacity, String id, int maxCapacity, String name,
+                                     Callback<Building> callback)
+    {
+        Query query = queryBuildings(currentCapacity, id, maxCapacity, name);
+        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    callback.onFailure(new Exception(error.getMessage()));
+                    return;
+                }
+
+                for (DocumentChange dc : value.getDocumentChanges()) {
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        Building building = dc.getDocument().toObject(Building.class);
+                        Log.d("filterRecords", "Found: " + building);
+                        callback.onSuccess(building);
+                    }
+                }
+            }
+        });
+    }
+
+    private static Query queryBuildings(int currentCapacity, String id, int maxCapacity, String name)
+    {
+        Query query = db.collection(BUILDING_COLLECTION);
+
+        // Filter by current capacity
+        if (currentCapacity != -1) {
+            query = query.whereEqualTo("currentCapacity", currentCapacity);
+        }
+
+        // Filter by id
+        if(!id.isEmpty()){
+            query = query.whereEqualTo("id", id);
+        }
+
+        // Filter by max capacity
+        if(maxCapacity != -1){
+            query = query.whereEqualTo("maxCapacity", maxCapacity);
+        }
+
+        // Filter by name
+        if(!name.isEmpty()){
+            query = query.whereEqualTo("name", name);
+        }
+
+        //Order by name
+        query = query.orderBy("name", Query.Direction.DESCENDING);
+        return query;
+    }
+
+    private static void orderBuildings(int currentCapacity, String id, int maxCapacity, String name, boolean descending, Callback<Building> callback){
+        //sort the building
+        CollectionReference buildingRef = db.collection(BUILDING_COLLECTION);
+
+        Query.Direction direction;
+        if(descending) { direction = Query.Direction.DESCENDING; }
+        else{ direction = Query.Direction.ASCENDING; }
+
+        //you can add a limit here too
+
+        //only one sorting catagory at once in order of paramater  (if multiple are input)
+        if(currentCapacity != -1){
+            buildingRef.orderBy("currentCapacity", direction);
+        }
+        else if(!(id.isEmpty())){
+            buildingRef.orderBy("id", direction);
+        }
+        else if(maxCapacity != -1){
+            buildingRef.orderBy("maxCapacity", direction);
+        }
+        else if(!(name.isEmpty())){
+            buildingRef.orderBy("name", direction);
+        }
+        //get the buildings
+        buildingRef
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                Building building = document.toObject(Building.class);
+                                callback.onSuccess(building);
+                            }
+                        }
+                        else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                            callback.onFailure(task.getException());
+                        }
+                    }
+            });
+    }
 }
+
+
+
+
+
