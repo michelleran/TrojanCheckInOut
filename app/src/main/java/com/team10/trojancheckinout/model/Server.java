@@ -519,6 +519,43 @@ public class Server {
             }
         });
     }
+
+    public static void setBuildingName(String id, String newName, Callback<Void> callback){
+        Query query = db.collection(BUILDING_COLLECTION)
+                .whereEqualTo("name", newName);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    // Check if building already exists with new name
+                    if(task.getResult().isEmpty()){
+                        final DocumentReference sfDocRef = db.collection(BUILDING_COLLECTION).document(id);
+                        sfDocRef.update("name", newName)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                        callback.onSuccess(aVoid);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w(TAG, "Error updating document", e);
+                                        callback.onFailure(e);
+                                    }
+                                });
+                    }else{
+                        callback.onFailure(new Exception("A building with the supplied name already exists"));
+                    }
+                }
+                else {
+                    callback.onFailure(task.getException());
+                }
+            }
+        });
+    }
+
                 
     public static void getAllBuildingNames(Callback<String> callback) {
         db.collection(BUILDING_COLLECTION).get().addOnSuccessListener(result -> {
