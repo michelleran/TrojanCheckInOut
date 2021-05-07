@@ -67,7 +67,7 @@ public class BuildingSearchResultsFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         resultsList.setLayoutManager(llm);
 
-        adapter = new BuildingAdapter(getParentFragmentManager());
+        adapter = new BuildingAdapter(getParentFragmentManager(), rootView.findViewById(R.id.empty));
         resultsList.setAdapter(adapter);
         Server.filterBuildings(name, current, max, new Callback<Building>() {
             @Override
