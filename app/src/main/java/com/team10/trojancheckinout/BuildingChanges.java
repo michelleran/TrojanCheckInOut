@@ -258,6 +258,10 @@ public class BuildingChanges extends Fragment {
                                         if (getContext() != null) {
                                             Toast.makeText(getContext(), "Successfully set building name to " + newBuildingName + " and max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
                                         }
+                                        if (getActivity() != null) {
+                                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                                            fm.popBackStack();
+                                        }
                                     }
 
                                     @Override
@@ -272,10 +276,7 @@ public class BuildingChanges extends Fragment {
                             } else {
                                 Log.d(TAG, "onSuccess: Building is null");
                             }
-                            if (getActivity() != null) {
-                                FragmentManager fm = getActivity().getSupportFragmentManager();
-                                fm.popBackStack();
-                            }
+
                         }
 
                         @Override

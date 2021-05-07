@@ -226,8 +226,8 @@ class BuildingAdapter
     implements Listener<Building>
 {
     private FragmentManager fragmentManager;
-    private ArrayList<String> buildingNames;
-    private HashMap<String, Building> nameToBuilding;
+    private ArrayList<String> buildingIds;
+    private HashMap<String, Building> idToBuilding;
 
     private final String TAG = "BuildingAdapter";
 
@@ -252,42 +252,42 @@ class BuildingAdapter
     public BuildingAdapter(FragmentManager fragmentManager) {
         this.fragmentManager = fragmentManager;
         // initialize cache
-        buildingNames = new ArrayList<>();
-        nameToBuilding = new HashMap<>();
+        buildingIds = new ArrayList<>();
+        idToBuilding = new HashMap<>();
     }
 
     @Override
     public void onAdd(Building item) {
-        if (buildingNames.contains(item.getName())) {
+        if (buildingIds.contains(item.getId())) {
             // replace building in cache
             onUpdate(item);
             return;
         }
-        buildingNames.add(item.getName());
-        nameToBuilding.put(item.getName(), item);
+        buildingIds.add(item.getId());
+        idToBuilding.put(item.getId(), item);
 
         // sort alphabetically
-        Collections.sort(buildingNames);
+        Collections.sort(buildingIds);
         // refresh
         notifyDataSetChanged();
     }
 
     @Override
     public void onRemove(Building item) {
-        buildingNames.remove(item.getName());
-        nameToBuilding.remove(item.getName());
+        buildingIds.remove(item.getId());
+        idToBuilding.remove(item.getId());
         // refresh
         notifyDataSetChanged();
     }
 
     @Override
     public void onUpdate(Building item) {
-        if (!buildingNames.contains(item.getName())) {
+        if (!buildingIds.contains(item.getId())) {
             // add new building
             onAdd(item);
             return;
         }
-        nameToBuilding.put(item.getName(), item);
+        idToBuilding.put(item.getId(), item);
         // refresh
         notifyDataSetChanged();
     }
@@ -309,7 +309,7 @@ class BuildingAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Building building = nameToBuilding.get(buildingNames.get(position));
+        Building building = idToBuilding.get(buildingIds.get(position));
         holder.name.setText(building.getName());
 
         // TODO
@@ -390,5 +390,5 @@ class BuildingAdapter
     }
 
     @Override
-    public int getItemCount() { return buildingNames.size(); }
+    public int getItemCount() { return buildingIds.size(); }
 }
