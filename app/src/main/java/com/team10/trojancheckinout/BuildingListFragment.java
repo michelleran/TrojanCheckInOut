@@ -278,6 +278,10 @@ class BuildingAdapter
     public void onRemove(Building item) {
         buildingIds.remove(item.getId());
         idToBuilding.remove(item.getId());
+
+        //sort
+        buildingIds = BuildingSorter.sortBuilding(buildingIds, idToBuilding);
+
         // refresh
         notifyDataSetChanged();
     }
@@ -290,6 +294,10 @@ class BuildingAdapter
             return;
         }
         idToBuilding.put(item.getId(), item);
+
+        //sort
+        buildingIds = BuildingSorter.sortBuilding(buildingIds, idToBuilding);
+
         // refresh
         notifyDataSetChanged();
     }
