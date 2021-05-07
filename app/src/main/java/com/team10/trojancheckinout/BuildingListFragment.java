@@ -268,14 +268,13 @@ class BuildingAdapter
 
     @Override
     public void onAdd(Building item) {
-        if (buildingNames.isEmpty() && empty != null) {
-            empty.setVisibility(View.GONE);
-        }
         if (buildingNames.contains(item.getName())) {
             // replace building in cache
             onUpdate(item);
             return;
         }
+        if (buildingNames.isEmpty() && empty != null)
+            empty.setVisibility(View.GONE);
         buildingNames.add(item.getName());
         nameToBuilding.put(item.getName(), item);
 
@@ -291,9 +290,8 @@ class BuildingAdapter
         nameToBuilding.remove(item.getName());
         // refresh
         notifyDataSetChanged();
-        if (buildingNames.isEmpty() && empty != null) {
+        if (buildingNames.isEmpty() && empty != null)
             empty.setVisibility(View.VISIBLE);
-        }
     }
 
     @Override
