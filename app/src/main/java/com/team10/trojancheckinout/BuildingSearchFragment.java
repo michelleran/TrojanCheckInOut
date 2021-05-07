@@ -45,6 +45,11 @@ public class BuildingSearchFragment extends Fragment {
             int maxCapacity = -1;
             try {
                 currentCapacity = Integer.parseInt(currentCapacityField.getText().toString().trim());
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+
+            try {
                 maxCapacity = Integer.parseInt(maxCapacityField.getText().toString().trim());
             } catch (NumberFormatException e) {
                 // ignore
