@@ -31,6 +31,7 @@ import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Listener;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.utils.BuildingSorter;
 import com.team10.trojancheckinout.utils.CSVParser;
 
 import java.io.File;
@@ -267,7 +268,8 @@ class BuildingAdapter
         idToBuilding.put(item.getId(), item);
 
         // sort alphabetically
-        Collections.sort(buildingIds);
+        buildingIds = BuildingSorter.sortBuilding(buildingIds, idToBuilding);
+//        Collections.sort(buildingIds);
         // refresh
         notifyDataSetChanged();
     }
