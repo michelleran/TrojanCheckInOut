@@ -64,6 +64,8 @@ public class BuildingChanges extends Fragment {
     private ImageView imgBcQR;
     private DownloadManager mgr=null;
 
+    private Context context;
+
     public BuildingChanges() {
         // Required empty public constructor
     }
@@ -103,6 +105,7 @@ public class BuildingChanges extends Fragment {
             buildingMaxCapacity = getArguments().getInt(ARG_MAX_CAPACITY);
             buildingQR = getArguments().getString(ARG_QR_CODE);
         }
+        context = getContext();
     }
 
     @Override
@@ -255,9 +258,7 @@ public class BuildingChanges extends Fragment {
                                     @Override
                                     public void onSuccess(Void result) {
                                         Log.d(TAG, "onSuccess: Building name set to " + newBuildingName);
-                                        if (getContext() != null) {
-                                            Toast.makeText(getContext(), "Successfully set building name to " + newBuildingName + " and max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
-                                        }
+                                        Toast.makeText(context, "Successfully set building name to " + newBuildingName + " and max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
                                         if (getActivity() != null) {
                                             FragmentManager fm = getActivity().getSupportFragmentManager();
                                             fm.popBackStack();
@@ -267,9 +268,7 @@ public class BuildingChanges extends Fragment {
                                     @Override
                                     public void onFailure(Exception exception) {
                                         Log.e(TAG, "onFailure: failed to change building name", exception);
-                                        if (getContext() != null) {
-                                            Toast.makeText(getContext(), "Successfully set building capacity to " + resultBuildingMaxCapacity + " but FAILED to set building name to " +  newBuildingName, Toast.LENGTH_LONG).show();
-                                        }
+                                        Toast.makeText(context, "Successfully set building capacity to " + resultBuildingMaxCapacity + " but FAILED to set building name to " +  newBuildingName, Toast.LENGTH_LONG).show();
                                     }
                                 });
 
@@ -285,20 +284,14 @@ public class BuildingChanges extends Fragment {
                             if (exception != null) {
                                 Log.e(TAG, "onFailure: Building edit error: " + exception.getMessage(), exception);
                                 if (exception.getMessage() != null && exception.getMessage().length() < 100) {
-                                    if (getContext() != null) {
-                                        Toast.makeText(getContext(), "Error: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
+                                    Toast.makeText(context, "Error: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                                 else {
-                                    if (getContext() != null) {
-                                        Toast.makeText(getContext(), "Error. Please try again", Toast.LENGTH_SHORT).show();
-                                    }
+                                    Toast.makeText(context, "Error. Please try again", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
                                 Log.e(TAG, "onFailure: Building edit error");
-                                if (getContext() != null) {
-                                    Toast.makeText(getContext(), "Error. Please try again", Toast.LENGTH_SHORT).show();
-                                }
+                                Toast.makeText(context, "Error. Please try again", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -346,10 +339,10 @@ public class BuildingChanges extends Fragment {
             @Override
             public void onClick(View view) {
                 if (edtBCname.getText().toString().trim().equals("") || edtBcMaxCap.getText().toString().trim().equals("")) {
-                    Toast.makeText(getContext(), "Please fill out all of the following fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Please fill out all of the following fields", Toast.LENGTH_SHORT).show();
                 }
                 else if (Integer.parseInt(edtBcMaxCap.getText().toString().trim()) < 0) {
-                    Toast.makeText(getContext(), "Maximum Capacity cannot be negative", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Maximum Capacity cannot be negative", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     String buildingName = edtBCname.getText().toString().trim();
@@ -364,9 +357,7 @@ public class BuildingChanges extends Fragment {
                             } else {
                                 Log.d(TAG, "onSuccess: Building is null");
                             }
-                            if (getContext() != null) {
-                                Toast.makeText(getContext(), "Building " + result.getName() + " successfully added", Toast.LENGTH_SHORT).show();
-                            }
+                            Toast.makeText(context, "Building " + result.getName() + " successfully added", Toast.LENGTH_SHORT).show();
                             if (getActivity() != null) {
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 fm.popBackStack();
@@ -382,9 +373,8 @@ public class BuildingChanges extends Fragment {
                             } else {
                                 Log.e(TAG, "onFailure: Building add error");
                             }
-                            if (getContext() != null) {
                                 if(exception.getMessage() == "Building with given name already exists"){
-                                    AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+                                    AlertDialog alertDialog = new AlertDialog.Builder(context).create();
                                     alertDialog.setTitle("Add Building Error");
                                     alertDialog.setMessage("Building with name \"" + buildingName + "\" already exists");
                                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
@@ -396,11 +386,8 @@ public class BuildingChanges extends Fragment {
                                     alertDialog.show();
 
                                 }else{
-                                    Toast.makeText(getContext(), "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
-
+                                    Toast.makeText(context, "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
                                 }
-
-                            }
                         }
                     });
                 }
