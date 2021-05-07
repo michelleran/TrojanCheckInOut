@@ -255,13 +255,17 @@ public class BuildingChanges extends Fragment {
                                     @Override
                                     public void onSuccess(Void result) {
                                         Log.d(TAG, "onSuccess: Building name set to " + newBuildingName);
-                                        Toast.makeText(getContext(), "Successfully set building name to " + newBuildingName + " and max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
+                                        if (getContext() != null) {
+                                            Toast.makeText(getContext(), "Successfully set building name to " + newBuildingName + " and max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
+                                        }
                                     }
 
                                     @Override
                                     public void onFailure(Exception exception) {
                                         Log.e(TAG, "onFailure: failed to change building name", exception);
-                                        Toast.makeText(getContext(), "Successfully set building name to " + newBuildingName + " but FAILED to set max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
+                                        if (getContext() != null) {
+                                            Toast.makeText(getContext(), "Successfully set building capacity to " + resultBuildingMaxCapacity + " but FAILED to set building name to " +  newBuildingName, Toast.LENGTH_LONG).show();
+                                        }
                                     }
                                 });
 

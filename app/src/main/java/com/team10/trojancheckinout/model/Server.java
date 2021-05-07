@@ -1016,6 +1016,6 @@ public class Server {
 
     public static void setBuildingName(String id, String newName, Callback<Void> callback) {
         Log.d(TAG, "setBuildingName: setting building name with id: " + id + " to: " + newName);
-        callback.onSuccess(null);
+        callback.onFailure(null);
     }
 }
