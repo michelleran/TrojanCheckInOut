@@ -379,7 +379,7 @@ class BuildingAdapter
                                                     @Override
                                                     public void onFailure(Exception exception) {
                                                         Log.e(TAG, "Building Delete Error", exception);
-                                                        Toast.makeText(holder.name.getContext(), "Error: Unable to Delete Building", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(holder.name.getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
                                                     }
                                                 });
                                             }

@@ -519,6 +519,42 @@ public class Server {
             }
         });
     }
+
+    public static void setBuildingName(String id, String newName, Callback<Void> callback){
+        Query query = db.collection(BUILDING_COLLECTION)
+                .whereEqualTo("name", newName);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    // Check if building already exists with new name
+                    if(task.getResult().isEmpty()){
+                        final DocumentReference sfDocRef = db.collection(BUILDING_COLLECTION).document(id);
+                        sfDocRef.update("name", newName)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                        callback.onSuccess(aVoid);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w(TAG, "Error updating document", e);
+                                        callback.onFailure(e);
+                                    }
+                                });
+                    }else{
+                        callback.onFailure(new Exception("A building with the supplied name already exists"));
+                    }
+                }
+                else {
+                    callback.onFailure(task.getException());
+                }
+            }
+        });
+    }
                 
     public static void getAllBuildingNames(Callback<String> callback) {
         db.collection(BUILDING_COLLECTION).get().addOnSuccessListener(result -> {
@@ -603,17 +639,43 @@ public class Server {
     }
 
     public static void removeBuilding(String id, Callback<Void> callback){
-        db.collection(BUILDING_COLLECTION).document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+        DocumentReference docRef = db.collection(BUILDING_COLLECTION).document(id);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(Void aVoid) {
-                callback.onSuccess(aVoid);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                callback.onFailure(e);
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        long currentCapacity = (long) document.get("currentCapacity");
+                        if(currentCapacity != 0){
+                            callback.onFailure(new Exception("Error: Selected Building for Deletion is Not Empty"));
+                        }else{
+                            db.collection(BUILDING_COLLECTION).document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    callback.onSuccess(aVoid);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    callback.onFailure(e);
+                                }
+                            });
+
+                        }
+                    } else {
+                        Log.d(TAG, "No such document");
+                        callback.onFailure(new Exception("No such Building"));
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                    callback.onFailure(new Exception(task.getException()));
+                }
             }
         });
+
+
     }
 
     public static void listenForBuildings(Listener<Building> listener) {
