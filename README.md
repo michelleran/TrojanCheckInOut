@@ -39,9 +39,13 @@ To run this project:
 Managers can import a CSV file in order to update the capacities of existing buildings.
 CSV files must be of the following format:
 * Each update record must be on a new line
-* Each update record must be in the following format: `U`,`<NAME_OF_BUILDING>`,`<MAX_CAPACITY>`
+* Each update record must be in the following format: `U`,`<NAME_OF_BUILDING>`,`<MAX_CAPACITY>`, `<UPDATED_NAME_OF_BUILDING>`
   * Replace `<NAME_OF_BUILDING>` with the name of the building that you wish to update
-  * Replace `<MAX_CAPACITY>` with the new maximum capacity. This **must** be an integer.
+  * Replace `<MAX_CAPACITY>` with the new maximum capacity.
+    - If `<MAX_CAPACITY>` is an integer, the current max capacity is set to that integer.
+    - If `<MAX_CAPACITY>` is `-`, then the current max capacity is not changed.
+  * Replace `<UPDATED_NAME_OF_BUILDING>` with the new building name
+    - If left blank then the name of building is not changed.
 * Each addition record must be in the following format: `A`,`<NAME_OF_BUILDING>`,`<MAX_CAPACITY>`
   * Replace `<NAME_OF_BUILDING>` with the name of the building that you wish to add
   * Replace `<MAX_CAPACITY>` with the building's maximum capacity. This **must** be an integer.
