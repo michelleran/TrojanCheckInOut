@@ -254,7 +254,6 @@ public class BuildingListFragment extends Fragment {
                         }
                         else if (info[0].equals("OPE")) {
                             operationErrors.add(info[1]);
-                            Log.d(TAG, "onActivityResult: OPEOPEOPEOPEOPEOPE" + info[1]);
                         }
                     }
                     if (capacityErrors.size() > 0 || operationErrors.size() > 0) {

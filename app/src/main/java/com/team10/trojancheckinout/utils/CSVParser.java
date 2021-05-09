@@ -34,11 +34,14 @@ public class CSVParser {
         }
         try {
             String[] nextLine = data.readNext();
-            if (nextLine == null || nextLine.length < 2) {
+            if (nextLine == null) {
                 return null;
             }
             int count = 0;
             while (nextLine != null) {
+                if (nextLine.length < 2) {
+                    return null;
+                }
                 String opType = nextLine[0];
                 if (opType.equals("U") || opType.equals("A")) {
 
@@ -83,7 +86,6 @@ public class CSVParser {
                     entry[0] = "OPE";
                     entry[1] = String.valueOf(count + 1);
                     information.add(entry);
-                    Log.d(TAG, "parseCSV: ERRORERRORERRORERRORERRORERROR");
                 }
                 count++;
                 nextLine = data.readNext();
