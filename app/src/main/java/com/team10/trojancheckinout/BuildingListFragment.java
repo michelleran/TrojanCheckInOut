@@ -118,19 +118,26 @@ public class BuildingListFragment extends Fragment {
                         Server.getBuildingIDByName(info[1], new Callback<String>() {
                             @Override
                             public void onSuccess(String result) {
-                                if (result != null) {
-                                    int maxCapacity = Integer.parseInt(info[2]);
-                                    Server.setBuildingMaxCapacity(result, maxCapacity, new Callback<Building>() {
-                                        @Override
-                                        public void onSuccess(Building result) {
-                                        }
+                                String buildingIDResult = result;
+                                if (buildingIDResult != null) {
+                                    if (info[2].equals("-")) {
 
-                                        @Override
-                                        public void onFailure(Exception exception) {
-                                            Log.e(TAG, "onFailure: building update failed ", exception);
-                                            Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
-                                        }
-                                    });
+                                    }
+                                    else {
+                                        int maxCapacity = Integer.parseInt(info[2]);
+                                        Server.setBuildingMaxCapacity(result, maxCapacity, new Callback<Building>() {
+                                            @Override
+                                            public void onSuccess(Building result) {
+                                            }
+
+                                            @Override
+                                            public void onFailure(Exception exception) {
+                                                Log.e(TAG, "onFailure: building update failed ", exception);
+                                                Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+
                                 }
                             }
 
