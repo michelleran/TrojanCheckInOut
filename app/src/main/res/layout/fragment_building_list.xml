@@ -23,31 +23,39 @@
             android:layout_marginBottom="50dp"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout2"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@color/cardview_dark_background"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:background="?android:attr/statusBarColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Button
+                android:id="@+id/buildings_search_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Search"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btnAddBuilding" />
 
             <Button
                 android:id="@+id/btnImportCSV"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text=" Import CSV "
+                android:text="Import"
                 app:layout_constraintEnd_toStartOf="@+id/btnAddBuilding"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <Button
                 android:id="@+id/btnAddBuilding"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="Add Building"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
+                android:text="Add"
+                app:layout_constraintEnd_toStartOf="@+id/buildings_search_button"
                 app:layout_constraintStart_toEndOf="@+id/btnImportCSV"
-                tools:layout_editor_absoluteY="1dp"
-                />
+                tools:layout_editor_absoluteY="1dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -64,6 +64,8 @@ public class BuildingChanges extends Fragment {
     private ImageView imgBcQR;
     private DownloadManager mgr=null;
 
+    private Context context;
+
     public BuildingChanges() {
         // Required empty public constructor
     }
@@ -103,6 +105,7 @@ public class BuildingChanges extends Fragment {
             buildingMaxCapacity = getArguments().getInt(ARG_MAX_CAPACITY);
             buildingQR = getArguments().getString(ARG_QR_CODE);
         }
+        context = getContext();
     }
 
     @Override
@@ -189,21 +192,31 @@ public class BuildingChanges extends Fragment {
     }
 
     public void setViewEdit() {
-        edtBCname.setVisibility(View.INVISIBLE);
+        edtBCname.setVisibility(View.VISIBLE);
         imgBcQR.setVisibility(View.INVISIBLE);
-        txtBcName.setVisibility(View.VISIBLE);
+        txtBcName.setVisibility(View.INVISIBLE);
         edtBcMaxCap.setVisibility(View.VISIBLE);
 
         btnBcConfirm.setText("Confirm");
 
 
         if (buildingName != null) {
-            txtBcName.setText("Building: " + buildingName);
+            edtBCname.setText(buildingName);
         }
         if (buildingMaxCapacity != -1) {
             edtBcMaxCap.setText(String.valueOf(buildingMaxCapacity));
         }
 
+        edtBCname.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(!b) {
+                    if (edtBCname.getText().toString().trim().equals("")){
+                        edtBCname.setError("Building name cannot be empty");
+                    }
+                }
+            }
+        });
 
         edtBcMaxCap.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -229,47 +242,98 @@ public class BuildingChanges extends Fragment {
                     Toast.makeText(getContext(), "Maximum Capacity cannot be negative", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    int maxCapacity = Integer.parseInt(edtBcMaxCap.getText().toString().trim());
-                    pbBcLoading.setVisibility(View.VISIBLE);
-                    Server.setBuildingMaxCapacity(buildingId, maxCapacity, new Callback<Building>() {
-                        @Override
-                        public void onSuccess(Building result) {
-                            pbBcLoading.setVisibility(View.INVISIBLE);
-                            if (result != null) {
-                                Log.d(TAG, "onSuccess: Maximum Capacity of Building " + result.getName() + " set to " + result.getMaxCapacity());
-                                Toast.makeText(getContext(), "Maximum Capacity of Building " + result.getName() + " set to " +  result.getMaxCapacity(), Toast.LENGTH_SHORT).show();
-                            } else {
-                                Log.d(TAG, "onSuccess: Building is null");
-                            }
-                            if (getActivity() != null) {
-                                FragmentManager fm = getActivity().getSupportFragmentManager();
-                                fm.popBackStack();
-                            }
-                        }
+                    if (buildingName.equals(edtBCname.getText().toString().trim())) {
+                        int maxCapacity = Integer.parseInt(edtBcMaxCap.getText().toString().trim());
+                        pbBcLoading.setVisibility(View.VISIBLE);
+                        Server.setBuildingMaxCapacity(buildingId, maxCapacity, new Callback<Building>() {
 
-                        @Override
-                        public void onFailure(Exception exception) {
-                            pbBcLoading.setVisibility(View.INVISIBLE);
-                            if (exception != null) {
-                                Log.e(TAG, "onFailure: Building edit error: " + exception.getMessage(), exception);
-                                if (exception.getMessage() != null && exception.getMessage().length() < 100) {
-                                    if (getContext() != null) {
-                                        Toast.makeText(getContext(), "Error: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
+                            @Override
+                            public void onSuccess(Building result) {
+                                int resultBuildingMaxCapacity = 0;
+                                if (result != null) {
+                                    resultBuildingMaxCapacity = result.getMaxCapacity();
                                 }
-                                else {
-                                    if (getContext() != null) {
-                                        Toast.makeText(getContext(), "Error. Please try again", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            } else {
-                                Log.e(TAG, "onFailure: Building edit error");
-                                if (getContext() != null) {
-                                    Toast.makeText(getContext(), "Error. Please try again", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Successfully set building max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
+                                if (getActivity() != null) {
+                                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                                    fm.popBackStack();
                                 }
                             }
-                        }
-                    });
+
+                            @Override
+                            public void onFailure(Exception exception) {
+                                if (exception != null) {
+                                    Log.e(TAG, "onFailure: Building edit error: " + exception.getMessage(), exception);
+                                    if (exception.getMessage() != null && exception.getMessage().length() < 100) {
+                                        Toast.makeText(context, "Error: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        Toast.makeText(context, "Error. Please try again", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Log.e(TAG, "onFailure: Building edit error");
+                                    Toast.makeText(context, "Error. Please try again", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        int maxCapacity = Integer.parseInt(edtBcMaxCap.getText().toString().trim());
+                        pbBcLoading.setVisibility(View.VISIBLE);
+                        Server.setBuildingMaxCapacity(buildingId, maxCapacity, new Callback<Building>() {
+                            @Override
+                            public void onSuccess(Building result) {
+                                pbBcLoading.setVisibility(View.INVISIBLE);
+                                if (result != null) {
+
+                                    String resultBuildingName = result.getName();
+                                    int resultBuildingMaxCapacity = result.getMaxCapacity();
+                                    Log.d(TAG, "onSuccess: Maximum Capacity of Building " + resultBuildingName + " set to " + resultBuildingMaxCapacity);
+                                    String newBuildingName = edtBCname.getText().toString().trim();
+                                    Server.setBuildingName(buildingId, newBuildingName, new Callback<Void>() {
+                                        @Override
+                                        public void onSuccess(Void result) {
+                                            Log.d(TAG, "onSuccess: Building name set to " + newBuildingName);
+                                            Toast.makeText(context, "Successfully set building name to " + newBuildingName + " and max capacity to " +  resultBuildingMaxCapacity, Toast.LENGTH_SHORT).show();
+                                            if (getActivity() != null) {
+                                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                                fm.popBackStack();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception exception) {
+                                            pbBcLoading.setVisibility(View.INVISIBLE);
+                                            Log.e(TAG, "onFailure: failed to change building name", exception);
+                                            Toast.makeText(context, "Successfully set building capacity to " + resultBuildingMaxCapacity + " but FAILED to set building name to " +  newBuildingName, Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+                                } else {
+                                    Log.d(TAG, "onSuccess: Building is null");
+                                }
+
+                            }
+
+                            @Override
+                            public void onFailure(Exception exception) {
+                                pbBcLoading.setVisibility(View.INVISIBLE);
+                                if (exception != null) {
+                                    Log.e(TAG, "onFailure: Building edit error: " + exception.getMessage(), exception);
+                                    if (exception.getMessage() != null && exception.getMessage().length() < 100) {
+                                        Toast.makeText(context, "Error: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        Toast.makeText(context, "Error. Please try again", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Log.e(TAG, "onFailure: Building edit error");
+                                    Toast.makeText(context, "Error. Please try again", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+
                 }
             }
         });
@@ -314,10 +378,10 @@ public class BuildingChanges extends Fragment {
             @Override
             public void onClick(View view) {
                 if (edtBCname.getText().toString().trim().equals("") || edtBcMaxCap.getText().toString().trim().equals("")) {
-                    Toast.makeText(getContext(), "Please fill out all of the following fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Please fill out all of the following fields", Toast.LENGTH_SHORT).show();
                 }
                 else if (Integer.parseInt(edtBcMaxCap.getText().toString().trim()) < 0) {
-                    Toast.makeText(getContext(), "Maximum Capacity cannot be negative", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Maximum Capacity cannot be negative", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     String buildingName = edtBCname.getText().toString().trim();
@@ -332,9 +396,7 @@ public class BuildingChanges extends Fragment {
                             } else {
                                 Log.d(TAG, "onSuccess: Building is null");
                             }
-                            if (getContext() != null) {
-                                Toast.makeText(getContext(), "Building " + result.getName() + " successfully added", Toast.LENGTH_SHORT).show();
-                            }
+                            Toast.makeText(context, "Building " + result.getName() + " successfully added", Toast.LENGTH_SHORT).show();
                             if (getActivity() != null) {
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 fm.popBackStack();
@@ -350,9 +412,8 @@ public class BuildingChanges extends Fragment {
                             } else {
                                 Log.e(TAG, "onFailure: Building add error");
                             }
-                            if (getContext() != null) {
                                 if(exception.getMessage() == "Building with given name already exists"){
-                                    AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+                                    AlertDialog alertDialog = new AlertDialog.Builder(context).create();
                                     alertDialog.setTitle("Add Building Error");
                                     alertDialog.setMessage("Building with name \"" + buildingName + "\" already exists");
                                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
@@ -364,11 +425,8 @@ public class BuildingChanges extends Fragment {
                                     alertDialog.show();
 
                                 }else{
-                                    Toast.makeText(getContext(), "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
-
+                                    Toast.makeText(context, "Building could not be added. Please try again", Toast.LENGTH_SHORT).show();
                                 }
-
-                            }
                         }
                     });
                 }

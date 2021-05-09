@@ -24,11 +24,15 @@ public class StudentAdapter
 {
     protected ArrayList<Student> students;
 
+    private View empty;
+
     private final String TAG = "StudentAdapter";
     private boolean sortBySurname = false;
 
     @Override
     public void onSuccess(Student item) {
+        if (students.isEmpty() && empty != null)
+            empty.setVisibility(View.GONE);
         students.add(item);
         // sort alphabetically by surname
         students.sort((Student s1, Student s2) -> s1.getSurname().compareTo(s2.getSurname()));
@@ -37,6 +41,8 @@ public class StudentAdapter
 
     @Override
     public void onAdd(Student item) {
+        if (students.isEmpty() && empty != null)
+            empty.setVisibility(View.GONE);
         students.add(item);
         notifyDataSetChanged();
     }
@@ -50,6 +56,8 @@ public class StudentAdapter
             }
         }
         notifyDataSetChanged();
+        if (students.isEmpty() && empty != null)
+            empty.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -76,9 +84,10 @@ public class StudentAdapter
         students = new ArrayList<>();
     }
 
-    public StudentAdapter(boolean sortBySurname) {
+    public StudentAdapter(boolean sortBySurname, View empty) {
         students = new ArrayList<>();
         this.sortBySurname = sortBySurname;
+        this.empty = empty;
     }
 
     @NonNull
