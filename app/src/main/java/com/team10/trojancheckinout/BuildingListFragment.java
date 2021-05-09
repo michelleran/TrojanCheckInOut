@@ -31,6 +31,7 @@ import com.team10.trojancheckinout.model.Building;
 import com.team10.trojancheckinout.model.Callback;
 import com.team10.trojancheckinout.model.Listener;
 import com.team10.trojancheckinout.model.Server;
+import com.team10.trojancheckinout.utils.BuildingSorter;
 import com.team10.trojancheckinout.utils.CSVParser;
 
 import java.io.File;
@@ -234,10 +235,9 @@ class BuildingAdapter
     implements Listener<Building>
 {
     private FragmentManager fragmentManager;
+    private ArrayList<String> buildingIds;
+    private HashMap<String, Building> idToBuilding;
     private View empty;
-
-    private ArrayList<String> buildingNames;
-    private HashMap<String, Building> nameToBuilding;
 
     private final String TAG = "BuildingAdapter";
 
@@ -262,46 +262,55 @@ class BuildingAdapter
         this.fragmentManager = fragmentManager;
         this.empty = empty;
         // initialize cache
-        buildingNames = new ArrayList<>();
-        nameToBuilding = new HashMap<>();
+        buildingIds = new ArrayList<>();
+        idToBuilding = new HashMap<>();
     }
 
     @Override
     public void onAdd(Building item) {
-        if (buildingNames.contains(item.getName())) {
+        if (buildingIds.contains(item.getId())) {
             // replace building in cache
             onUpdate(item);
             return;
         }
-        if (buildingNames.isEmpty() && empty != null)
+        if (buildingIds.isEmpty() && empty != null)
             empty.setVisibility(View.GONE);
-        buildingNames.add(item.getName());
-        nameToBuilding.put(item.getName(), item);
+        buildingIds.add(item.getId());
+        idToBuilding.put(item.getId(), item);
 
         // sort alphabetically
-        Collections.sort(buildingNames);
+        buildingIds = BuildingSorter.sortBuilding(buildingIds, idToBuilding);
+//        Collections.sort(buildingIds);
         // refresh
         notifyDataSetChanged();
     }
 
     @Override
     public void onRemove(Building item) {
-        buildingNames.remove(item.getName());
-        nameToBuilding.remove(item.getName());
+        buildingIds.remove(item.getId());
+        idToBuilding.remove(item.getId());
+
+        //sort
+        buildingIds = BuildingSorter.sortBuilding(buildingIds, idToBuilding);
+
         // refresh
         notifyDataSetChanged();
-        if (buildingNames.isEmpty() && empty != null)
+        if (buildingIds.isEmpty() && empty != null)
             empty.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onUpdate(Building item) {
-        if (!buildingNames.contains(item.getName())) {
+        if (!buildingIds.contains(item.getId())) {
             // add new building
             onAdd(item);
             return;
         }
-        nameToBuilding.put(item.getName(), item);
+        idToBuilding.put(item.getId(), item);
+
+        //sort
+        buildingIds = BuildingSorter.sortBuilding(buildingIds, idToBuilding);
+
         // refresh
         notifyDataSetChanged();
     }
@@ -323,7 +332,7 @@ class BuildingAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Building building = nameToBuilding.get(buildingNames.get(position));
+        Building building = idToBuilding.get(buildingIds.get(position));
         holder.name.setText(building.getName());
 
         holder.buildingCurrentCapacity.setText("Current Capacity: " + String.valueOf(building.getCurrentCapacity()));
@@ -403,5 +412,5 @@ class BuildingAdapter
     }
 
     @Override
-    public int getItemCount() { return buildingNames.size(); }
+    public int getItemCount() { return buildingIds.size(); }
 }

@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menuEdit"
-        android:title="Edit Capacity" />
+        android:title="Edit Building" />
     <item
         android:id="@+id/menuViewQR"
         android:title="View QR Code" />
