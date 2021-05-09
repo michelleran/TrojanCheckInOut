@@ -128,7 +128,7 @@ public class SearchResultsFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         resultsList.setLayoutManager(llm);
 
-        adapter = new StudentAdapter(true);
+        adapter = new StudentAdapter(true, rootView.findViewById(R.id.empty));
         resultsList.setAdapter(adapter);
         Server.searchStudents(name, id, major, building,
             startYear, startMonth, startDay, startHour, startMin,

@@ -1079,10 +1079,29 @@ public class Server {
     }
 
 
-    public static void filterBuildings(int currentCapacity, String id, int maxCapacity, String name,
+    public static void filterBuildings(String name, int currentCapacity, int maxCapacity,
                                      Callback<Building> callback)
     {
-        Query query = queryBuildings(currentCapacity, id, maxCapacity, name);
+        Query query = db.collection(BUILDING_COLLECTION);
+
+        // Filter by current capacity
+        if (currentCapacity != -1) {
+            query = query.whereEqualTo("currentCapacity", currentCapacity);
+        }
+
+        // Filter by max capacity
+        if(maxCapacity != -1){
+            query = query.whereEqualTo("maxCapacity", maxCapacity);
+        }
+
+        // Filter by name
+        if(!name.isEmpty()){
+            query = query.whereEqualTo("name", name);
+        } else {
+            //Order by name
+            query = query.orderBy("name", Query.Direction.DESCENDING);
+        }
+
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -1094,41 +1113,11 @@ public class Server {
                 for (DocumentChange dc : value.getDocumentChanges()) {
                     if (dc.getType() == DocumentChange.Type.ADDED) {
                         Building building = dc.getDocument().toObject(Building.class);
-                        Log.d("filterRecords", "Found: " + building);
                         callback.onSuccess(building);
                     }
                 }
             }
         });
-    }
-
-    private static Query queryBuildings(int currentCapacity, String id, int maxCapacity, String name)
-    {
-        Query query = db.collection(BUILDING_COLLECTION);
-
-        // Filter by current capacity
-        if (currentCapacity != -1) {
-            query = query.whereEqualTo("currentCapacity", currentCapacity);
-        }
-
-        // Filter by id
-        if(!id.isEmpty()){
-            query = query.whereEqualTo("id", id);
-        }
-
-        // Filter by max capacity
-        if(maxCapacity != -1){
-            query = query.whereEqualTo("maxCapacity", maxCapacity);
-        }
-
-        // Filter by name
-        if(!name.isEmpty()){
-            query = query.whereEqualTo("name", name);
-        }
-
-        //Order by name
-        query = query.orderBy("name", Query.Direction.DESCENDING);
-        return query;
     }
 
     private static void orderBuildings(int currentCapacity, String id, int maxCapacity, String name, boolean descending, Callback<Building> callback){

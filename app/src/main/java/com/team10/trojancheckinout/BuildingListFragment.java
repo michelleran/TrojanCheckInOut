@@ -71,7 +71,7 @@ public class BuildingListFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         buildingList.setLayoutManager(llm);
 
-        adapter = new BuildingAdapter(getParentFragmentManager());
+        adapter = new BuildingAdapter(getParentFragmentManager(), null);
         buildingList.setAdapter(adapter);
 
         // get extant buildings, then listen for add/remove/update
@@ -97,6 +97,14 @@ public class BuildingListFragment extends Fragment {
                 startActivityForResult(Intent.createChooser(intent, "Import CSV"), REQUEST_CODE);
 
             }
+        });
+
+        Button btnSearch = rootView.findViewById(R.id.buildings_search_button);
+        btnSearch.setOnClickListener(view -> {
+            FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+            ft.replace(R.id.building_list_frame, BuildingSearchFragment.newInstance());
+            ft.commit();
+            ft.addToBackStack("start_building_search");
         });
 
         return rootView;
@@ -226,6 +234,8 @@ class BuildingAdapter
     implements Listener<Building>
 {
     private FragmentManager fragmentManager;
+    private View empty;
+
     private ArrayList<String> buildingNames;
     private HashMap<String, Building> nameToBuilding;
 
@@ -241,7 +251,6 @@ class BuildingAdapter
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.building_name);
-            // TODO
             buildingCurrentCapacity = itemView.findViewById(R.id.txtBuildingCurrentCapacity);
             buildingMaximumCapacity = itemView.findViewById(R.id.txtBuildingMaximumCapacity);
             btnBuildingEdit = itemView.findViewById(R.id.btnBuildingEdit);
@@ -249,8 +258,9 @@ class BuildingAdapter
         }
     }
 
-    public BuildingAdapter(FragmentManager fragmentManager) {
+    public BuildingAdapter(FragmentManager fragmentManager, View empty) {
         this.fragmentManager = fragmentManager;
+        this.empty = empty;
         // initialize cache
         buildingNames = new ArrayList<>();
         nameToBuilding = new HashMap<>();
@@ -263,6 +273,8 @@ class BuildingAdapter
             onUpdate(item);
             return;
         }
+        if (buildingNames.isEmpty() && empty != null)
+            empty.setVisibility(View.GONE);
         buildingNames.add(item.getName());
         nameToBuilding.put(item.getName(), item);
 
@@ -278,6 +290,8 @@ class BuildingAdapter
         nameToBuilding.remove(item.getName());
         // refresh
         notifyDataSetChanged();
+        if (buildingNames.isEmpty() && empty != null)
+            empty.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -312,7 +326,6 @@ class BuildingAdapter
         Building building = nameToBuilding.get(buildingNames.get(position));
         holder.name.setText(building.getName());
 
-        // TODO
         holder.buildingCurrentCapacity.setText("Current Capacity: " + String.valueOf(building.getCurrentCapacity()));
         holder.buildingMaximumCapacity.setText("Maximum Capacity: " + String.valueOf(building.getMaxCapacity()));
 
@@ -321,7 +334,7 @@ class BuildingAdapter
             public void onClick(View view) {
                 // open building details (replace this fragment)
                 final FragmentTransaction ft = fragmentManager.beginTransaction();
-                ft.replace(R.id.building_tab_content,
+                ft.replace(R.id.building_list_frame,
                             BuildingDetailsFragment.newInstance(building));
 
                 ft.commit();
