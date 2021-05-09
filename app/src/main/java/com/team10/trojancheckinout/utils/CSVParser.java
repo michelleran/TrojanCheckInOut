@@ -30,45 +30,64 @@ public class CSVParser {
     public static ArrayList<String[]> parseCSV(CSVReader data) {
         ArrayList<String[]> information = new ArrayList<String[]>();
         if (data == null) {
-            return information;
+            return null;
         }
         try {
             String[] nextLine = data.readNext();
+            if (nextLine == null) {
+                return null;
+            }
+            int count = 0;
             while (nextLine != null) {
-                if (nextLine.length >= 2) {
-                    String opType = nextLine[0];
-                    if (opType.equals("U") || opType.equals("A")) {
+                if (nextLine.length < 2) {
+                    return null;
+                }
+                String opType = nextLine[0];
+                if (opType.equals("U") || opType.equals("A")) {
 
-                        Log.d(TAG, "parseCSV: Update or Add");
-                        if (nextLine.length >= 3) {
-                            String [] entry = new String [4];
-                            entry[0] = opType;
-                            entry[1] = nextLine[1];
-                            boolean valid = Pattern.matches(CAPACITY_REGEX, nextLine[2]);
-                            if (valid) {
-                                entry[2] = nextLine[2];
-                                Log.d(TAG, entry[2]);
-                            } else {
-                                entry[0] = "W";
-                                entry[2] = null;
-                                Log.d(TAG, "parseCSV: error");
-                            }
-                            if (nextLine.length >= 4) {
-                                entry[3] = nextLine[3];
-                            }
-                            information.add(entry);
-                        }
-
-                    }
-
-                    else if (opType.equals("D")) {
-                        Log.d(TAG, "parseCSV: Delete");
-                        String [] entry = new String [4];
+                    Log.d(TAG, "parseCSV: Update or Add");
+                    String [] entry = new String [4];
+                    if (nextLine.length >= 3) {
                         entry[0] = opType;
                         entry[1] = nextLine[1];
+                        boolean valid = Pattern.matches(CAPACITY_REGEX, nextLine[2]);
+                        if (valid) {
+                            entry[2] = nextLine[2];
+                            Log.d(TAG, entry[2]);
+                        } else {
+                            entry[0] = "W";
+                            entry[2] = null;
+                            Log.d(TAG, "parseCSV: error");
+                        }
+                        if (nextLine.length >= 4) {
+                            entry[3] = nextLine[3];
+                        }
                         information.add(entry);
                     }
+                    else {
+                        ArrayList<String[]> error = new ArrayList<String[]>();
+                        String [] err = new String[1];
+                        err[0] = "FE";
+                        error.add(err);
+                        return error;
+                    }
+
                 }
+
+                else if (opType.equals("D")) {
+                    Log.d(TAG, "parseCSV: Delete");
+                    String [] entry = new String [4];
+                    entry[0] = opType;
+                    entry[1] = nextLine[1];
+                    information.add(entry);
+                }
+                else {
+                    String [] entry = new String [4];
+                    entry[0] = "OPE";
+                    entry[1] = String.valueOf(count + 1);
+                    information.add(entry);
+                }
+                count++;
                 nextLine = data.readNext();
             }
         } catch (IOException e) {

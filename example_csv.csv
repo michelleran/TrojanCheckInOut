@@ -1,5 +1,5 @@
-U,Leavey,151
-U,GFS,210
-U,Kick,101
-A,CampusBuilding,50
-D,someBuilding
+D,TestBuilding
+A,ABC,12
+U,Mudd Hall,20,Mudd Hall Building
+U,SAL,54
+U,Doheny,-,Doheny building
