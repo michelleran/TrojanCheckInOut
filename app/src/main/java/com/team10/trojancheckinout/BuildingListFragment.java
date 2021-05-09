@@ -139,6 +139,7 @@ public class BuildingListFragment extends Fragment {
                 }
                 else {
                     ArrayList<String> capacityErrors = new ArrayList<String>(0);
+                    ArrayList<String> operationErrors = new ArrayList<String>(0);
                     for (String[] info : information) {
                         if (info[0].equals("U")) {
                             Server.getBuildingIDByName(info[1], new Callback<String>() {
@@ -146,8 +147,8 @@ public class BuildingListFragment extends Fragment {
                                 public void onSuccess(String result) {
                                     String buildingIDResult = result;
                                     if (buildingIDResult != null) {
-                                        if (info[2].equals("-")) {
-                                            if (info[3].length() > 0) {
+                                        if (info.length >= 3 && info[2] != null && info[2].equals("-")) {
+                                            if (info.length >= 4 && info[3] != null && info[3].length() > 0) {
                                                 Server.setBuildingName(buildingIDResult, info[3], new Callback<Void>() {
                                                     @Override
                                                     public void onSuccess(Void result) {
@@ -164,32 +165,35 @@ public class BuildingListFragment extends Fragment {
 
                                         }
                                         else {
-                                            int maxCapacity = Integer.parseInt(info[2]);
-                                            Server.setBuildingMaxCapacity(result, maxCapacity, new Callback<Building>() {
-                                                @Override
-                                                public void onSuccess(Building result) {
-                                                    if (info[3].length() > 0) {
-                                                        Server.setBuildingName(buildingIDResult, info[3], new Callback<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void result) {
-                                                                Log.d(TAG, "onSuccess: building name set");
+                                            if (info.length >= 3 && info[2] != null) {
+                                                int maxCapacity = Integer.parseInt(info[2]);
+                                                Server.setBuildingMaxCapacity(result, maxCapacity, new Callback<Building>() {
+                                                    @Override
+                                                    public void onSuccess(Building result) {
+                                                        if (info.length >= 4 && info[3] != null && info[3].length() > 0) {
+                                                            Server.setBuildingName(buildingIDResult, info[3], new Callback<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void result) {
+                                                                    Log.d(TAG, "onSuccess: building name set");
 
-                                                            }
+                                                                }
 
-                                                            @Override
-                                                            public void onFailure(Exception exception) {
-                                                                Log.e(TAG, "onFailure: building name set",exception );
+                                                                @Override
+                                                                public void onFailure(Exception exception) {
+                                                                    Log.e(TAG, "onFailure: building name set",exception );
 
-                                                            }
-                                                        });
+                                                                }
+                                                            });
+                                                        }
                                                     }
-                                                }
 
-                                                @Override
-                                                public void onFailure(Exception exception) {
-                                                    Log.e(TAG, "onFailure: building update failed ", exception);
-                                                }
-                                            });
+                                                    @Override
+                                                    public void onFailure(Exception exception) {
+                                                        Log.e(TAG, "onFailure: building update failed ", exception);
+                                                    }
+                                                });
+                                            }
+
                                         }
 
                                     }
@@ -202,18 +206,22 @@ public class BuildingListFragment extends Fragment {
                             });
                         }
                         else if (info[0].equals("A")) {
-                            int maxCapacity = Integer.parseInt(info[2]);
-                            Server.addBuilding(info[1], maxCapacity, new Callback<Building>() {
-                                @Override
-                                public void onSuccess(Building result) {
-                                    Log.d(TAG, "onSuccess: " + result.getName() + " added");
-                                }
+                            if (info.length >= 3 && info[2] != null){
+                                int maxCapacity = Integer.parseInt(
+                                        info[2]);
+                                Server.addBuilding(info[1], maxCapacity, new Callback<Building>() {
+                                    @Override
+                                    public void onSuccess(Building result) {
+                                        Log.d(TAG, "onSuccess: " + result.getName() + " added");
+                                    }
 
-                                @Override
-                                public void onFailure(Exception exception) {
-                                    Log.e(TAG, "onFailure: building addition failed", exception);
-                                }
-                            });
+                                    @Override
+                                    public void onFailure(Exception exception) {
+                                        Log.e(TAG, "onFailure: building addition failed", exception);
+                                    }
+                                });
+                            }
+
                         }
                         else if (info[0].equals("D")) {
                             Log.d(TAG, "onActivityResult: Going to delete!");
@@ -244,30 +252,60 @@ public class BuildingListFragment extends Fragment {
                         else if (info[0].equals("W")) {
                             capacityErrors.add(info[1]);
                         }
-                    }
-                    if (capacityErrors.size() > 0) {
-                        String warningMessage = "";
-                        int errorCount = 0;
-                        for (String error : capacityErrors) {
-                            if (errorCount > 30) {
-                                warningMessage += ", ...";
-                                break;
-                            }
-                            else {
-                                warningMessage += ", " + error;
-                                errorCount++;
-                            }
-
+                        else if (info[0].equals("OPE")) {
+                            operationErrors.add(info[1]);
+                            Log.d(TAG, "onActivityResult: OPEOPEOPEOPEOPEOPE" + info[1]);
                         }
-                        warningMessage = warningMessage.substring(2);
-                        warningMessage = "The following " + String.valueOf(capacityErrors.size())
-                                + " buildings have invalid capacities:\n"
-                                + warningMessage
-                                + "\n\nAll building capacities must be non-negative integers";
+                    }
+                    if (capacityErrors.size() > 0 || operationErrors.size() > 0) {
+                        String titleError = "WARNING: ";
+                        if (capacityErrors.size() > 0) {
+                            titleError += "Invalid Capacities, ";
+                        }
+                        if (operationErrors.size() > 0) {
+                            titleError += "Invalid Operations, ";
+                        }
+                        titleError = titleError.substring(0, titleError.length() - 2);
+
+                        String operationsMessage = "";
+                        if (operationErrors.size() > 0) {
+                            operationsMessage += "The following lines have invalid operations:\n";
+                            for (String operationError : operationErrors) {
+                                operationsMessage += operationError + ", ";
+                            }
+                            operationsMessage = operationsMessage.substring(0, operationsMessage.length() - 2);
+                            operationsMessage += "\n";
+                        }
+
+                        String warningMessage = "";
+                        if (capacityErrors.size() > 0) {
+                            int errorCount = 0;
+                            for (String error : capacityErrors) {
+                                if (errorCount > 30) {
+                                    warningMessage += ", ...";
+                                    break;
+                                }
+                                else {
+                                    warningMessage += ", " + error;
+                                    errorCount++;
+                                }
+
+                            }
+                            warningMessage = warningMessage.substring(2);
+                            warningMessage = "The following " + String.valueOf(capacityErrors.size())
+                                    + " buildings have invalid capacities:\n"
+                                    + warningMessage
+                                    + "\n\nAll building capacities must be non-negative integers";
+                        }
+
+
+                        if (operationsMessage.length() > 0) {
+                            warningMessage = operationsMessage + warningMessage;
+                        }
 
 
                         new AlertDialog.Builder(getContext())
-                                .setTitle("WARNING: Invalid Capacities")
+                                .setTitle(titleError)
                                 .setMessage(warningMessage)
                                 .setNeutralButton(android.R.string.ok, null)
                                 .show();
