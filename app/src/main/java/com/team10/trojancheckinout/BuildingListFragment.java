@@ -125,12 +125,13 @@ public class BuildingListFragment extends Fragment {
                                             Server.setBuildingName(buildingIDResult, info[3], new Callback<Void>() {
                                                 @Override
                                                 public void onSuccess(Void result) {
+                                                    Log.d(TAG, "onSuccess: building name set");
 
                                                 }
 
                                                 @Override
                                                 public void onFailure(Exception exception) {
-
+                                                    Log.e(TAG, "onFailure: building name set",exception );
                                                 }
                                             });
                                         }
@@ -145,11 +146,13 @@ public class BuildingListFragment extends Fragment {
                                                     Server.setBuildingName(buildingIDResult, info[3], new Callback<Void>() {
                                                         @Override
                                                         public void onSuccess(Void result) {
+                                                            Log.d(TAG, "onSuccess: building name set");
 
                                                         }
 
                                                         @Override
                                                         public void onFailure(Exception exception) {
+                                                            Log.e(TAG, "onFailure: building name set",exception );
 
                                                         }
                                                     });
@@ -159,7 +162,6 @@ public class BuildingListFragment extends Fragment {
                                             @Override
                                             public void onFailure(Exception exception) {
                                                 Log.e(TAG, "onFailure: building update failed ", exception);
-                                                Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
                                             }
                                         });
                                     }
@@ -202,7 +204,6 @@ public class BuildingListFragment extends Fragment {
                                         @Override
                                         public void onFailure(Exception exception) {
                                             Log.e(TAG, "onFailure: building delete failed ", exception);
-                                            Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
