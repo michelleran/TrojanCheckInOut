@@ -295,7 +295,7 @@ class BuildingAdapter
 
         // refresh
         notifyDataSetChanged();
-        if (buildingNames.isEmpty() && empty != null)
+        if (buildingIds.isEmpty() && empty != null)
             empty.setVisibility(View.VISIBLE);
     }
 
