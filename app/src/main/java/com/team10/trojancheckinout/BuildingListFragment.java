@@ -121,6 +121,19 @@ public class BuildingListFragment extends Fragment {
                                 String buildingIDResult = result;
                                 if (buildingIDResult != null) {
                                     if (info[2].equals("-")) {
+                                        if (info[3].length() > 0) {
+                                            Server.setBuildingName(buildingIDResult, info[3], new Callback<Void>() {
+                                                @Override
+                                                public void onSuccess(Void result) {
+
+                                                }
+
+                                                @Override
+                                                public void onFailure(Exception exception) {
+
+                                                }
+                                            });
+                                        }
 
                                     }
                                     else {
@@ -128,6 +141,19 @@ public class BuildingListFragment extends Fragment {
                                         Server.setBuildingMaxCapacity(result, maxCapacity, new Callback<Building>() {
                                             @Override
                                             public void onSuccess(Building result) {
+                                                if (info[3].length() > 0) {
+                                                    Server.setBuildingName(buildingIDResult, info[3], new Callback<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void result) {
+
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Exception exception) {
+
+                                                        }
+                                                    });
+                                                }
                                             }
 
                                             @Override

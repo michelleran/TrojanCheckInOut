@@ -41,7 +41,7 @@ public class CSVParser {
 
                         Log.d(TAG, "parseCSV: Update or Add");
                         if (nextLine.length >= 3) {
-                            String [] entry = new String [3];
+                            String [] entry = new String [4];
                             entry[0] = opType;
                             entry[1] = nextLine[1];
                             boolean valid = Pattern.matches(CAPACITY_REGEX, nextLine[2]);
@@ -53,6 +53,9 @@ public class CSVParser {
                                 entry[2] = null;
                                 Log.d(TAG, "parseCSV: error");
                             }
+                            if (nextLine.length >= 4) {
+                                entry[3] = nextLine[3];
+                            }
                             information.add(entry);
                         }
 
@@ -60,7 +63,7 @@ public class CSVParser {
 
                     else if (opType.equals("D")) {
                         Log.d(TAG, "parseCSV: Delete");
-                        String [] entry = new String [3];
+                        String [] entry = new String [4];
                         entry[0] = opType;
                         entry[1] = nextLine[1];
                         information.add(entry);
