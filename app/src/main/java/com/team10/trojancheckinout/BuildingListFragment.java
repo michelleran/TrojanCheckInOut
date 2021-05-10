@@ -231,13 +231,16 @@ public class BuildingListFragment extends Fragment {
                                     if (result != null) {
                                         Server.removeBuilding(result, new Callback<Void>() {
                                             @Override
-                                            public void onSuccess(Void result) {
-
-                                            }
+                                            public void onSuccess(Void result) { }
 
                                             @Override
                                             public void onFailure(Exception exception) {
                                                 Log.e(TAG, "onFailure: building delete failed ", exception);
+                                                new AlertDialog.Builder(getContext())
+                                                    .setTitle("ERROR: Failed to delete " + info[1])
+                                                    .setMessage(exception.getMessage())
+                                                    .setNeutralButton(android.R.string.ok, null)
+                                                    .show();
                                             }
                                         });
                                     }
